@@ -7,11 +7,11 @@
   const SHEET_ID = '1rmlrMYfxqqE3tTd7NqNahI22FNecAKpgaK-UTOFVHP8';
   const CALL_LOG_GID = '0';
   const TICKET_GID = '1982537380';
-  const REFRESH_INTERVAL = 60000; // 60 seconds
+  const REFRESH_INTERVAL = 600000; // 10 minutes
   const CORS_PROXY = ''; // set if needed, e.g. 'https://corsproxy.io/?'
 
   function getSheetURL(gid) {
-    return `${CORS_PROXY}https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${gid}`;
+    return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${gid}`;
   }
 
   // ===== STATE =====
