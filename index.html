@@ -128,7 +128,7 @@ body{font-family:'Inter','Noto Sans Thai',sans-serif;background:var(--bg);color:
     <div class="logo">E</div>
     <div>
       <h1>ETERNITY CONTACT CENTER</h1>
-      <div class="header-sub">Daily Productivity Dashboard &mdash; Call &amp; LINE OA (2026)</div>
+      <div class="header-sub">Daily Productivity Dashboard &mdash; Call &amp; LINE OA (Jan - Mar 2026)</div>
     </div>
   </div>
   <div class="header-right">
@@ -180,8 +180,10 @@ function nick(n){return NICK[n]||n.split(' ')[0]}
 function sum(a){return a.reduce((s,v)=>s+v,0)}
 function getTot(src,a,days){return sum(days.map(d=>(src[a]||[])[d-1]||0))}
 
-// Period definitions from Format sheet
+// Period definitions from Format sheet (all 4 periods since Jan 2026)
 const PERIOD_LIST=[
+  {id:"01",code:"01 - 17 Jan 2026",label:"2 Jan - 17 Jan 2026",days:[]},
+  {id:"02",code:"02 - 01 Feb 2026",label:"18 Jan - 1 Feb 2026",days:[]},
   {id:"03",code:"03 - 16 Feb 2026",label:"2 Feb - 16 Feb 2026",days:Array.from({length:15},(_,i)=>i+2)},
   {id:"04",code:"04 - 01 Mar 2026",label:"17 Feb - 1 Mar 2026",days:Array.from({length:12},(_,i)=>i+17)}
 ];
@@ -206,19 +208,71 @@ const CSAT={
   "Yasumin Malasri":{nick:"Bell",sent:9,resp:6,dsat:0,neutral:0,csat:6,pct:100}
 };
 
-// Top contact reasons
-const CONTACT_REASONS=[
-  {cat2:"คำสั่งซื้อไม่สำเร็จ",cat3:"ไม่แนบสลิปภายในเวลาที่กำหนด",count:1084},
-  {cat2:"วิธีการสั่งซื้อ/ ชำระเงิน",cat3:"ตรวจสอบสถานะคำสั่งซื้อ",count:936},
-  {cat2:"แก้ไขข้อมูลสมาชิก",cat3:"บัญชีธนาคาร",count:555},
-  {cat2:"วิธีการแนบสลิป",cat3:"แนบสลิปหน้าแดง",count:487},
-  {cat2:"สอบถามข้อมูลทั่วไป",cat3:"อื่นๆ",count:393},
-  {cat2:"วิธีการสั่งซื้อ/ ชำระเงิน",cat3:"สอบถามข้อมูลและรายละเอียดคำสั่งซื้อ",count:246},
-  {cat2:"รับเงินรางวัล",cat3:"วิธีการรับเงินรางวัล",count:181},
-  {cat2:"มิจฉาชีพ",cat3:"สอบถามข้อมูลมิจฉาชีพ",count:158},
-  {cat2:"โอนเงินคืน",cat3:"ขอสลิปโอนเงินคืน",count:146},
-  {cat2:"สอบถามข้อมูลทั่วไป",cat3:"เลขในระบบ",count:120}
-];
+// Top contact reasons from Google Sheet Tickets (736 tickets, 4 periods)
+// Data per period for filtering
+const REASONS_BY_PERIOD={
+  "all":[
+    {cat2:"คำสั่งซื้อไม่สำเร็จ",cat3:"ไม่แนบสลิปภายในเวลาที่กำหนด",count:169},
+    {cat2:"วิธีการสั่งซื้อ/ ชำระเงิน",cat3:"ตรวจสอบสถานะคำสั่งซื้อ",count:127},
+    {cat2:"วิธีการแนบสลิป",cat3:"แนบสลิปหน้าแดง",count:97},
+    {cat2:"วิธีการสั่งซื้อ/ ชำระเงิน",cat3:"สอบถามข้อมูลและรายละเอียดคำสั่งซื้อ",count:55},
+    {cat2:"แก้ไขข้อมูลสมาชิก",cat3:"บัญชีธนาคาร",count:43},
+    {cat2:"สอบถามข้อมูลทั่วไป",cat3:"วันประกาศผลรางวัล",count:23},
+    {cat2:"มิจฉาชีพ",cat3:"สอบถามข้อมูลมิจฉาชีพ",count:22},
+    {cat2:"สอบถามข้อมูลทั่วไป",cat3:"อื่นๆ",count:20},
+    {cat2:"สอบถามข้อมูลทั่วไป",cat3:"รายละเอียดการซื้อลอตเตอรี่/การเช่าตู้เซฟ",count:20},
+    {cat2:"วิธีการสั่งซื้อ/ ชำระเงิน",cat3:"วิธีการสั่งซื้อลอตเตอรี่",count:11}
+  ],
+  "01":[
+    {cat2:"คำสั่งซื้อไม่สำเร็จ",cat3:"ไม่แนบสลิปภายในเวลาที่กำหนด",count:30},
+    {cat2:"วิธีการสั่งซื้อ/ ชำระเงิน",cat3:"ตรวจสอบสถานะคำสั่งซื้อ",count:28},
+    {cat2:"วิธีการแนบสลิป",cat3:"แนบสลิปหน้าแดง",count:18},
+    {cat2:"วิธีการสั่งซื้อ/ ชำระเงิน",cat3:"สอบถามข้อมูลและรายละเอียดคำสั่งซื้อ",count:9},
+    {cat2:"มิจฉาชีพ",cat3:"สอบถามข้อมูลมิจฉาชีพ",count:7},
+    {cat2:"สอบถามข้อมูลทั่วไป",cat3:"อื่นๆ",count:7},
+    {cat2:"สอบถามข้อมูลทั่วไป",cat3:"รายละเอียดการซื้อลอตเตอรี่/การเช่าตู้เซฟ",count:7},
+    {cat2:"แก้ไขข้อมูลสมาชิก",cat3:"บัญชีธนาคาร",count:6},
+    {cat2:"แก้ไขข้อมูลสมาชิก",cat3:"วัน/เดือน/ปีเกิด",count:4},
+    {cat2:"สอบถามข้อมูลทั่วไป",cat3:"ตรวจสอบประวัติการซื้องวดเก่า",count:3}
+  ],
+  "02":[
+    {cat2:"คำสั่งซื้อไม่สำเร็จ",cat3:"ไม่แนบสลิปภายในเวลาที่กำหนด",count:49},
+    {cat2:"วิธีการแนบสลิป",cat3:"แนบสลิปหน้าแดง",count:29},
+    {cat2:"วิธีการสั่งซื้อ/ ชำระเงิน",cat3:"ตรวจสอบสถานะคำสั่งซื้อ",count:28},
+    {cat2:"วิธีการสั่งซื้อ/ ชำระเงิน",cat3:"สอบถามข้อมูลและรายละเอียดคำสั่งซื้อ",count:22},
+    {cat2:"สอบถามข้อมูลทั่วไป",cat3:"รายละเอียดการซื้อลอตเตอรี่/การเช่าตู้เซฟ",count:9},
+    {cat2:"สอบถามข้อมูลทั่วไป",cat3:"อื่นๆ",count:7},
+    {cat2:"มิจฉาชีพ",cat3:"สอบถามข้อมูลมิจฉาชีพ",count:6},
+    {cat2:"แก้ไขข้อมูลสมาชิก",cat3:"บัญชีธนาคาร",count:6},
+    {cat2:"ปัญหาธนาคาร",cat3:"มีรายการโอนออก แต่ไม่มีสลิป",count:3},
+    {cat2:"วิธีการแนบสลิป",cat3:"แนบสลิปหน้าเหลือง",count:3}
+  ],
+  "03":[
+    {cat2:"คำสั่งซื้อไม่สำเร็จ",cat3:"ไม่แนบสลิปภายในเวลาที่กำหนด",count:66},
+    {cat2:"วิธีการสั่งซื้อ/ ชำระเงิน",cat3:"ตรวจสอบสถานะคำสั่งซื้อ",count:55},
+    {cat2:"สอบถามข้อมูลทั่วไป",cat3:"วันประกาศผลรางวัล",count:22},
+    {cat2:"แก้ไขข้อมูลสมาชิก",cat3:"บัญชีธนาคาร",count:21},
+    {cat2:"วิธีการแนบสลิป",cat3:"แนบสลิปหน้าแดง",count:20},
+    {cat2:"ปัญหาระบบ",cat3:"ระบบไม่อ่าน QR Code - SCB",count:10},
+    {cat2:"วิธีการสั่งซื้อ/ ชำระเงิน",cat3:"สอบถามข้อมูลและรายละเอียดคำสั่งซื้อ",count:6},
+    {cat2:"แก้ไขข้อมูลสมาชิก",cat3:"ชื่อ - นามสกุล",count:6},
+    {cat2:"มิจฉาชีพ",cat3:"สอบถามข้อมูลมิจฉาชีพ",count:4},
+    {cat2:"สอบถามข้อมูลทั่วไป",cat3:"เลขในระบบ",count:4}
+  ],
+  "04":[
+    {cat2:"วิธีการแนบสลิป",cat3:"แนบสลิปหน้าแดง",count:30},
+    {cat2:"คำสั่งซื้อไม่สำเร็จ",cat3:"ไม่แนบสลิปภายในเวลาที่กำหนด",count:24},
+    {cat2:"วิธีการสั่งซื้อ/ ชำระเงิน",cat3:"สอบถามข้อมูลและรายละเอียดคำสั่งซื้อ",count:18},
+    {cat2:"วิธีการสั่งซื้อ/ ชำระเงิน",cat3:"ตรวจสอบสถานะคำสั่งซื้อ",count:16},
+    {cat2:"แก้ไขข้อมูลสมาชิก",cat3:"บัญชีธนาคาร",count:10},
+    {cat2:"วิธีการสั่งซื้อ/ ชำระเงิน",cat3:"วิธีการสั่งซื้อลอตเตอรี่",count:8},
+    {cat2:"มิจฉาชีพ",cat3:"สอบถามข้อมูลมิจฉาชีพ",count:5},
+    {cat2:"บัญชีสมาชิก",cat3:"ลูกค้าเปลี่ยนไลน์ใหม่",count:5},
+    {cat2:"ปัญหาแอปพลิเคชัน",cat3:"ปัญหาอื่นๆ",count:5},
+    {cat2:"บัญชีสมาชิก",cat3:"ขั้นตอนการสมัครสมาชิก",count:4}
+  ]
+};
+const TICKET_TOTALS={"all":736,"01":141,"02":184,"03":251,"04":160};
 
 // ===== INIT FILTERS =====
 const fAgent=document.getElementById('fAgent');
@@ -335,10 +389,15 @@ function renderProdChart(agents,days,src){
   charts.prod=new Chart(document.getElementById('cProd'),{type:'line',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,interaction:{intersect:false,mode:'index'},plugins:{legend:{labels:{color:'#94a3b8',font:{size:10},usePointStyle:true}},datalabels:{color:'#e2e8f0',font:{size:9,weight:'700'},anchor:'top',align:'top',offset:2,formatter:v=>v>0?v.toLocaleString():''}},scales:{x:{title:{display:true,text:'Day of Feb 2026',color:'#64748b',font:{size:10}},ticks:{color:'#64748b',font:{size:9}},grid:{color:'rgba(28,37,69,.4)'}},y:{ticks:{color:'#64748b',font:{size:9}},grid:{color:'rgba(28,37,69,.4)'}}}}});
 }
 
-// ===== TOP 10 CONTACT REASONS =====
+// ===== TOP 10 CONTACT REASONS (filtered by period) =====
 function renderReasons(){
-  document.getElementById('reasonList').innerHTML=CONTACT_REASONS.map((r,i)=>{
-    const barPct=Math.round(r.count/CONTACT_REASONS[0].count*100);
+  const reasons=REASONS_BY_PERIOD[curPeriod]||REASONS_BY_PERIOD['all'];
+  const total=TICKET_TOTALS[curPeriod]||TICKET_TOTALS['all'];
+  const maxCount=reasons[0]?reasons[0].count:1;
+  document.querySelector('.chart-reasons .card-title').innerHTML=
+    `<div class="icon" style="background:rgba(168,85,247,.1);color:var(--purple)">&#128203;</div>Top 10 Contact Reasons <span style="font-size:10px;color:var(--text3);font-weight:400;margin-left:6px">(${total} tickets)</span>`;
+  document.getElementById('reasonList').innerHTML=reasons.map((r,i)=>{
+    const barPct=Math.round(r.count/maxCount*100);
     return `<div class="reason-item">
       <div class="reason-num">${i+1}</div>
       <div class="reason-info">
