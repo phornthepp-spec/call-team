@@ -1,163 +1,500 @@
 <!DOCTYPE html>
 <html lang="th">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="refresh" content="600">
-  <meta name="description" content="Agent Performance Dashboard - Real-time monitoring from Google Sheet">
-  <title>Agent Performance Dashboard</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="refresh" content="600">
+<title>Eternity Contact Center - Performance Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--bg:#06081a;--card:#0d1225;--card2:#141b33;--border:#1c2545;
+--cyan:#00e5ff;--purple:#a855f7;--pink:#ec4899;--green:#10b981;
+--yellow:#f59e0b;--red:#ef4444;--blue:#3b82f6;--orange:#f97316;
+--text:#e2e8f0;--text2:#94a3b8;--text3:#64748b;
+}
+body{font-family:'Inter','Noto Sans Thai',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+.header{background:linear-gradient(135deg,rgba(13,18,37,.97),rgba(30,27,75,.97),rgba(13,18,37,.97));border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(24px)}
+.header-left{display:flex;align-items:center;gap:14px}
+.logo{width:42px;height:42px;background:linear-gradient(135deg,var(--cyan),var(--purple));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#fff;box-shadow:0 0 20px rgba(0,229,255,.25)}
+.header h1{font-size:18px;font-weight:800;background:linear-gradient(90deg,var(--cyan),#818cf8,var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:.5px}
+.header-sub{font-size:11px;color:var(--text3);margin-top:1px}
+.header-right{display:flex;align-items:center;gap:14px}
+.live-badge{display:flex;align-items:center;gap:6px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);border-radius:20px;padding:5px 12px}
+.live-dot{width:7px;height:7px;background:var(--green);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,.4)}50%{box-shadow:0 0 0 6px rgba(16,185,129,0)}}
+.live-badge span{font-size:11px;color:var(--green);font-weight:700;letter-spacing:1px}
+.last-update{font-size:10px;color:var(--text3)}
+
+.filter-bar{padding:12px 28px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;border-bottom:1px solid rgba(28,37,69,.5)}
+.filter-group{display:flex;align-items:center;gap:6px}
+.filter-group label{font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.filter-select{background:var(--card);border:1px solid var(--border);color:var(--text);padding:7px 12px;border-radius:8px;font-size:12px;font-family:inherit;cursor:pointer;transition:all .2s}
+.filter-select:focus{outline:none;border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,229,255,.12)}
+.filter-select option{background:var(--card);color:var(--text)}
+.channel-tabs{display:flex;gap:4px;margin-left:auto}
+.ch-tab{background:var(--card);border:1px solid var(--border);color:var(--text3);padding:7px 16px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;transition:all .2s;font-family:inherit;letter-spacing:.3px}
+.ch-tab:hover{border-color:rgba(0,229,255,.4);color:var(--text)}
+.ch-tab.active{background:linear-gradient(135deg,rgba(0,229,255,.12),rgba(168,85,247,.12));border-color:var(--cyan);color:var(--cyan);box-shadow:0 0 12px rgba(0,229,255,.1)}
+
+.dashboard{padding:16px 28px 28px;display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;position:relative;overflow:hidden;transition:all .3s}
+.kpi:hover{border-color:rgba(0,229,255,.25);transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.4)}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.kpi:nth-child(1)::before{background:linear-gradient(90deg,var(--cyan),var(--blue))}
+.kpi:nth-child(2)::before{background:linear-gradient(90deg,var(--purple),var(--pink))}
+.kpi:nth-child(3)::before{background:linear-gradient(90deg,var(--green),var(--cyan))}
+.kpi:nth-child(4)::before{background:linear-gradient(90deg,var(--yellow),var(--orange))}
+.kpi:nth-child(5)::before{background:linear-gradient(90deg,var(--pink),var(--red))}
+.kpi-top{display:flex;align-items:center;justify-content:space-between}
+.kpi-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.kpi:nth-child(1) .kpi-icon{background:rgba(0,229,255,.1);color:var(--cyan)}
+.kpi:nth-child(2) .kpi-icon{background:rgba(168,85,247,.1);color:var(--purple)}
+.kpi:nth-child(3) .kpi-icon{background:rgba(16,185,129,.1);color:var(--green)}
+.kpi:nth-child(4) .kpi-icon{background:rgba(245,158,11,.1);color:var(--yellow)}
+.kpi:nth-child(5) .kpi-icon{background:rgba(236,72,153,.1);color:var(--pink)}
+.kpi-change{font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px}
+.kpi-up{color:var(--green);background:rgba(16,185,129,.1)}
+.kpi-down{color:var(--red);background:rgba(239,68,68,.1)}
+.kpi-neutral{color:var(--yellow);background:rgba(245,158,11,.1)}
+.kpi-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1.2px;font-weight:700;margin-top:14px}
+.kpi-value{font-size:30px;font-weight:900;margin:4px 0 2px;line-height:1;letter-spacing:-.5px}
+.kpi-sub{font-size:11px;color:var(--text3)}
+.kpi-detail{margin-top:6px;display:flex;gap:6px;flex-wrap:wrap}
+.kpi-tag{font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;letter-spacing:.3px}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;overflow:hidden}
+.card-title{font-size:13px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px;color:var(--text)}
+.card-title .icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+
+.chart-prod{grid-column:1/4}
+.chart-reasons{grid-column:4/6}
+.ranking-card{grid-column:1/3}
+.chart-csat{grid-column:3/6}
+
+.chart-container{position:relative;width:100%;height:260px}
+.chart-container.tall{height:340px}
+
+.rank-grid{display:grid;grid-template-columns:1fr;gap:6px;max-height:340px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.rank-grid::-webkit-scrollbar{width:4px}
+.rank-grid::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.rank-item{display:flex;align-items:center;gap:8px;padding:10px;border-radius:10px;background:var(--card2);border:1px solid transparent;transition:all .2s}
+.rank-item:hover{border-color:rgba(0,229,255,.15)}
+.rank-num{width:24px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;flex-shrink:0}
+.rank-1{background:linear-gradient(135deg,#fbbf24,#d97706);color:#000}
+.rank-2{background:linear-gradient(135deg,#d1d5db,#9ca3af);color:#000}
+.rank-3{background:linear-gradient(135deg,#f59e0b,#b45309);color:#fff}
+.rank-other{background:var(--border);color:var(--text3)}
+.rank-info{flex:1;min-width:0}
+.rank-name{font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rank-stats{font-size:9px;color:var(--text3);margin-top:1px}
+.rank-bar{height:3px;background:var(--border);border-radius:2px;margin-top:4px;overflow:hidden}
+.rank-bar-fill{height:100%;border-radius:2px}
+.rank-val{font-size:15px;font-weight:900;color:var(--cyan);min-width:36px;text-align:right}
+
+.reason-list{display:flex;flex-direction:column;gap:5px;max-height:340px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.reason-list::-webkit-scrollbar{width:4px}
+.reason-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.reason-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;background:var(--card2);font-size:11px}
+.reason-num{width:22px;height:22px;border-radius:6px;background:rgba(0,229,255,.1);color:var(--cyan);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0}
+.reason-info{flex:1;min-width:0}
+.reason-cat3{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.reason-cat2{font-size:9px;color:var(--text3);margin-top:1px}
+.reason-count{font-size:14px;font-weight:800;color:var(--cyan);min-width:34px;text-align:right}
+
+.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:9999;transition:opacity .5s}
+.loading-overlay.hidden{opacity:0;pointer-events:none}
+.loading-spinner{width:44px;height:44px;border:3px solid var(--border);border-top-color:var(--cyan);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-size:13px;color:var(--text3)}
+
+.bg-grid{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:.025;background-image:radial-gradient(circle,var(--cyan) 1px,transparent 1px);background-size:40px 40px}
+.main{position:relative;z-index:1}
+
+@media(max-width:1400px){
+  .dashboard{grid-template-columns:1fr 1fr}
+  .kpi{grid-column:auto!important}
+  .chart-prod,.chart-reasons,.chart-csat,.ranking-card{grid-column:1/-1!important}
+  .rank-grid{grid-template-columns:1fr}
+}
+</style>
 </head>
-
 <body>
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-text">Loading Dashboard from Google Sheet...</div>
+</div>
+<div class="bg-grid"></div>
+<div class="main">
 
-  <!-- Loading Overlay -->
-  <div class="loading-overlay" id="loadingOverlay">
-    <div class="loading-spinner"></div>
-    <div class="loading-text">Loading Dashboard...</div>
+<div class="header">
+  <div class="header-left">
+    <div class="logo">E</div>
+    <div>
+      <h1>ETERNITY CONTACT CENTER</h1>
+      <div class="header-sub">Daily Performance Dashboard &mdash; Live from Google Sheet</div>
+    </div>
   </div>
-
-  <div class="dashboard">
-
-    <!-- ===== Header ===== -->
-    <header class="header">
-      <div class="header-left">
-        <div class="logo">📊</div>
-        <div class="header-title">
-          <h1>Agent Performance Dashboard</h1>
-          <p>Real-time monitoring &bull; Lottery Plus Contact Center</p>
-        </div>
-      </div>
-      <div class="header-right">
-        <div class="filter-group">
-          <select id="agentFilter" class="filter-select">
-            <option value="all">👤 All Agents</option>
-          </select>
-          <select id="dateFilter" class="filter-select">
-            <option value="today">📅 Today</option>
-            <option value="yesterday">Yesterday</option>
-            <option value="7days">Last 7 Days</option>
-            <option value="30days">Last 30 Days</option>
-            <option value="all">All Time</option>
-          </select>
-          <select id="channelFilter" class="filter-select">
-            <option value="all">📞 All Channels</option>
-          </select>
-        </div>
-        <div class="live-badge">
-          <span class="live-dot"></span>
-          LIVE
-        </div>
-        <span class="last-updated" id="lastUpdated">--</span>
-      </div>
-    </header>
-
-    <!-- ===== KPI Cards ===== -->
-    <div class="kpi-grid">
-      <div class="kpi-card" id="kpiTotalCalls">
-        <div class="kpi-header">
-          <span class="kpi-label">Total Calls</span>
-          <span class="kpi-icon">📞</span>
-        </div>
-        <div class="kpi-value" id="valTotalCalls">--</div>
-        <div class="kpi-sub" id="subTotalCalls">Incoming: -- &bull; Outgoing: --</div>
-      </div>
-      <div class="kpi-card" id="kpiAnswered">
-        <div class="kpi-header">
-          <span class="kpi-label">Answered Rate</span>
-          <span class="kpi-icon">✅</span>
-        </div>
-        <div class="kpi-value" id="valAnswered">--%</div>
-        <div class="kpi-sub" id="subAnswered">Answered: -- &bull; Missed: --</div>
-      </div>
-      <div class="kpi-card" id="kpiAHT">
-        <div class="kpi-header">
-          <span class="kpi-label">Avg Handle Time</span>
-          <span class="kpi-icon">⏱️</span>
-        </div>
-        <div class="kpi-value" id="valAHT">--:--</div>
-        <div class="kpi-sub" id="subAHT">avg talk time per call</div>
-      </div>
-      <div class="kpi-card" id="kpiCSAT">
-        <div class="kpi-header">
-          <span class="kpi-label">CSAT Score</span>
-          <span class="kpi-icon">⭐</span>
-        </div>
-        <div class="kpi-value" id="valCSAT">--</div>
-        <div class="kpi-sub" id="subCSAT">from -- surveys</div>
-      </div>
-      <div class="kpi-card" id="kpiAvgQueue">
-        <div class="kpi-header">
-          <span class="kpi-label">Avg Queue Time</span>
-          <span class="kpi-icon">⏳</span>
-        </div>
-        <div class="kpi-value" id="valAvgQueue">--:--</div>
-        <div class="kpi-sub" id="subAvgQueue">customer wait time</div>
-      </div>
-      <div class="kpi-card" id="kpiTickets">
-        <div class="kpi-header">
-          <span class="kpi-label">Total Tickets</span>
-          <span class="kpi-icon">🎫</span>
-        </div>
-        <div class="kpi-value" id="valTickets">--</div>
-        <div class="kpi-sub" id="subTickets">Info: -- &bull; Problem: -- &bull; Request: --</div>
-      </div>
-    </div>
-
-    <!-- ===== Charts Row ===== -->
-    <div class="charts-row">
-      <div class="chart-card">
-        <div class="chart-title"><span class="icon">📈</span> Daily Call Volume Trend</div>
-        <div class="chart-container">
-          <canvas id="chartDailyVolume"></canvas>
-        </div>
-      </div>
-      <div class="chart-card">
-        <div class="chart-title"><span class="icon">🍩</span> Category Breakdown</div>
-        <div class="chart-container">
-          <canvas id="chartCategory"></canvas>
-        </div>
-      </div>
-    </div>
-
-    <!-- ===== Bottom Row ===== -->
-    <div class="bottom-row">
-      <div class="ranking-card">
-        <div class="chart-title"><span class="icon">🏆</span> Agent Ranking</div>
-        <div class="ranking-table-wrap">
-          <table class="ranking-table">
-            <thead>
-              <tr>
-                <th style="width:50px">Rank</th>
-                <th>Agent Name</th>
-                <th>Total Calls</th>
-                <th>Answered %</th>
-                <th>Avg Handle Time</th>
-                <th>CSAT</th>
-                <th style="width:100px">Performance</th>
-              </tr>
-            </thead>
-            <tbody id="rankingBody">
-              <tr>
-                <td colspan="7" style="text-align:center;color:var(--text-muted)">Loading...</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div class="chart-card">
-        <div class="chart-title"><span class="icon">📊</span> Agent Performance Comparison</div>
-        <div class="chart-container">
-          <canvas id="chartAgentComparison"></canvas>
-        </div>
-      </div>
-    </div>
-
+  <div class="header-right">
+    <div class="live-badge"><div class="live-dot"></div><span>LIVE</span></div>
+    <div class="last-update" id="lastUpdate"></div>
   </div>
+</div>
 
-  <script src="app.js"></script>
+<div class="filter-bar">
+  <div class="filter-group">
+    <label>Agent</label>
+    <select class="filter-select" id="fAgent"><option value="all">All Agents</option></select>
+  </div>
+  <div class="filter-group" style="margin-left:8px">
+    <label>Date</label>
+    <select class="filter-select" id="fDay" style="min-width:120px"><option value="all">All Days</option></select>
+  </div>
+  <div class="channel-tabs">
+    <button class="ch-tab active" data-ch="all">All</button>
+    <button class="ch-tab" data-ch="inbound">Inbound</button>
+    <button class="ch-tab" data-ch="outbound">Outbound</button>
+  </div>
+</div>
+
+<div class="dashboard">
+  <div class="kpi"><div class="kpi-top"><div class="kpi-icon">&#128202;</div><div class="kpi-change kpi-up" id="kc1"></div></div><div class="kpi-label">Total Calls</div><div class="kpi-value" id="kv1">--</div><div class="kpi-sub" id="ks1"></div><div class="kpi-detail" id="kd1"></div></div>
+  <div class="kpi"><div class="kpi-top"><div class="kpi-icon">&#128100;</div><div class="kpi-change kpi-up" id="kc2"></div></div><div class="kpi-label">Active Agents</div><div class="kpi-value" id="kv2">--</div><div class="kpi-sub" id="ks2"></div></div>
+  <div class="kpi"><div class="kpi-top"><div class="kpi-icon">&#128222;</div><div class="kpi-change" id="kc3"></div></div><div class="kpi-label">Avg Daily / Agent</div><div class="kpi-value" id="kv3">--</div><div class="kpi-sub" id="ks3"></div></div>
+  <div class="kpi"><div class="kpi-top"><div class="kpi-icon">&#11088;</div><div class="kpi-change" id="kc4"></div></div><div class="kpi-label">CSAT Score</div><div class="kpi-value" id="kv4">--</div><div class="kpi-sub" id="ks4"></div><div class="kpi-detail" id="kd4"></div></div>
+  <div class="kpi"><div class="kpi-top"><div class="kpi-icon">&#127942;</div><div class="kpi-change" id="kc5"></div></div><div class="kpi-label">Top Performer</div><div class="kpi-value" id="kv5" style="font-size:20px">--</div><div class="kpi-sub" id="ks5"></div></div>
+
+  <div class="card chart-prod"><div class="card-title"><div class="icon" style="background:rgba(0,229,255,.1);color:var(--cyan)">&#128200;</div>Daily Call Volume Trend</div><div class="chart-container"><canvas id="cProd"></canvas></div></div>
+  <div class="card chart-reasons"><div class="card-title"><div class="icon" style="background:rgba(168,85,247,.1);color:var(--purple)">&#128203;</div>Top 10 Contact Reasons</div><div class="reason-list" id="reasonList"></div></div>
+  <div class="card ranking-card"><div class="card-title"><div class="icon" style="background:rgba(245,158,11,.1);color:var(--yellow)">&#127942;</div>Agent Ranking (by Total Calls)</div><div class="rank-grid" id="rankList"></div></div>
+  <div class="card chart-csat"><div class="card-title"><div class="icon" style="background:rgba(245,158,11,.1);color:var(--yellow)">&#11088;</div>CSAT by Agent</div><div class="chart-container tall"><canvas id="cCSAT"></canvas></div></div>
+</div>
+</div>
+
+<script>
+Chart.register(ChartDataLabels);
+
+// ===== CONFIG =====
+const SHEET_ID='1rmlrMYfxqqE3tTd7NqNahI22FNecAKpgaK-UTOFVHP8';
+const CALL_GID='0';
+const TICKET_GID='1982537380';
+const REFRESH_MS=600000; // 10 minutes
+
+function sheetURL(gid){return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${gid}`}
+
+// ===== STATE =====
+let callData=[],ticketData=[],allAgents=[],allDates=[];
+let curAgent='all',curDay='all',curChannel='all';
+let charts={};
+
+// ===== NICKNAME =====
+const KNOWN_NICK={"Jantralak Paenjan":"Fai","Kanpicha Luangyai":"Namfon","Kewalin Namprom":"Fah","Kittipob Supachawengnath":"Pob","Konraphin Bunsodakorn":"Bee","Laddawan Larbkeod":"Pang","Thanapon Keawplod":"Adel","Thanapong Sribou":"Tle","watcharapon phandee":"Dinsor","Yasumin Malasri":"Bell","Thanundron Sornmanee":"Aom"};
+function nick(n){
+  if(!n)return'?';
+  if(KNOWN_NICK[n])return KNOWN_NICK[n];
+  if(n.includes('-')){return n.split('-')[0]}
+  return n.split(' ')[0];
+}
+
+// ===== CSV PARSER =====
+function parseCSV(text){
+  const lines=[];let cur='',inQ=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(c==='"'){if(inQ&&text[i+1]==='"'){cur+='"';i++}else{inQ=!inQ}}
+    else if((c==='\n'||c==='\r')&&!inQ){if(cur.length)lines.push(cur);cur='';if(c==='\r'&&text[i+1]==='\n')i++}
+    else{cur+=c}
+  }
+  if(cur.length)lines.push(cur);
+  if(!lines.length)return[];
+  const hdr=splitLine(lines[0]);
+  const rows=[];
+  for(let i=1;i<lines.length;i++){
+    const vals=splitLine(lines[i]);if(!vals.length)continue;
+    const obj={};hdr.forEach((h,idx)=>{obj[h.trim()]=(vals[idx]||'').trim()});
+    rows.push(obj);
+  }
+  return rows;
+}
+function splitLine(line){
+  const r=[];let cur='',inQ=false;
+  for(let i=0;i<line.length;i++){
+    const c=line[i];
+    if(c==='"'){if(inQ&&line[i+1]==='"'){cur+='"';i++}else{inQ=!inQ}}
+    else if(c===','&&!inQ){r.push(cur);cur=''}
+    else{cur+=c}
+  }
+  r.push(cur);return r;
+}
+
+// ===== TIME HELPERS =====
+function parseTime(s){if(!s)return 0;const p=s.split(':').map(Number);return(p[0]||0)*3600+(p[1]||0)*60+(p[2]||0)}
+function fmtTime(s){if(!s)return'0:00';const m=Math.floor(s/60),sec=Math.round(s%60);return`${m}:${sec.toString().padStart(2,'0')}`}
+function parseDate(s){if(!s)return null;try{return new Date(s)}catch{return null}}
+function dateStr(d){if(!d)return'';return`${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')}`}
+function shortDate(d){if(!d)return'';return`${d.getDate()}/${d.getMonth()+1}`}
+
+// ===== FETCH DATA =====
+async function loadData(){
+  try{
+    const [callCSV,ticketCSV]=await Promise.all([
+      fetch(sheetURL(CALL_GID)).then(r=>r.text()),
+      fetch(sheetURL(TICKET_GID)).then(r=>r.text())
+    ]);
+    callData=parseCSV(callCSV).map(r=>({
+      ...r,
+      _date:parseDate(r['Call Start Time']),
+      _dateStr:r['Call Start Time']?dateStr(parseDate(r['Call Start Time'])):'',
+      _dir:r['Direction']||'',
+      _status:r['Status']||'',
+      _agent:r['Agent Name']||'',
+      _talkSecs:parseTime(r['Talk Time']),
+      _queueSecs:parseTime(r['Queue Time']),
+      _surveySent:r['Transfer Survey']==='TRUE',
+      _score:r['Survey Score']!==''?Number(r['Survey Score']):null
+    })).filter(r=>r._agent);
+
+    ticketData=parseCSV(ticketCSV).map(r=>({
+      cat1:(r['Category 1']||'').trim(),
+      cat2:(r['Category 2']||'').trim(),
+      cat3:(r[' Category 3']||r['Category 3']||'').trim()
+    })).filter(r=>r.cat2);
+
+    // Discover agents & dates
+    allAgents=[...new Set(callData.map(r=>r._agent))].sort();
+    allDates=[...new Set(callData.map(r=>r._dateStr))].sort();
+
+    populateFilters();
+    render();
+    updateTimestamp();
+
+    document.getElementById('loadingOverlay').classList.add('hidden');
+  }catch(err){
+    console.error('Load error:',err);
+    document.getElementById('loadingOverlay').innerHTML=
+      '<div style="color:#ef4444;font-size:14px;text-align:center;padding:20px">'+
+      'Error loading data from Google Sheet<br><span style="font-size:11px;color:#94a3b8">'+
+      err.message+'<br>Make sure the sheet is shared (Anyone with link = Viewer)</span></div>';
+  }
+}
+
+// ===== FILTERS =====
+function populateFilters(){
+  const fA=document.getElementById('fAgent');
+  const prevA=fA.value;
+  fA.innerHTML='<option value="all">All Agents</option>';
+  allAgents.forEach(a=>{const o=document.createElement('option');o.value=a;o.textContent=`${nick(a)} (${a})`;fA.appendChild(o)});
+  fA.value=prevA||'all';
+
+  const fD=document.getElementById('fDay');
+  const prevD=fD.value;
+  fD.innerHTML='<option value="all">All Days</option>';
+  allDates.forEach(d=>{const dt=new Date(d);const o=document.createElement('option');o.value=d;o.textContent=shortDate(dt)+' ('+d+')';fD.appendChild(o)});
+  fD.value=prevD||'all';
+}
+
+document.getElementById('fAgent').onchange=e=>{curAgent=e.target.value;render()};
+document.getElementById('fDay').onchange=e=>{curDay=e.target.value;render()};
+document.querySelectorAll('.ch-tab').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.ch-tab').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');curChannel=b.dataset.ch;render()
+});
+
+// ===== FILTER DATA =====
+function getFiltered(){
+  let data=callData;
+  if(curAgent!=='all')data=data.filter(r=>r._agent===curAgent);
+  if(curDay!=='all')data=data.filter(r=>r._dateStr===curDay);
+  if(curChannel==='inbound')data=data.filter(r=>r._dir==='Incoming');
+  else if(curChannel==='outbound')data=data.filter(r=>r._dir==='Outgoing');
+  return data;
+}
+
+// ===== RENDER =====
+function render(){
+  const data=getFiltered();
+  const activeAgents=curAgent==='all'?allAgents:[curAgent];
+  const activeDates=curDay==='all'?allDates:[curDay];
+
+  // === KPI 1: Total Calls ===
+  const total=data.length;
+  const inCount=data.filter(r=>r._dir==='Incoming').length;
+  const outCount=data.filter(r=>r._dir==='Outgoing').length;
+  document.getElementById('kv1').textContent=total.toLocaleString();
+  document.getElementById('ks1').textContent=`${curChannel==='all'?'All Channels':curChannel} | ${activeDates.length} day(s)`;
+  document.getElementById('kc1').textContent=activeDates.length>0?activeDates[0]:'';
+  document.getElementById('kd1').innerHTML=
+    `<span class="kpi-tag" style="background:rgba(0,229,255,.15);color:var(--cyan)">IN ${inCount}</span>`+
+    `<span class="kpi-tag" style="background:rgba(168,85,247,.15);color:var(--purple)">OUT ${outCount}</span>`;
+
+  // === KPI 2: Active Agents ===
+  const working=new Set(data.map(r=>r._agent)).size;
+  document.getElementById('kv2').textContent=working;
+  document.getElementById('ks2').textContent=`of ${allAgents.length} total agents`;
+  document.getElementById('kc2').textContent='Active';document.getElementById('kc2').className='kpi-change kpi-up';
+
+  // === KPI 3: Avg Daily / Agent ===
+  const workDates=new Set(data.map(r=>r._dateStr)).size;
+  const avgDaily=workDates&&working?(total/working/workDates):0;
+  document.getElementById('kv3').textContent=avgDaily.toFixed(1);
+  document.getElementById('ks3').textContent=`calls/agent/day (${workDates} work day${workDates>1?'s':''})`;
+  document.getElementById('kc3').textContent=avgDaily>10?'High':'Normal';
+  document.getElementById('kc3').className=`kpi-change ${avgDaily>10?'kpi-up':''}`;
+
+  // === KPI 4: CSAT Score ===
+  const surveyed=data.filter(r=>r._surveySent);
+  const responded=surveyed.filter(r=>r._score!==null&&r._score>0);
+  const csatCount=responded.filter(r=>r._score>=4).length;
+  const neutralCount=responded.filter(r=>r._score>=2&&r._score<=3).length;
+  const dsatCount=responded.filter(r=>r._score===1).length;
+  const csatPct=responded.length?(csatCount/responded.length*100):0;
+  document.getElementById('kv4').textContent=responded.length?csatPct.toFixed(0)+'%':'N/A';
+  document.getElementById('ks4').textContent=`Sent: ${surveyed.length} | Responded: ${responded.length}`;
+  document.getElementById('kc4').textContent=csatPct>=80?'Excellent':csatPct>=60?'Good':responded.length?'Low':'--';
+  document.getElementById('kc4').className=`kpi-change ${csatPct>=80?'kpi-up':csatPct>=60?'kpi-neutral':'kpi-down'}`;
+  document.getElementById('kd4').innerHTML=
+    `<span class="kpi-tag" style="background:rgba(16,185,129,.15);color:var(--green)">CSAT ${csatCount}</span>`+
+    `<span class="kpi-tag" style="background:rgba(245,158,11,.15);color:var(--yellow)">Neutral ${neutralCount}</span>`+
+    `<span class="kpi-tag" style="background:rgba(239,68,68,.15);color:var(--red)">DSAT ${dsatCount}</span>`;
+
+  // === KPI 5: Top Performer ===
+  const agentCounts={};
+  data.forEach(r=>{agentCounts[r._agent]=(agentCounts[r._agent]||0)+1});
+  let topAgent='',topVal=0;
+  Object.entries(agentCounts).forEach(([a,v])=>{if(v>topVal){topVal=v;topAgent=a}});
+  document.getElementById('kv5').textContent=topAgent?nick(topAgent):'--';
+  document.getElementById('ks5').textContent=topAgent?`${topVal} calls this period`:'';
+  document.getElementById('kc5').textContent=topAgent?'#1':'';document.getElementById('kc5').className='kpi-change kpi-up';
+
+  renderProdChart(data);
+  renderReasons();
+  renderRanking(data);
+  renderCSATChart(data);
+}
+
+// ===== CHART: Daily Call Volume Trend =====
+function renderProdChart(data){
+  const daily={};
+  data.forEach(r=>{if(r._dateStr){daily[r._dateStr]=(daily[r._dateStr]||0)+1}});
+  const dates=Object.keys(daily).sort();
+  const labels=dates.map(d=>{const dt=new Date(d);return shortDate(dt)});
+  const values=dates.map(d=>daily[d]);
+
+  if(charts.prod)charts.prod.destroy();
+  const ctx=document.getElementById('cProd').getContext('2d');
+  const grad=ctx.createLinearGradient(0,0,0,250);
+  grad.addColorStop(0,'rgba(0,229,255,.2)');grad.addColorStop(1,'rgba(0,229,255,0)');
+
+  charts.prod=new Chart(ctx,{type:'line',data:{labels,datasets:[{
+    label:'Total Calls',data:values,borderColor:'#00e5ff',backgroundColor:grad,fill:true,
+    tension:.3,pointRadius:5,pointBackgroundColor:'#00e5ff',borderWidth:2.5,pointHoverRadius:7
+  }]},options:{responsive:true,maintainAspectRatio:false,interaction:{intersect:false,mode:'index'},
+    plugins:{legend:{labels:{color:'#94a3b8',font:{size:10},usePointStyle:true}},
+      datalabels:{color:'#e2e8f0',font:{size:10,weight:'700'},anchor:'top',align:'top',offset:2,formatter:v=>v>0?v.toLocaleString():''}},
+    scales:{x:{title:{display:true,text:'Date',color:'#64748b',font:{size:10}},ticks:{color:'#64748b',font:{size:9}},grid:{color:'rgba(28,37,69,.4)'}},
+      y:{ticks:{color:'#64748b',font:{size:9}},grid:{color:'rgba(28,37,69,.4)'}}}}});
+}
+
+// ===== TOP 10 CONTACT REASONS =====
+function renderReasons(){
+  const counter={};
+  ticketData.forEach(r=>{
+    const key=r.cat2+'||'+r.cat3;
+    counter[key]=(counter[key]||0)+1;
+  });
+  const sorted=Object.entries(counter).map(([k,v])=>{const[c2,c3]=k.split('||');return{cat2:c2,cat3:c3,count:v}}).sort((a,b)=>b.count-a.count).slice(0,10);
+  const maxCount=sorted[0]?sorted[0].count:1;
+  document.getElementById('reasonList').innerHTML=sorted.map((r,i)=>{
+    const barPct=Math.round(r.count/maxCount*100);
+    return`<div class="reason-item">
+      <div class="reason-num">${i+1}</div>
+      <div class="reason-info">
+        <div class="reason-cat3">${r.cat2}</div>
+        <div class="reason-cat2">${r.cat3}</div>
+        <div style="height:3px;background:var(--border);border-radius:2px;margin-top:4px;overflow:hidden"><div style="height:100%;width:${barPct}%;background:linear-gradient(90deg,var(--cyan),var(--purple));border-radius:2px"></div></div>
+      </div>
+      <div class="reason-count">${r.count}</div>
+    </div>`}).join('');
+}
+
+// ===== AGENT RANKING =====
+function renderRanking(data){
+  const agentMap={};
+  data.forEach(r=>{
+    if(!agentMap[r._agent])agentMap[r._agent]={total:0,inb:0,outb:0,answered:0};
+    agentMap[r._agent].total++;
+    if(r._dir==='Incoming')agentMap[r._agent].inb++;
+    if(r._dir==='Outgoing')agentMap[r._agent].outb++;
+    if(r._status==='Answered')agentMap[r._agent].answered++;
+  });
+  const ranked=Object.entries(agentMap).map(([name,d])=>({name,...d})).sort((a,b)=>b.total-a.total);
+  const max=ranked[0]?ranked[0].total:1;
+  document.getElementById('rankList').innerHTML=ranked.length?ranked.map((r,i)=>{
+    const barBg=i===0?'linear-gradient(90deg,#fbbf24,#f59e0b)':i===1?'linear-gradient(90deg,#d1d5db,#9ca3af)':i===2?'linear-gradient(90deg,#f59e0b,#b45309)':'linear-gradient(90deg,var(--cyan),var(--purple))';
+    const ansPct=r.total?(r.answered/r.total*100).toFixed(0)+'%':'0%';
+    return`<div class="rank-item">
+      <div class="rank-num ${i<3?'rank-'+(i+1):'rank-other'}">${i+1}</div>
+      <div class="rank-info">
+        <div class="rank-name">${nick(r.name)}</div>
+        <div class="rank-stats">IN:${r.inb} | OUT:${r.outb} | Answered:${ansPct}</div>
+        <div class="rank-bar"><div class="rank-bar-fill" style="width:${(r.total/max*100).toFixed(1)}%;background:${barBg}"></div></div>
+      </div>
+      <div class="rank-val">${r.total}</div>
+    </div>`}).join(''):'<div style="padding:20px;text-align:center;color:var(--text3);font-size:12px">No data</div>';
+}
+
+// ===== CHART: CSAT by Agent =====
+function renderCSATChart(data){
+  const agentCSAT={};
+  data.filter(r=>r._surveySent).forEach(r=>{
+    if(!agentCSAT[r._agent])agentCSAT[r._agent]={sent:0,resp:0,csat:0,neutral:0,dsat:0};
+    agentCSAT[r._agent].sent++;
+    if(r._score!==null&&r._score>0){
+      agentCSAT[r._agent].resp++;
+      if(r._score>=4)agentCSAT[r._agent].csat++;
+      else if(r._score>=2)agentCSAT[r._agent].neutral++;
+      else agentCSAT[r._agent].dsat++;
+    }
+  });
+  const agents=Object.entries(agentCSAT).filter(([,d])=>d.resp>0);
+  const labels=agents.map(([a])=>nick(a));
+  const pcts=agents.map(([,d])=>d.resp?(d.csat/d.resp*100):0);
+  const colors=pcts.map(p=>p>=80?'rgba(16,185,129,.8)':p>=60?'rgba(245,158,11,.8)':'rgba(239,68,68,.8)');
+
+  if(charts.csat)charts.csat.destroy();
+  charts.csat=new Chart(document.getElementById('cCSAT'),{type:'bar',data:{labels,datasets:[{
+    label:'CSAT %',data:pcts,backgroundColor:colors,borderRadius:6,borderSkipped:false
+  }]},options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},
+      datalabels:{color:'#fff',font:{size:11,weight:'800'},anchor:'center',align:'center',formatter:(v,ctx)=>{
+        const[,d]=agents[ctx.dataIndex];
+        return`${v.toFixed(0)}%\nS:${d.sent} R:${d.resp}\nCSAT:${d.csat} N:${d.neutral} D:${d.dsat}`;
+      }},
+      tooltip:{backgroundColor:'rgba(13,18,37,.95)',borderColor:'#1c2545',borderWidth:1,padding:10,cornerRadius:8,
+        callbacks:{label:ctx=>{const[,d]=agents[ctx.dataIndex];return[`CSAT: ${ctx.raw.toFixed(0)}%`,`Sent: ${d.sent}`,`Responded: ${d.resp}`,`CSAT (4-5): ${d.csat}`,`Neutral (2-3): ${d.neutral}`,`DSAT (1): ${d.dsat}`]}}}
+    },
+    scales:{x:{ticks:{color:'#94a3b8',font:{size:11,weight:'600'}},grid:{display:false}},
+      y:{max:100,ticks:{color:'#64748b',font:{size:9},callback:v=>v+'%'},grid:{color:'rgba(28,37,69,.4)'}}}}});
+}
+
+// ===== TIMESTAMP =====
+function updateTimestamp(){
+  document.getElementById('lastUpdate').textContent='Updated: '+new Date().toLocaleTimeString('th-TH');
+}
+
+// ===== AUTO REFRESH =====
+setInterval(async()=>{
+  try{await loadData();console.log('[Dashboard] Refreshed',new Date().toLocaleTimeString())}
+  catch(e){console.error('[Dashboard] Refresh error:',e)}
+},REFRESH_MS);
+
+// ===== INIT =====
+loadData();
+</script>
 </body>
-
 </html>
