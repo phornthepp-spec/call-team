@@ -179,20 +179,36 @@ const NICK={"Jantralak Paenjan":"Fai","Kanpicha Luangyai":"Namfon","Kewalin Namp
 function nick(n){return NICK[n]||n.split(' ')[0]}
 function sum(a){return a.reduce((s,v)=>s+v,0)}
 function getTot(src,a,days){return sum(days.map(d=>(src[a]||[])[d-1]||0))}
+// Absolute day label: 1-31=Jan, 32-59=Feb
+function dayLabel(d){return d<=31?d+' Jan':(d-31)+' Feb'}
 
-// Period definitions from Format sheet (all 4 periods since Jan 2026)
+// ===== DATA: January (31 days, from Prod.Log sheet) =====
+const JAN_ALL={"Jantralak Paenjan":[0,85,27,12,15,18,0,19,19,0,0,49,38,0,60,142,108,0,14,24,45,0,0,0,0,24,21,11,0,36,68],"Kanpicha Luangyai":[28,69,0,9,12,8,10,0,16,13,14,13,0,23,34,0,93,14,0,0,0,4,10,0,0,1,3,4,21,7,29],"Kewalin Namprom":[32,43,12,7,4,2,11,13,0,13,34,35,16,28,14,53,107,66,20,33,49,17,0,0,0,11,35,12,0,62,114],"Kittipob Supachawengnath":[128,58,0,0,10,18,24,0,16,26,43,0,0,29,31,137,131,33,0,0,0,45,25,18,29,9,0,0,25,40,97],"Konraphin Bunsodakorn":[30,53,31,0,1,6,0,10,9,13,4,0,9,7,72,125,100,54,0,0,0,6,8,5,7,3,0,11,26,42,130],"Laddawan Larbkeod":[68,70,20,0,21,42,14,33,21,0,0,0,42,59,0,120,101,0,10,21,37,0,0,0,21,0,24,11,45,0,83],"Thanapon Keawplod":[116,109,0,35,31,58,0,0,0,30,29,50,0,56,0,182,114,41,0,39,49,6,0,34,37,11,40,21,18,74,131],"Thanapong Sribou":[115,44,15,0,29,45,0,38,9,19,0,45,49,0,21,146,113,13,0,0,0,0,33,18,0,9,36,24,0,38,99],"watcharapon phandee":[119,90,17,0,16,27,27,26,0,0,0,0,103,0,74,192,103,0,8,58,37,0,7,16,0,20,27,8,0,32,56],"Yasumin Malasri":[165,117,0,0,11,22,34,28,0,0,47,23,56,0,59,207,231,0,0,0,0,85,26,25,31,0,0,15,73,67,94]};
+const JAN_IN={"Jantralak Paenjan":[0,18,10,9,5,6,0,7,10,0,0,21,10,0,14,43,78,0,7,11,21,0,0,0,0,16,11,8,0,16,26],"Kanpicha Luangyai":[15,44,0,5,11,2,7,0,10,12,8,8,0,21,23,0,70,3,0,0,0,4,9,0,0,1,3,3,15,5,25],"Kewalin Namprom":[5,1,0,2,1,1,3,3,0,1,6,9,2,8,6,17,10,1,0,5,8,4,0,0,0,6,14,8,0,21,33],"Kittipob Supachawengnath":[46,25,0,0,9,7,11,0,10,16,18,0,0,20,13,47,87,7,0,0,0,15,12,9,8,7,0,0,16,25,35],"Konraphin Bunsodakorn":[7,2,1,0,1,2,0,5,6,7,3,0,5,2,36,34,13,2,0,0,0,1,6,1,4,3,0,9,18,22,35],"Laddawan Larbkeod":[22,46,4,0,9,5,5,15,8,0,0,0,11,26,0,52,63,0,6,9,23,0,0,0,11,0,12,6,18,0,28],"Thanapon Keawplod":[23,77,0,6,14,10,0,0,0,15,17,21,0,19,0,59,93,5,0,16,27,4,0,10,14,2,6,4,4,20,40],"Thanapong Sribou":[32,17,7,0,13,8,0,6,5,11,0,10,12,0,7,35,87,6,0,0,0,0,10,6,0,7,15,9,0,26,34],"watcharapon phandee":[20,67,4,0,13,6,7,15,0,0,0,0,7,0,29,56,90,0,6,14,24,0,6,8,0,14,11,7,0,15,0],"Yasumin Malasri":[49,16,0,0,9,7,13,9,0,0,20,11,15,0,15,43,0,0,0,0,0,16,15,11,11,0,0,9,20,17,25]};
+const JAN_OUT={"Jantralak Paenjan":[0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,10],"Kanpicha Luangyai":[2,2,0,1,0,0,0,0,0,0,2,0,0,0,1,0,3,1,0,0,0,0,0,0,0,0,0,0,0,0,0],"Kewalin Namprom":[0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,2,0,0,0,0,1,0,0,0,0,0,2,0,1,2],"Kittipob Supachawengnath":[0,0,0,0,0,2,2,0,0,1,0,0,0,0,0,1,1,13,0,0,0,2,0,0,0,0,0,0,0,0,4],"Konraphin Bunsodakorn":[1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,1,3,2,1],"Laddawan Larbkeod":[1,2,14,0,1,0,0,2,1,0,0,0,1,1,0,2,3,0,1,0,1,0,0,0,0,0,0,0,1,0,9],"Thanapon Keawplod":[0,2,0,1,0,0,0,0,0,1,0,0,0,0,0,2,1,2,0,1,5,0,0,0,1,0,0,0,0,1,1],"Thanapong Sribou":[1,1,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],"watcharapon phandee":[0,8,13,0,0,0,1,0,0,0,0,0,0,0,1,2,1,0,0,0,1,0,0,1,0,0,0,0,0,1,0],"Yasumin Malasri":[3,0,0,0,1,5,1,0,0,0,0,1,1,0,3,1,0,0,0,0,0,2,1,0,0,0,0,0,0,0,9]};
+const JAN_LINE={"Jantralak Paenjan":[0,67,17,3,10,11,0,12,9,0,0,28,28,0,46,99,30,0,7,13,23,0,0,0,0,8,10,3,0,20,32],"Kanpicha Luangyai":[11,23,0,3,1,6,3,0,6,1,4,5,0,2,10,0,20,10,0,0,0,0,1,0,0,0,0,1,6,2,4],"Kewalin Namprom":[27,42,12,5,3,1,8,9,0,12,28,26,14,20,8,36,95,65,20,28,41,12,0,0,0,5,21,2,0,40,79],"Kittipob Supachawengnath":[82,33,0,0,1,9,11,0,6,9,25,0,0,9,18,89,43,13,0,0,0,28,13,9,21,2,0,0,9,15,58],"Konraphin Bunsodakorn":[22,51,30,0,0,4,0,4,3,6,1,0,4,5,36,89,87,52,0,0,0,5,2,4,3,0,0,1,5,18,94],"Laddawan Larbkeod":[45,22,2,0,11,37,9,16,12,0,0,0,30,32,0,66,35,0,3,12,13,0,0,0,10,0,12,5,26,0,46],"Thanapon Keawplod":[93,30,0,28,17,48,0,0,0,14,12,29,0,37,0,121,20,34,0,22,17,2,0,24,22,9,34,17,14,53,90],"Thanapong Sribou":[82,26,8,0,16,37,0,31,4,8,0,35,37,0,14,110,26,7,0,0,0,0,23,12,0,2,21,15,0,12,64],"watcharapon phandee":[99,15,0,0,3,21,19,11,0,0,0,0,96,0,44,134,12,0,2,44,12,0,1,7,0,6,16,1,0,16,56],"Yasumin Malasri":[113,101,0,0,1,10,20,19,0,0,27,11,40,0,41,163,231,0,0,0,0,67,10,14,20,0,0,6,53,50,60]};
+
+// ===== DATA: February (28 days, from Summary sheet) =====
+const FEB_ALL={"Jantralak Paenjan":[108,0,41,33,42,56,0,121,74,63,93,0,81,110,0,141,151,0,42,19,89,0,0,68,82,143,64,0],"Kanpicha Luangyai":[102,169,47,6,43,92,69,46,20,80,79,92,68,25,119,152,172,16,0,19,63,73,79,58,0,161,63,0],"Kewalin Namprom":[118,0,50,22,81,67,0,0,60,77,75,0,78,82,97,150,111,7,0,35,0,46,34,54,0,0,88,0],"Kittipob Supachawengnath":[142,60,0,19,47,43,54,0,56,59,85,60,0,103,131,185,0,0,27,34,50,58,34,0,57,0,0,0],"Konraphin Bunsodakorn":[119,0,54,22,92,62,71,80,0,66,65,54,81,0,165,162,70,9,0,55,69,0,0,65,73,132,0,0],"Laddawan Larbkeod":[114,114,0,36,41,60,0,116,76,81,77,0,97,122,0,0,0,15,51,28,84,84,40,79,0,86,182,0],"Thanapon Keawplod":[302,411,8,33,49,62,42,28,75,65,42,35,112,101,103,313,331,9,80,84,61,37,0,20,105,71,0,0],"Thanapong Sribou":[180,51,0,22,64,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"watcharapon phandee":[85,65,0,17,37,58,77,0,57,66,76,90,0,118,152,157,0,23,66,32,0,67,60,0,0,0,99,0],"Yasumin Malasri":[127,0,45,42,56,47,107,0,0,96,88,102,127,0,171,186,252,10,42,0,90,91,48,0,97,187,28,0]};
+const FEB_IN={"Jantralak Paenjan":[68,0,0,1,3,7,0,14,12,10,13,0,6,8,0,125,21,0,18,7,8,0,0,12,13,22,45,0],"Kanpicha Luangyai":[20,1,0,1,2,7,3,2,0,0,2,7,1,10,25,25,2,0,0,1,1,4,11,2,0,18,20,0],"Kewalin Namprom":[91,0,1,1,12,2,0,0,8,7,8,0,19,29,34,102,3,2,0,8,0,16,6,13,0,0,34,0],"Kittipob Supachawengnath":[112,4,0,1,12,7,9,0,10,8,12,14,0,24,38,156,0,0,13,7,10,12,5,0,18,0,0,0],"Konraphin Bunsodakorn":[84,0,1,2,13,4,9,21,0,7,11,9,17,0,29,124,3,3,0,7,7,0,0,13,13,13,0,0],"Laddawan Larbkeod":[71,13,0,2,4,7,0,15,9,11,11,0,6,13,0,0,0,3,23,9,9,8,7,13,0,6,13,0],"Thanapon Keawplod":[25,5,0,0,2,8,2,2,2,2,1,5,16,14,29,26,1,0,2,3,4,3,0,4,11,6,0,0],"Thanapong Sribou":[122,5,0,2,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"watcharapon phandee":[75,11,0,1,3,6,8,0,9,6,12,15,0,11,38,138,0,2,22,7,0,8,6,0,0,0,7,0],"Yasumin Malasri":[73,0,2,6,7,0,12,0,0,12,14,11,10,0,36,147,23,4,12,0,8,8,5,0,19,15,24,0]};
+const FEB_OUT={"Jantralak Paenjan":[2,0,1,0,0,0,0,1,0,0,0,0,0,8,0,3,14,0,0,0,0,0,0,0,0,0,0,0],"Kanpicha Luangyai":[0,0,0,0,1,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,1,2,0],"Kewalin Namprom":[5,0,0,1,0,1,0,0,0,0,1,0,2,4,2,5,3,0,0,0,0,1,0,0,0,0,2,0],"Kittipob Supachawengnath":[4,8,0,0,0,0,0,0,0,2,2,3,0,2,0,3,0,0,0,1,1,0,0,0,1,0,0,0],"Konraphin Bunsodakorn":[4,0,0,2,0,1,0,1,0,2,0,0,7,0,3,5,3,2,0,1,2,0,0,1,1,1,0,0],"Laddawan Larbkeod":[4,28,0,0,0,2,0,1,1,1,1,0,0,10,0,0,0,0,0,0,2,0,0,1,0,0,1,0],"Thanapon Keawplod":[2,0,0,0,0,0,0,1,0,1,0,0,0,0,2,1,0,0,0,2,1,0,0,0,7,1,0,0],"Thanapong Sribou":[0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"watcharapon phandee":[3,24,0,0,0,0,0,0,0,2,0,0,0,8,0,2,0,1,0,1,0,0,0,0,0,0,0,0],"Yasumin Malasri":[1,0,2,0,0,0,0,0,0,1,2,1,2,0,0,3,14,0,1,0,0,0,1,0,1,1,1,0]};
+const FEB_LINE={"Jantralak Paenjan":[38,0,40,32,39,49,0,106,62,53,80,0,75,94,0,13,116,0,24,12,81,0,0,56,69,121,19,0],"Kanpicha Luangyai":[82,168,47,5,40,85,66,44,20,80,77,85,67,15,92,127,170,16,0,18,62,69,68,56,0,142,41,0],"Kewalin Namprom":[22,0,49,20,69,64,0,0,52,70,66,0,57,49,61,43,105,5,0,27,0,29,28,41,0,0,52,0],"Kittipob Supachawengnath":[26,48,0,18,35,36,45,0,46,49,71,43,0,77,93,26,0,0,14,26,39,46,29,0,38,0,0,0],"Konraphin Bunsodakorn":[31,0,53,18,79,57,62,58,0,57,54,45,57,0,133,33,64,4,0,47,60,0,0,51,59,118,0,0],"Laddawan Larbkeod":[39,73,0,34,37,51,0,100,66,69,65,0,91,99,0,0,0,12,28,19,73,76,33,65,0,80,168,0],"Thanapon Keawplod":[275,406,8,33,47,54,40,25,73,62,41,30,96,87,72,286,330,9,78,79,56,34,0,16,87,64,0,0],"Thanapong Sribou":[58,41,0,20,54,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"watcharapon phandee":[7,30,0,16,34,52,69,0,48,58,64,75,0,99,114,17,0,20,44,24,0,59,54,0,0,0,92,0],"Yasumin Malasri":[53,0,41,36,49,47,95,0,0,83,72,90,115,0,135,36,215,6,29,0,82,83,42,0,77,171,3,0]};
+
+// Combine Jan(31) + Feb(28) = 59 entries per agent
+// Absolute day indexing: 1-31=Jan, 32-59=Feb
+function combine(j,f){const r={};AGENTS.forEach(a=>{r[a]=[...(j[a]||new Array(31).fill(0)),...(f[a]||new Array(28).fill(0))]});return r}
+const PROD_ALL=combine(JAN_ALL,FEB_ALL);
+const PROD_IN=combine(JAN_IN,FEB_IN);
+const PROD_OUT=combine(JAN_OUT,FEB_OUT);
+const PROD_LINE=combine(JAN_LINE,FEB_LINE);
+
+// Period definitions (abs day: 1-31=Jan, 32-59=Feb)
 const PERIOD_LIST=[
-  {id:"01",code:"01 - 17 Jan 2026",label:"2 Jan - 17 Jan 2026",days:[],note:"ข้อมูล Productivity เดือน ม.ค. ยังไม่พร้อม"},
-  {id:"02",code:"02 - 01 Feb 2026",label:"18 Jan - 1 Feb 2026",days:[1],note:"เฉพาะ 1 ก.พ. (ข้อมูล ม.ค. ยังไม่พร้อม)"},
-  {id:"03",code:"03 - 16 Feb 2026",label:"2 Feb - 16 Feb 2026",days:Array.from({length:15},(_,i)=>i+2)},
-  {id:"04",code:"04 - 01 Mar 2026",label:"17 Feb - 1 Mar 2026",days:Array.from({length:12},(_,i)=>i+17)}
+  {id:"01",code:"01 - 17 Jan 2026",label:"2 Jan - 17 Jan 2026",days:Array.from({length:16},(_,i)=>i+2)},
+  {id:"02",code:"02 - 01 Feb 2026",label:"18 Jan - 1 Feb 2026",days:Array.from({length:15},(_,i)=>i+18)},
+  {id:"03",code:"03 - 16 Feb 2026",label:"2 Feb - 16 Feb 2026",days:Array.from({length:15},(_,i)=>i+33)},
+  {id:"04",code:"04 - 01 Mar 2026",label:"17 Feb - 1 Mar 2026",days:Array.from({length:12},(_,i)=>i+48)}
 ];
-
-// Summary data
-const PROD_ALL={"Jantralak Paenjan":[108,0,41,33,42,56,0,121,74,63,93,0,81,110,0,141,151,0,42,19,89,0,0,68,82,143,64,0],"Kanpicha Luangyai":[102,169,47,6,43,92,69,46,20,80,79,92,68,25,119,152,172,16,0,19,63,73,79,58,0,161,63,0],"Kewalin Namprom":[118,0,50,22,81,67,0,0,60,77,75,0,78,82,97,150,111,7,0,35,0,46,34,54,0,0,88,0],"Kittipob Supachawengnath":[142,60,0,19,47,43,54,0,56,59,85,60,0,103,131,185,0,0,27,34,50,58,34,0,57,0,0,0],"Konraphin Bunsodakorn":[119,0,54,22,92,62,71,80,0,66,65,54,81,0,165,162,70,9,0,55,69,0,0,65,73,132,0,0],"Laddawan Larbkeod":[114,114,0,36,41,60,0,116,76,81,77,0,97,122,0,0,0,15,51,28,84,84,40,79,0,86,182,0],"Thanapon Keawplod":[302,411,8,33,49,62,42,28,75,65,42,35,112,101,103,313,331,9,80,84,61,37,0,20,105,71,0,0],"Thanapong Sribou":[180,51,0,22,64,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"watcharapon phandee":[85,65,0,17,37,58,77,0,57,66,76,90,0,118,152,157,0,23,66,32,0,67,60,0,0,0,99,0],"Yasumin Malasri":[127,0,45,42,56,47,107,0,0,96,88,102,127,0,171,186,252,10,42,0,90,91,48,0,97,187,28,0]};
-const PROD_IN={"Jantralak Paenjan":[68,0,0,1,3,7,0,14,12,10,13,0,6,8,0,125,21,0,18,7,8,0,0,12,13,22,45,0],"Kanpicha Luangyai":[20,1,0,1,2,7,3,2,0,0,2,7,1,10,25,25,2,0,0,1,1,4,11,2,0,18,20,0],"Kewalin Namprom":[91,0,1,1,12,2,0,0,8,7,8,0,19,29,34,102,3,2,0,8,0,16,6,13,0,0,34,0],"Kittipob Supachawengnath":[112,4,0,1,12,7,9,0,10,8,12,14,0,24,38,156,0,0,13,7,10,12,5,0,18,0,0,0],"Konraphin Bunsodakorn":[84,0,1,2,13,4,9,21,0,7,11,9,17,0,29,124,3,3,0,7,7,0,0,13,13,13,0,0],"Laddawan Larbkeod":[71,13,0,2,4,7,0,15,9,11,11,0,6,13,0,0,0,3,23,9,9,8,7,13,0,6,13,0],"Thanapon Keawplod":[25,5,0,0,2,8,2,2,2,2,1,5,16,14,29,26,1,0,2,3,4,3,0,4,11,6,0,0],"Thanapong Sribou":[122,5,0,2,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"watcharapon phandee":[75,11,0,1,3,6,8,0,9,6,12,15,0,11,38,138,0,2,22,7,0,8,6,0,0,0,7,0],"Yasumin Malasri":[73,0,2,6,7,0,12,0,0,12,14,11,10,0,36,147,23,4,12,0,8,8,5,0,19,15,24,0]};
-const PROD_OUT={"Jantralak Paenjan":[2,0,1,0,0,0,0,1,0,0,0,0,0,8,0,3,14,0,0,0,0,0,0,0,0,0,0,0],"Kanpicha Luangyai":[0,0,0,0,1,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,1,2,0],"Kewalin Namprom":[5,0,0,1,0,1,0,0,0,0,1,0,2,4,2,5,3,0,0,0,0,1,0,0,0,0,2,0],"Kittipob Supachawengnath":[4,8,0,0,0,0,0,0,0,2,2,3,0,2,0,3,0,0,0,1,1,0,0,0,1,0,0,0],"Konraphin Bunsodakorn":[4,0,0,2,0,1,0,1,0,2,0,0,7,0,3,5,3,2,0,1,2,0,0,1,1,1,0,0],"Laddawan Larbkeod":[4,28,0,0,0,2,0,1,1,1,1,0,0,10,0,0,0,0,0,0,2,0,0,1,0,0,1,0],"Thanapon Keawplod":[2,0,0,0,0,0,0,1,0,1,0,0,0,0,2,1,0,0,0,2,1,0,0,0,7,1,0,0],"Thanapong Sribou":[0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"watcharapon phandee":[3,24,0,0,0,0,0,0,0,2,0,0,0,8,0,2,0,1,0,1,0,0,0,0,0,0,0,0],"Yasumin Malasri":[1,0,2,0,0,0,0,0,0,1,2,1,2,0,0,3,14,0,1,0,0,0,1,0,1,1,1,0]};
-const PROD_LINE={"Jantralak Paenjan":[38,0,40,32,39,49,0,106,62,53,80,0,75,94,0,13,116,0,24,12,81,0,0,56,69,121,19,0],"Kanpicha Luangyai":[82,168,47,5,40,85,66,44,20,80,77,85,67,15,92,127,170,16,0,18,62,69,68,56,0,142,41,0],"Kewalin Namprom":[22,0,49,20,69,64,0,0,52,70,66,0,57,49,61,43,105,5,0,27,0,29,28,41,0,0,52,0],"Kittipob Supachawengnath":[26,48,0,18,35,36,45,0,46,49,71,43,0,77,93,26,0,0,14,26,39,46,29,0,38,0,0,0],"Konraphin Bunsodakorn":[31,0,53,18,79,57,62,58,0,57,54,45,57,0,133,33,64,4,0,47,60,0,0,51,59,118,0,0],"Laddawan Larbkeod":[39,73,0,34,37,51,0,100,66,69,65,0,91,99,0,0,0,12,28,19,73,76,33,65,0,80,168,0],"Thanapon Keawplod":[275,406,8,33,47,54,40,25,73,62,41,30,96,87,72,286,330,9,78,79,56,34,0,16,87,64,0,0],"Thanapong Sribou":[58,41,0,20,54,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"watcharapon phandee":[7,30,0,16,34,52,69,0,48,58,64,75,0,99,114,17,0,20,44,24,0,59,54,0,0,0,92,0],"Yasumin Malasri":[53,0,41,36,49,47,95,0,0,83,72,90,115,0,135,36,215,6,29,0,82,83,42,0,77,171,3,0]};
 
 // CSAT
 const CSAT={
@@ -209,7 +225,6 @@ const CSAT={
 };
 
 // Top contact reasons from Google Sheet Tickets (736 tickets, 4 periods)
-// Data per period for filtering
 const REASONS_BY_PERIOD={
   "all":[
     {cat2:"คำสั่งซื้อไม่สำเร็จ",cat3:"ไม่แนบสลิปภายในเวลาที่กำหนด",count:169},
@@ -279,14 +294,14 @@ const fAgent=document.getElementById('fAgent');
 AGENTS.forEach(a=>{const o=document.createElement('option');o.value=a;o.textContent=`${nick(a)} (${a})`;fAgent.appendChild(o)});
 
 const fDay=document.getElementById('fDay');
-for(let i=1;i<=28;i++){const o=document.createElement('option');o.value=i;o.textContent=`${i} Feb`;fDay.appendChild(o)}
+for(let i=1;i<=59;i++){const o=document.createElement('option');o.value=i;o.textContent=dayLabel(i);fDay.appendChild(o)}
 
 const fPeriod=document.getElementById('fPeriod');
 const pAll=document.createElement('option');pAll.value='all';pAll.textContent='All Periods';fPeriod.appendChild(pAll);
 PERIOD_LIST.forEach(p=>{const o=document.createElement('option');o.value=p.id;o.textContent=`${p.code}  (${p.label})`;fPeriod.appendChild(o)});
-fPeriod.value='03';
+fPeriod.value='all';
 
-let curAgent='all',curDay='all',curPeriod='03',curChannel='all';
+let curAgent='all',curDay='all',curPeriod='all',curChannel='all';
 let charts={};
 
 fAgent.onchange=e=>{curAgent=e.target.value;render()};
@@ -300,8 +315,8 @@ document.querySelectorAll('.ch-tab').forEach(b=>b.onclick=()=>{
 // ===== RENDER =====
 function render(){
   let activeDays;
-  if(curPeriod==='all'){activeDays=Array.from({length:28},(_,i)=>i+1)}
-  else{const p=PERIOD_LIST.find(x=>x.id===curPeriod);activeDays=p?[...p.days]:Array.from({length:28},(_,i)=>i+1)}
+  if(curPeriod==='all'){activeDays=Array.from({length:59},(_,i)=>i+1)}
+  else{const p=PERIOD_LIST.find(x=>x.id===curPeriod);activeDays=p?[...p.days]:Array.from({length:59},(_,i)=>i+1)}
   if(curDay!=='all'){const d=parseInt(curDay);activeDays=activeDays.includes(d)?[d]:[]}
 
   const activeAgents=curAgent==='all'?AGENTS:[curAgent];
@@ -318,10 +333,9 @@ function render(){
   activeAgents.forEach(a=>{totalProd+=getTot(src,a,activeDays)});
   document.getElementById('kv1').textContent=totalProd.toLocaleString();
   const chLabel=curChannel==='all'?'All Channels':curChannel==='inbound'?'Inbound Calls':curChannel==='outbound'?'Outbound Calls':'LINE OA';
+  document.getElementById('ks1').textContent=`${chLabel} | ${activeDays.length} days`;
   const pObj=curPeriod!=='all'?PERIOD_LIST.find(x=>x.id===curPeriod):null;
-  const pNote=pObj&&pObj.note?` — ${pObj.note}`:'';
-  document.getElementById('ks1').textContent=`${chLabel} | ${activeDays.length} days${pNote}`;
-  const pLabel=pObj?pObj.code:'Feb 2026';
+  const pLabel=pObj?pObj.code:'Jan - Feb 2026';
   document.getElementById('kc1').textContent=pLabel;
   let totIn=0,totOut=0,totLine=0;
   activeAgents.forEach(a=>{totIn+=getTot(PROD_IN,a,activeDays);totOut+=getTot(PROD_OUT,a,activeDays);totLine+=getTot(PROD_LINE,a,activeDays)});
@@ -373,22 +387,23 @@ function render(){
 
 // ===== CHART: Daily Productivity =====
 function renderProdChart(agents,days,src){
-  const labels=days.map(d=>`${d}`);
+  const labels=days.map(d=>dayLabel(d));
   const datasets=[];
   if(agents.length===1){
     const a=agents[0];
-    datasets.push({label:'Inbound',data:days.map(d=>(PROD_IN[a]||[])[d-1]||0),borderColor:'#00e5ff',backgroundColor:'rgba(0,229,255,.08)',fill:true,tension:.3,pointRadius:4,pointBackgroundColor:'#00e5ff',borderWidth:2});
-    datasets.push({label:'Outbound',data:days.map(d=>(PROD_OUT[a]||[])[d-1]||0),borderColor:'#a855f7',backgroundColor:'rgba(168,85,247,.08)',fill:true,tension:.3,pointRadius:4,pointBackgroundColor:'#a855f7',borderWidth:2});
-    datasets.push({label:'LINE OA',data:days.map(d=>(PROD_LINE[a]||[])[d-1]||0),borderColor:'#10b981',backgroundColor:'rgba(16,185,129,.08)',fill:true,tension:.3,pointRadius:4,pointBackgroundColor:'#10b981',borderWidth:2});
+    datasets.push({label:'Inbound',data:days.map(d=>(PROD_IN[a]||[])[d-1]||0),borderColor:'#00e5ff',backgroundColor:'rgba(0,229,255,.08)',fill:true,tension:.3,pointRadius:3,pointBackgroundColor:'#00e5ff',borderWidth:2});
+    datasets.push({label:'Outbound',data:days.map(d=>(PROD_OUT[a]||[])[d-1]||0),borderColor:'#a855f7',backgroundColor:'rgba(168,85,247,.08)',fill:true,tension:.3,pointRadius:3,pointBackgroundColor:'#a855f7',borderWidth:2});
+    datasets.push({label:'LINE OA',data:days.map(d=>(PROD_LINE[a]||[])[d-1]||0),borderColor:'#10b981',backgroundColor:'rgba(16,185,129,.08)',fill:true,tension:.3,pointRadius:3,pointBackgroundColor:'#10b981',borderWidth:2});
   } else {
     const totals=days.map(d=>{let t=0;agents.forEach(a=>{t+=(src[a]||[])[d-1]||0});return t});
     const ctx=document.getElementById('cProd').getContext('2d');
     const grad=ctx.createLinearGradient(0,0,0,250);
     grad.addColorStop(0,'rgba(0,229,255,.2)');grad.addColorStop(1,'rgba(0,229,255,0)');
-    datasets.push({label:'Total Entries',data:totals,borderColor:'#00e5ff',backgroundColor:grad,fill:true,tension:.3,pointRadius:5,pointBackgroundColor:'#00e5ff',borderWidth:2.5,pointHoverRadius:7});
+    datasets.push({label:'Total Entries',data:totals,borderColor:'#00e5ff',backgroundColor:grad,fill:true,tension:.3,pointRadius:days.length>30?2:5,pointBackgroundColor:'#00e5ff',borderWidth:2.5,pointHoverRadius:7});
   }
   if(charts.prod)charts.prod.destroy();
-  charts.prod=new Chart(document.getElementById('cProd'),{type:'line',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,interaction:{intersect:false,mode:'index'},plugins:{legend:{labels:{color:'#94a3b8',font:{size:10},usePointStyle:true}},datalabels:{color:'#e2e8f0',font:{size:9,weight:'700'},anchor:'top',align:'top',offset:2,formatter:v=>v>0?v.toLocaleString():''}},scales:{x:{title:{display:true,text:'Day of Feb 2026',color:'#64748b',font:{size:10}},ticks:{color:'#64748b',font:{size:9}},grid:{color:'rgba(28,37,69,.4)'}},y:{ticks:{color:'#64748b',font:{size:9}},grid:{color:'rgba(28,37,69,.4)'}}}}});
+  const showLabels=days.length<=20;
+  charts.prod=new Chart(document.getElementById('cProd'),{type:'line',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,interaction:{intersect:false,mode:'index'},plugins:{legend:{labels:{color:'#94a3b8',font:{size:10},usePointStyle:true}},datalabels:{display:showLabels,color:'#e2e8f0',font:{size:9,weight:'700'},anchor:'top',align:'top',offset:2,formatter:v=>v>0?v.toLocaleString():''}},scales:{x:{title:{display:true,text:'Date (Jan - Feb 2026)',color:'#64748b',font:{size:10}},ticks:{color:'#64748b',font:{size:8},maxRotation:45,autoSkip:true,maxTicksLimit:30},grid:{color:'rgba(28,37,69,.4)'}},y:{ticks:{color:'#64748b',font:{size:9}},grid:{color:'rgba(28,37,69,.4)'}}}}});
 }
 
 // ===== TOP 10 CONTACT REASONS (filtered by period) =====
@@ -421,7 +436,7 @@ function renderCSATChart(){
   charts.csat=new Chart(document.getElementById('cCSAT'),{type:'bar',data:{labels,datasets:[{label:'CSAT %',data:pcts,backgroundColor:colors,borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},datalabels:{color:'#fff',font:{size:11,weight:'800'},anchor:'center',align:'center',formatter:(v,ctx)=>{
     const a=agents[ctx.dataIndex];const c=CSAT[a];
     return `${v}%\nSent:${c.sent} Resp:${c.resp}\nCSAT:${c.csat} N:${c.neutral} D:${c.dsat}`;
-  }},tooltip:{backgroundColor:'rgba(13,18,37,.95)',borderColor:'#1c2545',borderWidth:1,padding:10,cornerRadius:8,callbacks:{label:ctx=>{const a=agents[ctx.dataIndex];const c=CSAT[a];return [`CSAT: ${ctx.raw}%`,`Total Sent: ${c.sent}`,`Responses: ${c.resp}`,`CSAT (ดีมาก+เยี่ยมเลย): ${c.csat}`,`Neutral (ดี+พอใช้): ${c.neutral}`,`DSAT (ปรับปรุง): ${c.dsat}`]}}}},scales:{x:{ticks:{color:'#94a3b8',font:{size:11,weight:'600'}},grid:{display:false}},y:{max:100,ticks:{color:'#64748b',font:{size:9},callback:v=>v+'%'},grid:{color:'rgba(28,37,69,.4)'}}}}});
+  }},tooltip:{backgroundColor:'rgba(13,18,37,.95)',borderColor:'#1c2545',borderWidth:1,padding:10,cornerRadius:8,callbacks:{label:ctx=>{const a=agents[ctx.dataIndex];const c=CSAT[a];return [`CSAT: ${ctx.raw}%`,`Total Sent: ${c.sent}`,`Responses: ${c.resp}`,`CSAT: ${c.csat}`,`Neutral: ${c.neutral}`,`DSAT: ${c.dsat}`]}}}},scales:{x:{ticks:{color:'#94a3b8',font:{size:11,weight:'600'}},grid:{display:false}},y:{max:100,ticks:{color:'#64748b',font:{size:9},callback:v=>v+'%'},grid:{color:'rgba(28,37,69,.4)'}}}}});
 }
 
 // ===== RANKING =====
