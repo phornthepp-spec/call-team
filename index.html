@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="refresh" content="600">
+  <meta name="description" content="Agent Performance Dashboard - Real-time monitoring from Google Sheet">
+  <title>Agent Performance Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Loading Dashboard...</div>
+  </div>
+
+  <div class="dashboard">
+
+    <!-- ===== Header ===== -->
+    <header class="header">
+      <div class="header-left">
+        <div class="logo">📊</div>
+        <div class="header-title">
+          <h1>Agent Performance Dashboard</h1>
+          <p>Real-time monitoring &bull; Lottery Plus Contact Center</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="filter-group">
+          <select id="agentFilter" class="filter-select">
+            <option value="all">👤 All Agents</option>
+          </select>
+          <select id="dateFilter" class="filter-select">
+            <option value="today">📅 Today</option>
+            <option value="yesterday">Yesterday</option>
+            <option value="7days">Last 7 Days</option>
+            <option value="30days">Last 30 Days</option>
+            <option value="all">All Time</option>
+          </select>
+          <select id="channelFilter" class="filter-select">
+            <option value="all">📞 All Channels</option>
+          </select>
+        </div>
+        <div class="live-badge">
+          <span class="live-dot"></span>
+          LIVE
+        </div>
+        <span class="last-updated" id="lastUpdated">--</span>
+      </div>
+    </header>
+
+    <!-- ===== KPI Cards ===== -->
+    <div class="kpi-grid">
+      <div class="kpi-card" id="kpiTotalCalls">
+        <div class="kpi-header">
+          <span class="kpi-label">Total Calls</span>
+          <span class="kpi-icon">📞</span>
+        </div>
+        <div class="kpi-value" id="valTotalCalls">--</div>
+        <div class="kpi-sub" id="subTotalCalls">Incoming: -- &bull; Outgoing: --</div>
+      </div>
+      <div class="kpi-card" id="kpiAnswered">
+        <div class="kpi-header">
+          <span class="kpi-label">Answered Rate</span>
+          <span class="kpi-icon">✅</span>
+        </div>
+        <div class="kpi-value" id="valAnswered">--%</div>
+        <div class="kpi-sub" id="subAnswered">Answered: -- &bull; Missed: --</div>
+      </div>
+      <div class="kpi-card" id="kpiAHT">
+        <div class="kpi-header">
+          <span class="kpi-label">Avg Handle Time</span>
+          <span class="kpi-icon">⏱️</span>
+        </div>
+        <div class="kpi-value" id="valAHT">--:--</div>
+        <div class="kpi-sub" id="subAHT">avg talk time per call</div>
+      </div>
+      <div class="kpi-card" id="kpiCSAT">
+        <div class="kpi-header">
+          <span class="kpi-label">CSAT Score</span>
+          <span class="kpi-icon">⭐</span>
+        </div>
+        <div class="kpi-value" id="valCSAT">--</div>
+        <div class="kpi-sub" id="subCSAT">from -- surveys</div>
+      </div>
+      <div class="kpi-card" id="kpiAvgQueue">
+        <div class="kpi-header">
+          <span class="kpi-label">Avg Queue Time</span>
+          <span class="kpi-icon">⏳</span>
+        </div>
+        <div class="kpi-value" id="valAvgQueue">--:--</div>
+        <div class="kpi-sub" id="subAvgQueue">customer wait time</div>
+      </div>
+      <div class="kpi-card" id="kpiTickets">
+        <div class="kpi-header">
+          <span class="kpi-label">Total Tickets</span>
+          <span class="kpi-icon">🎫</span>
+        </div>
+        <div class="kpi-value" id="valTickets">--</div>
+        <div class="kpi-sub" id="subTickets">Info: -- &bull; Problem: -- &bull; Request: --</div>
+      </div>
+    </div>
+
+    <!-- ===== Charts Row ===== -->
+    <div class="charts-row">
+      <div class="chart-card">
+        <div class="chart-title"><span class="icon">📈</span> Daily Call Volume Trend</div>
+        <div class="chart-container">
+          <canvas id="chartDailyVolume"></canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title"><span class="icon">🍩</span> Category Breakdown</div>
+        <div class="chart-container">
+          <canvas id="chartCategory"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== Bottom Row ===== -->
+    <div class="bottom-row">
+      <div class="ranking-card">
+        <div class="chart-title"><span class="icon">🏆</span> Agent Ranking</div>
+        <div class="ranking-table-wrap">
+          <table class="ranking-table">
+            <thead>
+              <tr>
+                <th style="width:50px">Rank</th>
+                <th>Agent Name</th>
+                <th>Total Calls</th>
+                <th>Answered %</th>
+                <th>Avg Handle Time</th>
+                <th>CSAT</th>
+                <th style="width:100px">Performance</th>
+              </tr>
+            </thead>
+            <tbody id="rankingBody">
+              <tr>
+                <td colspan="7" style="text-align:center;color:var(--text-muted)">Loading...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title"><span class="icon">📊</span> Agent Performance Comparison</div>
+        <div class="chart-container">
+          <canvas id="chartAgentComparison"></canvas>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+
+</html>
