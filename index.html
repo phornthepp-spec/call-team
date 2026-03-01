@@ -28,7 +28,6 @@ body{font-family:'Inter','Noto Sans Thai',sans-serif;background:var(--bg);color:
 .live-dot{width:7px;height:7px;background:var(--green);border-radius:50%;animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,.4)}50%{box-shadow:0 0 0 6px rgba(16,185,129,0)}}
 .live-badge span{font-size:11px;color:var(--green);font-weight:700;letter-spacing:1px}
-.last-update{font-size:10px;color:var(--text3)}
 
 .filter-bar{padding:12px 28px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;border-bottom:1px solid rgba(28,37,69,.5)}
 .filter-group{display:flex;align-items:center;gap:6px}
@@ -80,6 +79,7 @@ body{font-family:'Inter','Noto Sans Thai',sans-serif;background:var(--bg);color:
 .chart-container{position:relative;width:100%;height:260px}
 .chart-container.tall{height:340px}
 
+/* Ranking */
 .rank-grid{display:grid;grid-template-columns:1fr;gap:6px;max-height:340px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
 .rank-grid::-webkit-scrollbar{width:4px}
 .rank-grid::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
@@ -97,6 +97,7 @@ body{font-family:'Inter','Noto Sans Thai',sans-serif;background:var(--bg);color:
 .rank-bar-fill{height:100%;border-radius:2px}
 .rank-val{font-size:15px;font-weight:900;color:var(--cyan);min-width:36px;text-align:right}
 
+/* Top reasons */
 .reason-list{display:flex;flex-direction:column;gap:5px;max-height:340px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
 .reason-list::-webkit-scrollbar{width:4px}
 .reason-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
@@ -106,12 +107,6 @@ body{font-family:'Inter','Noto Sans Thai',sans-serif;background:var(--bg);color:
 .reason-cat3{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .reason-cat2{font-size:9px;color:var(--text3);margin-top:1px}
 .reason-count{font-size:14px;font-weight:800;color:var(--cyan);min-width:34px;text-align:right}
-
-.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:9999;transition:opacity .5s}
-.loading-overlay.hidden{opacity:0;pointer-events:none}
-.loading-spinner{width:44px;height:44px;border:3px solid var(--border);border-top-color:var(--cyan);border-radius:50%;animation:spin .8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.loading-text{font-size:13px;color:var(--text3)}
 
 .bg-grid{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:.025;background-image:radial-gradient(circle,var(--cyan) 1px,transparent 1px);background-size:40px 40px}
 .main{position:relative;z-index:1}
@@ -125,10 +120,6 @@ body{font-family:'Inter','Noto Sans Thai',sans-serif;background:var(--bg);color:
 </style>
 </head>
 <body>
-<div class="loading-overlay" id="loadingOverlay">
-  <div class="loading-spinner"></div>
-  <div class="loading-text">Loading Dashboard from Google Sheet...</div>
-</div>
 <div class="bg-grid"></div>
 <div class="main">
 
@@ -137,12 +128,11 @@ body{font-family:'Inter','Noto Sans Thai',sans-serif;background:var(--bg);color:
     <div class="logo">E</div>
     <div>
       <h1>ETERNITY CONTACT CENTER</h1>
-      <div class="header-sub">Daily Performance Dashboard &mdash; Live from Google Sheet</div>
+      <div class="header-sub">Daily Productivity Dashboard &mdash; Call &amp; LINE OA (2026)</div>
     </div>
   </div>
   <div class="header-right">
     <div class="live-badge"><div class="live-dot"></div><span>LIVE</span></div>
-    <div class="last-update" id="lastUpdate"></div>
   </div>
 </div>
 
@@ -152,26 +142,31 @@ body{font-family:'Inter','Noto Sans Thai',sans-serif;background:var(--bg);color:
     <select class="filter-select" id="fAgent"><option value="all">All Agents</option></select>
   </div>
   <div class="filter-group" style="margin-left:8px">
-    <label>Date</label>
-    <select class="filter-select" id="fDay" style="min-width:120px"><option value="all">All Days</option></select>
+    <label>Day</label>
+    <select class="filter-select" id="fDay" style="min-width:100px"><option value="all">All Days</option></select>
+  </div>
+  <div class="filter-group" style="margin-left:8px">
+    <label>Period</label>
+    <select class="filter-select" id="fPeriod" style="min-width:260px"></select>
   </div>
   <div class="channel-tabs">
     <button class="ch-tab active" data-ch="all">All</button>
     <button class="ch-tab" data-ch="inbound">Inbound</button>
     <button class="ch-tab" data-ch="outbound">Outbound</button>
+    <button class="ch-tab" data-ch="line">LINE OA</button>
   </div>
 </div>
 
 <div class="dashboard">
-  <div class="kpi"><div class="kpi-top"><div class="kpi-icon">&#128202;</div><div class="kpi-change kpi-up" id="kc1"></div></div><div class="kpi-label">Total Calls</div><div class="kpi-value" id="kv1">--</div><div class="kpi-sub" id="ks1"></div><div class="kpi-detail" id="kd1"></div></div>
+  <div class="kpi"><div class="kpi-top"><div class="kpi-icon">&#128202;</div><div class="kpi-change kpi-up" id="kc1"></div></div><div class="kpi-label">Total Productivity</div><div class="kpi-value" id="kv1">--</div><div class="kpi-sub" id="ks1"></div><div class="kpi-detail" id="kd1"></div></div>
   <div class="kpi"><div class="kpi-top"><div class="kpi-icon">&#128100;</div><div class="kpi-change kpi-up" id="kc2"></div></div><div class="kpi-label">Active Agents</div><div class="kpi-value" id="kv2">--</div><div class="kpi-sub" id="ks2"></div></div>
   <div class="kpi"><div class="kpi-top"><div class="kpi-icon">&#128222;</div><div class="kpi-change" id="kc3"></div></div><div class="kpi-label">Avg Daily / Agent</div><div class="kpi-value" id="kv3">--</div><div class="kpi-sub" id="ks3"></div></div>
   <div class="kpi"><div class="kpi-top"><div class="kpi-icon">&#11088;</div><div class="kpi-change" id="kc4"></div></div><div class="kpi-label">CSAT Score</div><div class="kpi-value" id="kv4">--</div><div class="kpi-sub" id="ks4"></div><div class="kpi-detail" id="kd4"></div></div>
   <div class="kpi"><div class="kpi-top"><div class="kpi-icon">&#127942;</div><div class="kpi-change" id="kc5"></div></div><div class="kpi-label">Top Performer</div><div class="kpi-value" id="kv5" style="font-size:20px">--</div><div class="kpi-sub" id="ks5"></div></div>
 
-  <div class="card chart-prod"><div class="card-title"><div class="icon" style="background:rgba(0,229,255,.1);color:var(--cyan)">&#128200;</div>Daily Call Volume Trend</div><div class="chart-container"><canvas id="cProd"></canvas></div></div>
+  <div class="card chart-prod"><div class="card-title"><div class="icon" style="background:rgba(0,229,255,.1);color:var(--cyan)">&#128200;</div>Daily Productivity Trend (Entries per Day)</div><div class="chart-container"><canvas id="cProd"></canvas></div></div>
   <div class="card chart-reasons"><div class="card-title"><div class="icon" style="background:rgba(168,85,247,.1);color:var(--purple)">&#128203;</div>Top 10 Contact Reasons</div><div class="reason-list" id="reasonList"></div></div>
-  <div class="card ranking-card"><div class="card-title"><div class="icon" style="background:rgba(245,158,11,.1);color:var(--yellow)">&#127942;</div>Agent Ranking (by Total Calls)</div><div class="rank-grid" id="rankList"></div></div>
+  <div class="card ranking-card"><div class="card-title"><div class="icon" style="background:rgba(245,158,11,.1);color:var(--yellow)">&#127942;</div>Agent Ranking (by Productivity Entries)</div><div class="rank-grid" id="rankList"></div></div>
   <div class="card chart-csat"><div class="card-title"><div class="icon" style="background:rgba(245,158,11,.1);color:var(--yellow)">&#11088;</div>CSAT by Agent</div><div class="chart-container tall"><canvas id="cCSAT"></canvas></div></div>
 </div>
 </div>
@@ -179,239 +174,172 @@ body{font-family:'Inter','Noto Sans Thai',sans-serif;background:var(--bg);color:
 <script>
 Chart.register(ChartDataLabels);
 
-// ===== CONFIG =====
-const SHEET_ID='1rmlrMYfxqqE3tTd7NqNahI22FNecAKpgaK-UTOFVHP8';
-const CALL_GID='0';
-const TICKET_GID='1982537380';
-const REFRESH_MS=600000; // 10 minutes
+const AGENTS=["Jantralak Paenjan","Kanpicha Luangyai","Kewalin Namprom","Kittipob Supachawengnath","Konraphin Bunsodakorn","Laddawan Larbkeod","Thanapon Keawplod","Thanapong Sribou","watcharapon phandee","Yasumin Malasri"];
+const NICK={"Jantralak Paenjan":"Fai","Kanpicha Luangyai":"Namfon","Kewalin Namprom":"Fah","Kittipob Supachawengnath":"Pob","Konraphin Bunsodakorn":"Bee","Laddawan Larbkeod":"Pang","Thanapon Keawplod":"Adel","Thanapong Sribou":"Tle","watcharapon phandee":"Dinsor","Yasumin Malasri":"Bell"};
+function nick(n){return NICK[n]||n.split(' ')[0]}
+function sum(a){return a.reduce((s,v)=>s+v,0)}
+function getTot(src,a,days){return sum(days.map(d=>(src[a]||[])[d-1]||0))}
 
-function sheetURL(gid){return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${gid}`}
+// Period definitions from Format sheet
+const PERIOD_LIST=[
+  {id:"03",code:"03 - 16 Feb 2026",label:"2 Feb - 16 Feb 2026",days:Array.from({length:15},(_,i)=>i+2)},
+  {id:"04",code:"04 - 01 Mar 2026",label:"17 Feb - 1 Mar 2026",days:Array.from({length:12},(_,i)=>i+17)}
+];
 
-// ===== STATE =====
-let callData=[],ticketData=[],allAgents=[],allDates=[];
-let curAgent='all',curDay='all',curChannel='all';
+// Summary data
+const PROD_ALL={"Jantralak Paenjan":[108,0,41,33,42,56,0,121,74,63,93,0,81,110,0,141,151,0,42,19,89,0,0,68,82],"Kanpicha Luangyai":[102,169,47,6,43,92,69,46,20,80,79,92,68,25,119,152,172,16,0,19,63,73,79,58,0],"Kewalin Namprom":[118,0,50,22,81,67,0,0,60,77,75,0,78,82,97,150,111,7,0,35,0,46,34,54,0],"Kittipob Supachawengnath":[142,60,0,19,47,43,54,0,56,59,85,60,0,103,131,185,0,0,27,34,50,58,34,0,57],"Konraphin Bunsodakorn":[119,0,54,22,92,62,71,80,0,66,65,54,81,0,165,162,70,9,0,55,69,0,0,65,73],"Laddawan Larbkeod":[114,114,0,36,41,60,0,116,76,81,77,0,97,122,0,0,0,15,51,28,84,84,40,79,0],"Thanapon Keawplod":[302,411,8,33,49,62,42,28,75,65,42,35,112,101,103,313,331,9,80,84,61,37,0,20,105],"Thanapong Sribou":[180,51,0,22,64,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"watcharapon phandee":[85,65,0,17,37,58,77,0,57,66,76,90,0,118,152,157,0,23,66,32,0,67,60,0,0],"Yasumin Malasri":[127,0,45,42,56,47,107,0,0,96,88,102,127,0,171,186,252,10,42,0,90,91,48,0,97]};
+const PROD_IN={"Jantralak Paenjan":[68,0,0,1,3,7,0,14,12,10,13,0,6,8,0,125,21,0,18,7,8,0,0,12,13],"Kanpicha Luangyai":[20,1,0,1,2,7,3,2,0,0,2,7,1,10,25,25,2,0,0,1,1,4,11,2,0],"Kewalin Namprom":[91,0,1,1,12,2,0,0,8,7,8,0,19,29,34,102,3,2,0,8,0,16,6,13,0],"Kittipob Supachawengnath":[112,4,0,1,12,7,9,0,10,8,12,14,0,24,38,156,0,0,13,7,10,12,5,0,18],"Konraphin Bunsodakorn":[84,0,1,2,13,4,9,21,0,7,11,9,17,0,29,124,3,3,0,7,7,0,0,13,13],"Laddawan Larbkeod":[71,13,0,2,4,7,0,15,9,11,11,0,6,13,0,0,0,3,23,9,9,8,7,13,0],"Thanapon Keawplod":[25,5,0,0,2,8,2,2,2,2,1,5,16,14,29,26,1,0,2,3,4,3,0,4,11],"Thanapong Sribou":[122,5,0,2,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"watcharapon phandee":[75,11,0,1,3,6,8,0,9,6,12,15,0,11,38,138,0,2,22,7,0,8,6,0,0],"Yasumin Malasri":[73,0,2,6,7,0,12,0,0,12,14,11,10,0,36,147,23,4,12,0,8,8,5,0,19]};
+const PROD_OUT={"Jantralak Paenjan":[2,0,1,0,0,0,0,1,0,0,0,0,0,8,0,3,14,0,0,0,0,0,0,0,0],"Kanpicha Luangyai":[0,0,0,0,1,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0],"Kewalin Namprom":[5,0,0,1,0,1,0,0,0,0,1,0,2,4,2,5,3,0,0,0,0,1,0,0,0],"Kittipob Supachawengnath":[4,8,0,0,0,0,0,0,0,2,2,3,0,2,0,3,0,0,0,1,1,0,0,0,1],"Konraphin Bunsodakorn":[4,0,0,2,0,1,0,1,0,2,0,0,7,0,3,5,3,2,0,1,2,0,0,1,1],"Laddawan Larbkeod":[4,28,0,0,0,2,0,1,1,1,1,0,0,10,0,0,0,0,0,0,2,0,0,1,0],"Thanapon Keawplod":[2,0,0,0,0,0,0,1,0,1,0,0,0,0,2,1,0,0,0,2,1,0,0,0,7],"Thanapong Sribou":[0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"watcharapon phandee":[3,24,0,0,0,0,0,0,0,2,0,0,0,8,0,2,0,1,0,1,0,0,0,0,0],"Yasumin Malasri":[1,0,2,0,0,0,0,0,0,1,2,1,2,0,0,3,14,0,1,0,0,0,1,0,1]};
+const PROD_LINE={"Jantralak Paenjan":[38,0,40,32,39,49,0,106,62,53,80,0,75,94,0,13,116,0,24,12,81,0,0,56,69],"Kanpicha Luangyai":[82,168,47,5,40,85,66,44,20,80,77,85,67,15,92,127,170,16,0,18,62,69,68,56,0],"Kewalin Namprom":[22,0,49,20,69,64,0,0,52,70,66,0,57,49,61,43,105,5,0,27,0,29,28,41,0],"Kittipob Supachawengnath":[26,48,0,18,35,36,45,0,46,49,71,43,0,77,93,26,0,0,14,26,39,46,29,0,38],"Konraphin Bunsodakorn":[31,0,53,18,79,57,62,58,0,57,54,45,57,0,133,33,64,4,0,47,60,0,0,51,59],"Laddawan Larbkeod":[39,73,0,34,37,51,0,100,66,69,65,0,91,99,0,0,0,12,28,19,73,76,33,65,0],"Thanapon Keawplod":[275,406,8,33,47,54,40,25,73,62,41,30,96,87,72,286,330,9,78,79,56,34,0,16,87],"Thanapong Sribou":[58,41,0,20,54,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"watcharapon phandee":[7,30,0,16,34,52,69,0,48,58,64,75,0,99,114,17,0,20,44,24,0,59,54,0,0],"Yasumin Malasri":[53,0,41,36,49,47,95,0,0,83,72,90,115,0,135,36,215,6,29,0,82,83,42,0,77]};
+
+// CSAT
+const CSAT={
+  "Jantralak Paenjan":{nick:"Fai",sent:2,resp:0,dsat:0,neutral:0,csat:0,pct:null},
+  "Kanpicha Luangyai":{nick:"Namfon",sent:0,resp:0,dsat:0,neutral:0,csat:0,pct:null},
+  "Kewalin Namprom":{nick:"Fah",sent:13,resp:7,dsat:1,neutral:0,csat:6,pct:86},
+  "Kittipob Supachawengnath":{nick:"Pob",sent:3,resp:3,dsat:0,neutral:0,csat:3,pct:100},
+  "Konraphin Bunsodakorn":{nick:"Bee",sent:16,resp:4,dsat:0,neutral:0,csat:4,pct:100},
+  "Laddawan Larbkeod":{nick:"Pang",sent:2,resp:1,dsat:0,neutral:0,csat:1,pct:100},
+  "Thanapon Keawplod":{nick:"Adel",sent:19,resp:7,dsat:0,neutral:2,csat:5,pct:71},
+  "Thanapong Sribou":{nick:"Tle",sent:4,resp:3,dsat:0,neutral:0,csat:3,pct:100},
+  "watcharapon phandee":{nick:"Dinsor",sent:8,resp:2,dsat:1,neutral:0,csat:1,pct:50},
+  "Yasumin Malasri":{nick:"Bell",sent:9,resp:6,dsat:0,neutral:0,csat:6,pct:100}
+};
+
+// Top contact reasons
+const CONTACT_REASONS=[
+  {cat2:"คำสั่งซื้อไม่สำเร็จ",cat3:"ไม่แนบสลิปภายในเวลาที่กำหนด",count:1084},
+  {cat2:"วิธีการสั่งซื้อ/ ชำระเงิน",cat3:"ตรวจสอบสถานะคำสั่งซื้อ",count:936},
+  {cat2:"แก้ไขข้อมูลสมาชิก",cat3:"บัญชีธนาคาร",count:555},
+  {cat2:"วิธีการแนบสลิป",cat3:"แนบสลิปหน้าแดง",count:487},
+  {cat2:"สอบถามข้อมูลทั่วไป",cat3:"อื่นๆ",count:393},
+  {cat2:"วิธีการสั่งซื้อ/ ชำระเงิน",cat3:"สอบถามข้อมูลและรายละเอียดคำสั่งซื้อ",count:246},
+  {cat2:"รับเงินรางวัล",cat3:"วิธีการรับเงินรางวัล",count:181},
+  {cat2:"มิจฉาชีพ",cat3:"สอบถามข้อมูลมิจฉาชีพ",count:158},
+  {cat2:"โอนเงินคืน",cat3:"ขอสลิปโอนเงินคืน",count:146},
+  {cat2:"สอบถามข้อมูลทั่วไป",cat3:"เลขในระบบ",count:120}
+];
+
+// ===== INIT FILTERS =====
+const fAgent=document.getElementById('fAgent');
+AGENTS.forEach(a=>{const o=document.createElement('option');o.value=a;o.textContent=`${nick(a)} (${a})`;fAgent.appendChild(o)});
+
+const fDay=document.getElementById('fDay');
+for(let i=1;i<=28;i++){const o=document.createElement('option');o.value=i;o.textContent=`${i} Feb`;fDay.appendChild(o)}
+
+const fPeriod=document.getElementById('fPeriod');
+const pAll=document.createElement('option');pAll.value='all';pAll.textContent='All Periods';fPeriod.appendChild(pAll);
+PERIOD_LIST.forEach(p=>{const o=document.createElement('option');o.value=p.id;o.textContent=`${p.code}  (${p.label})`;fPeriod.appendChild(o)});
+fPeriod.value='03';
+
+let curAgent='all',curDay='all',curPeriod='03',curChannel='all';
 let charts={};
 
-// ===== NICKNAME =====
-const KNOWN_NICK={"Jantralak Paenjan":"Fai","Kanpicha Luangyai":"Namfon","Kewalin Namprom":"Fah","Kittipob Supachawengnath":"Pob","Konraphin Bunsodakorn":"Bee","Laddawan Larbkeod":"Pang","Thanapon Keawplod":"Adel","Thanapong Sribou":"Tle","watcharapon phandee":"Dinsor","Yasumin Malasri":"Bell","Thanundron Sornmanee":"Aom"};
-function nick(n){
-  if(!n)return'?';
-  if(KNOWN_NICK[n])return KNOWN_NICK[n];
-  if(n.includes('-')){return n.split('-')[0]}
-  return n.split(' ')[0];
-}
-
-// ===== CSV PARSER =====
-function parseCSV(text){
-  const lines=[];let cur='',inQ=false;
-  for(let i=0;i<text.length;i++){
-    const c=text[i];
-    if(c==='"'){if(inQ&&text[i+1]==='"'){cur+='"';i++}else{inQ=!inQ}}
-    else if((c==='\n'||c==='\r')&&!inQ){if(cur.length)lines.push(cur);cur='';if(c==='\r'&&text[i+1]==='\n')i++}
-    else{cur+=c}
-  }
-  if(cur.length)lines.push(cur);
-  if(!lines.length)return[];
-  const hdr=splitLine(lines[0]);
-  const rows=[];
-  for(let i=1;i<lines.length;i++){
-    const vals=splitLine(lines[i]);if(!vals.length)continue;
-    const obj={};hdr.forEach((h,idx)=>{obj[h.trim()]=(vals[idx]||'').trim()});
-    rows.push(obj);
-  }
-  return rows;
-}
-function splitLine(line){
-  const r=[];let cur='',inQ=false;
-  for(let i=0;i<line.length;i++){
-    const c=line[i];
-    if(c==='"'){if(inQ&&line[i+1]==='"'){cur+='"';i++}else{inQ=!inQ}}
-    else if(c===','&&!inQ){r.push(cur);cur=''}
-    else{cur+=c}
-  }
-  r.push(cur);return r;
-}
-
-// ===== TIME HELPERS =====
-function parseTime(s){if(!s)return 0;const p=s.split(':').map(Number);return(p[0]||0)*3600+(p[1]||0)*60+(p[2]||0)}
-function fmtTime(s){if(!s)return'0:00';const m=Math.floor(s/60),sec=Math.round(s%60);return`${m}:${sec.toString().padStart(2,'0')}`}
-function parseDate(s){if(!s)return null;try{return new Date(s)}catch{return null}}
-function dateStr(d){if(!d)return'';return`${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')}`}
-function shortDate(d){if(!d)return'';return`${d.getDate()}/${d.getMonth()+1}`}
-
-// ===== FETCH DATA =====
-async function loadData(){
-  try{
-    const [callCSV,ticketCSV]=await Promise.all([
-      fetch(sheetURL(CALL_GID)).then(r=>r.text()),
-      fetch(sheetURL(TICKET_GID)).then(r=>r.text())
-    ]);
-    callData=parseCSV(callCSV).map(r=>({
-      ...r,
-      _date:parseDate(r['Call Start Time']),
-      _dateStr:r['Call Start Time']?dateStr(parseDate(r['Call Start Time'])):'',
-      _dir:r['Direction']||'',
-      _status:r['Status']||'',
-      _agent:r['Agent Name']||'',
-      _talkSecs:parseTime(r['Talk Time']),
-      _queueSecs:parseTime(r['Queue Time']),
-      _surveySent:r['Transfer Survey']==='TRUE',
-      _score:r['Survey Score']!==''?Number(r['Survey Score']):null
-    })).filter(r=>r._agent);
-
-    ticketData=parseCSV(ticketCSV).map(r=>({
-      cat1:(r['Category 1']||'').trim(),
-      cat2:(r['Category 2']||'').trim(),
-      cat3:(r[' Category 3']||r['Category 3']||'').trim()
-    })).filter(r=>r.cat2);
-
-    // Discover agents & dates
-    allAgents=[...new Set(callData.map(r=>r._agent))].sort();
-    allDates=[...new Set(callData.map(r=>r._dateStr))].sort();
-
-    populateFilters();
-    render();
-    updateTimestamp();
-
-    document.getElementById('loadingOverlay').classList.add('hidden');
-  }catch(err){
-    console.error('Load error:',err);
-    document.getElementById('loadingOverlay').innerHTML=
-      '<div style="color:#ef4444;font-size:14px;text-align:center;padding:20px">'+
-      'Error loading data from Google Sheet<br><span style="font-size:11px;color:#94a3b8">'+
-      err.message+'<br>Make sure the sheet is shared (Anyone with link = Viewer)</span></div>';
-  }
-}
-
-// ===== FILTERS =====
-function populateFilters(){
-  const fA=document.getElementById('fAgent');
-  const prevA=fA.value;
-  fA.innerHTML='<option value="all">All Agents</option>';
-  allAgents.forEach(a=>{const o=document.createElement('option');o.value=a;o.textContent=`${nick(a)} (${a})`;fA.appendChild(o)});
-  fA.value=prevA||'all';
-
-  const fD=document.getElementById('fDay');
-  const prevD=fD.value;
-  fD.innerHTML='<option value="all">All Days</option>';
-  allDates.forEach(d=>{const dt=new Date(d);const o=document.createElement('option');o.value=d;o.textContent=shortDate(dt)+' ('+d+')';fD.appendChild(o)});
-  fD.value=prevD||'all';
-}
-
-document.getElementById('fAgent').onchange=e=>{curAgent=e.target.value;render()};
-document.getElementById('fDay').onchange=e=>{curDay=e.target.value;render()};
+fAgent.onchange=e=>{curAgent=e.target.value;render()};
+fDay.onchange=e=>{curDay=e.target.value;render()};
+fPeriod.onchange=e=>{curPeriod=e.target.value;render()};
 document.querySelectorAll('.ch-tab').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('.ch-tab').forEach(x=>x.classList.remove('active'));
   b.classList.add('active');curChannel=b.dataset.ch;render()
 });
 
-// ===== FILTER DATA =====
-function getFiltered(){
-  let data=callData;
-  if(curAgent!=='all')data=data.filter(r=>r._agent===curAgent);
-  if(curDay!=='all')data=data.filter(r=>r._dateStr===curDay);
-  if(curChannel==='inbound')data=data.filter(r=>r._dir==='Incoming');
-  else if(curChannel==='outbound')data=data.filter(r=>r._dir==='Outgoing');
-  return data;
-}
-
 // ===== RENDER =====
 function render(){
-  const data=getFiltered();
-  const activeAgents=curAgent==='all'?allAgents:[curAgent];
-  const activeDates=curDay==='all'?allDates:[curDay];
+  let activeDays;
+  if(curPeriod==='all'){activeDays=Array.from({length:25},(_,i)=>i+1)}
+  else{const p=PERIOD_LIST.find(x=>x.id===curPeriod);activeDays=p?[...p.days]:Array.from({length:25},(_,i)=>i+1)}
+  if(curDay!=='all'){const d=parseInt(curDay);activeDays=activeDays.includes(d)?[d]:[]}
 
-  // === KPI 1: Total Calls ===
-  const total=data.length;
-  const inCount=data.filter(r=>r._dir==='Incoming').length;
-  const outCount=data.filter(r=>r._dir==='Outgoing').length;
-  document.getElementById('kv1').textContent=total.toLocaleString();
-  document.getElementById('ks1').textContent=`${curChannel==='all'?'All Channels':curChannel} | ${activeDates.length} day(s)`;
-  document.getElementById('kc1').textContent=activeDates.length>0?activeDates[0]:'';
+  const activeAgents=curAgent==='all'?AGENTS:[curAgent];
+  function getSrc(){
+    if(curChannel==='inbound')return PROD_IN;
+    if(curChannel==='outbound')return PROD_OUT;
+    if(curChannel==='line')return PROD_LINE;
+    return PROD_ALL;
+  }
+  const src=getSrc();
+
+  // KPI 1: Total Productivity
+  let totalProd=0;
+  activeAgents.forEach(a=>{totalProd+=getTot(src,a,activeDays)});
+  document.getElementById('kv1').textContent=totalProd.toLocaleString();
+  const chLabel=curChannel==='all'?'All Channels':curChannel==='inbound'?'Inbound Calls':curChannel==='outbound'?'Outbound Calls':'LINE OA';
+  document.getElementById('ks1').textContent=`${chLabel} | ${activeDays.length} days`;
+  const pLabel=curPeriod!=='all'?PERIOD_LIST.find(x=>x.id===curPeriod).code:'Feb 2026';
+  document.getElementById('kc1').textContent=pLabel;
+  let totIn=0,totOut=0,totLine=0;
+  activeAgents.forEach(a=>{totIn+=getTot(PROD_IN,a,activeDays);totOut+=getTot(PROD_OUT,a,activeDays);totLine+=getTot(PROD_LINE,a,activeDays)});
   document.getElementById('kd1').innerHTML=
-    `<span class="kpi-tag" style="background:rgba(0,229,255,.15);color:var(--cyan)">IN ${inCount}</span>`+
-    `<span class="kpi-tag" style="background:rgba(168,85,247,.15);color:var(--purple)">OUT ${outCount}</span>`;
+    `<span class="kpi-tag" style="background:rgba(0,229,255,.15);color:var(--cyan)">IN ${totIn.toLocaleString()}</span>`+
+    `<span class="kpi-tag" style="background:rgba(168,85,247,.15);color:var(--purple)">OUT ${totOut.toLocaleString()}</span>`+
+    `<span class="kpi-tag" style="background:rgba(16,185,129,.15);color:var(--green)">LINE ${totLine.toLocaleString()}</span>`;
 
-  // === KPI 2: Active Agents ===
-  const working=new Set(data.map(r=>r._agent)).size;
+  // KPI 2: Active Agents
+  const working=activeAgents.filter(a=>getTot(src,a,activeDays)>0).length;
   document.getElementById('kv2').textContent=working;
-  document.getElementById('ks2').textContent=`of ${allAgents.length} total agents`;
+  document.getElementById('ks2').textContent=`of ${AGENTS.length} total agents`;
   document.getElementById('kc2').textContent='Active';document.getElementById('kc2').className='kpi-change kpi-up';
 
-  // === KPI 3: Avg Daily / Agent ===
-  const workDates=new Set(data.map(r=>r._dateStr)).size;
-  const avgDaily=workDates&&working?(total/working/workDates):0;
+  // KPI 3: Avg Daily / Agent
+  const workDays=activeDays.filter(d=>{let t=0;activeAgents.forEach(a=>{t+=(src[a]||[])[d-1]||0});return t>0}).length;
+  const avgDaily=workDays&&working?(totalProd/working/workDays):0;
   document.getElementById('kv3').textContent=avgDaily.toFixed(1);
-  document.getElementById('ks3').textContent=`calls/agent/day (${workDates} work day${workDates>1?'s':''})`;
-  document.getElementById('kc3').textContent=avgDaily>10?'High':'Normal';
-  document.getElementById('kc3').className=`kpi-change ${avgDaily>10?'kpi-up':''}`;
+  document.getElementById('ks3').textContent=`entries/agent/day (${workDays} work days)`;
+  document.getElementById('kc3').textContent=avgDaily>40?'High':'Normal';
+  document.getElementById('kc3').className=`kpi-change ${avgDaily>40?'kpi-up':''}`;
 
-  // === KPI 4: CSAT Score ===
-  const surveyed=data.filter(r=>r._surveySent);
-  const responded=surveyed.filter(r=>r._score!==null&&r._score>0);
-  const csatCount=responded.filter(r=>r._score>=4).length;
-  const neutralCount=responded.filter(r=>r._score>=2&&r._score<=3).length;
-  const dsatCount=responded.filter(r=>r._score===1).length;
-  const csatPct=responded.length?(csatCount/responded.length*100):0;
-  document.getElementById('kv4').textContent=responded.length?csatPct.toFixed(0)+'%':'N/A';
-  document.getElementById('ks4').textContent=`Sent: ${surveyed.length} | Responded: ${responded.length}`;
-  document.getElementById('kc4').textContent=csatPct>=80?'Excellent':csatPct>=60?'Good':responded.length?'Low':'--';
+  // KPI 4: CSAT
+  const csatAgents=curAgent==='all'?AGENTS:[curAgent];
+  let tSent=0,tResp=0,tCSAT=0,tNeutral=0,tDSAT=0;
+  csatAgents.forEach(a=>{if(CSAT[a]){tSent+=CSAT[a].sent;tResp+=CSAT[a].resp;tCSAT+=CSAT[a].csat;tNeutral+=CSAT[a].neutral;tDSAT+=CSAT[a].dsat}});
+  const csatPct=tResp?(tCSAT/tResp*100):0;
+  document.getElementById('kv4').textContent=tResp?csatPct.toFixed(0)+'%':'N/A';
+  document.getElementById('ks4').textContent=`Total Sent: ${tSent} | Responses: ${tResp}`;
+  document.getElementById('kc4').textContent=csatPct>=80?'Excellent':csatPct>=60?'Good':'Low';
   document.getElementById('kc4').className=`kpi-change ${csatPct>=80?'kpi-up':csatPct>=60?'kpi-neutral':'kpi-down'}`;
   document.getElementById('kd4').innerHTML=
-    `<span class="kpi-tag" style="background:rgba(16,185,129,.15);color:var(--green)">CSAT ${csatCount}</span>`+
-    `<span class="kpi-tag" style="background:rgba(245,158,11,.15);color:var(--yellow)">Neutral ${neutralCount}</span>`+
-    `<span class="kpi-tag" style="background:rgba(239,68,68,.15);color:var(--red)">DSAT ${dsatCount}</span>`;
+    `<span class="kpi-tag" style="background:rgba(16,185,129,.15);color:var(--green)">CSAT ${tCSAT}</span>`+
+    `<span class="kpi-tag" style="background:rgba(245,158,11,.15);color:var(--yellow)">Neutral ${tNeutral}</span>`+
+    `<span class="kpi-tag" style="background:rgba(239,68,68,.15);color:var(--red)">DSAT ${tDSAT}</span>`;
 
-  // === KPI 5: Top Performer ===
-  const agentCounts={};
-  data.forEach(r=>{agentCounts[r._agent]=(agentCounts[r._agent]||0)+1});
+  // KPI 5: Top Performer
   let topAgent='',topVal=0;
-  Object.entries(agentCounts).forEach(([a,v])=>{if(v>topVal){topVal=v;topAgent=a}});
-  document.getElementById('kv5').textContent=topAgent?nick(topAgent):'--';
-  document.getElementById('ks5').textContent=topAgent?`${topVal} calls this period`:'';
-  document.getElementById('kc5').textContent=topAgent?'#1':'';document.getElementById('kc5').className='kpi-change kpi-up';
+  AGENTS.forEach(a=>{const v=getTot(src,a,activeDays);if(v>topVal){topVal=v;topAgent=a}});
+  document.getElementById('kv5').textContent=nick(topAgent);
+  document.getElementById('ks5').textContent=`${topVal.toLocaleString()} entries this period`;
+  document.getElementById('kc5').textContent='#1';document.getElementById('kc5').className='kpi-change kpi-up';
 
-  renderProdChart(data);
+  renderProdChart(activeAgents,activeDays,src);
   renderReasons();
-  renderRanking(data);
-  renderCSATChart(data);
+  renderCSATChart();
+  renderRanking(activeDays,src);
 }
 
-// ===== CHART: Daily Call Volume Trend =====
-function renderProdChart(data){
-  const daily={};
-  data.forEach(r=>{if(r._dateStr){daily[r._dateStr]=(daily[r._dateStr]||0)+1}});
-  const dates=Object.keys(daily).sort();
-  const labels=dates.map(d=>{const dt=new Date(d);return shortDate(dt)});
-  const values=dates.map(d=>daily[d]);
-
+// ===== CHART: Daily Productivity =====
+function renderProdChart(agents,days,src){
+  const labels=days.map(d=>`${d}`);
+  const datasets=[];
+  if(agents.length===1){
+    const a=agents[0];
+    datasets.push({label:'Inbound',data:days.map(d=>(PROD_IN[a]||[])[d-1]||0),borderColor:'#00e5ff',backgroundColor:'rgba(0,229,255,.08)',fill:true,tension:.3,pointRadius:4,pointBackgroundColor:'#00e5ff',borderWidth:2});
+    datasets.push({label:'Outbound',data:days.map(d=>(PROD_OUT[a]||[])[d-1]||0),borderColor:'#a855f7',backgroundColor:'rgba(168,85,247,.08)',fill:true,tension:.3,pointRadius:4,pointBackgroundColor:'#a855f7',borderWidth:2});
+    datasets.push({label:'LINE OA',data:days.map(d=>(PROD_LINE[a]||[])[d-1]||0),borderColor:'#10b981',backgroundColor:'rgba(16,185,129,.08)',fill:true,tension:.3,pointRadius:4,pointBackgroundColor:'#10b981',borderWidth:2});
+  } else {
+    const totals=days.map(d=>{let t=0;agents.forEach(a=>{t+=(src[a]||[])[d-1]||0});return t});
+    const ctx=document.getElementById('cProd').getContext('2d');
+    const grad=ctx.createLinearGradient(0,0,0,250);
+    grad.addColorStop(0,'rgba(0,229,255,.2)');grad.addColorStop(1,'rgba(0,229,255,0)');
+    datasets.push({label:'Total Entries',data:totals,borderColor:'#00e5ff',backgroundColor:grad,fill:true,tension:.3,pointRadius:5,pointBackgroundColor:'#00e5ff',borderWidth:2.5,pointHoverRadius:7});
+  }
   if(charts.prod)charts.prod.destroy();
-  const ctx=document.getElementById('cProd').getContext('2d');
-  const grad=ctx.createLinearGradient(0,0,0,250);
-  grad.addColorStop(0,'rgba(0,229,255,.2)');grad.addColorStop(1,'rgba(0,229,255,0)');
-
-  charts.prod=new Chart(ctx,{type:'line',data:{labels,datasets:[{
-    label:'Total Calls',data:values,borderColor:'#00e5ff',backgroundColor:grad,fill:true,
-    tension:.3,pointRadius:5,pointBackgroundColor:'#00e5ff',borderWidth:2.5,pointHoverRadius:7
-  }]},options:{responsive:true,maintainAspectRatio:false,interaction:{intersect:false,mode:'index'},
-    plugins:{legend:{labels:{color:'#94a3b8',font:{size:10},usePointStyle:true}},
-      datalabels:{color:'#e2e8f0',font:{size:10,weight:'700'},anchor:'top',align:'top',offset:2,formatter:v=>v>0?v.toLocaleString():''}},
-    scales:{x:{title:{display:true,text:'Date',color:'#64748b',font:{size:10}},ticks:{color:'#64748b',font:{size:9}},grid:{color:'rgba(28,37,69,.4)'}},
-      y:{ticks:{color:'#64748b',font:{size:9}},grid:{color:'rgba(28,37,69,.4)'}}}}});
+  charts.prod=new Chart(document.getElementById('cProd'),{type:'line',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,interaction:{intersect:false,mode:'index'},plugins:{legend:{labels:{color:'#94a3b8',font:{size:10},usePointStyle:true}},datalabels:{color:'#e2e8f0',font:{size:9,weight:'700'},anchor:'top',align:'top',offset:2,formatter:v=>v>0?v.toLocaleString():''}},scales:{x:{title:{display:true,text:'Day of Feb 2026',color:'#64748b',font:{size:10}},ticks:{color:'#64748b',font:{size:9}},grid:{color:'rgba(28,37,69,.4)'}},y:{ticks:{color:'#64748b',font:{size:9}},grid:{color:'rgba(28,37,69,.4)'}}}}});
 }
 
 // ===== TOP 10 CONTACT REASONS =====
 function renderReasons(){
-  const counter={};
-  ticketData.forEach(r=>{
-    const key=r.cat2+'||'+r.cat3;
-    counter[key]=(counter[key]||0)+1;
-  });
-  const sorted=Object.entries(counter).map(([k,v])=>{const[c2,c3]=k.split('||');return{cat2:c2,cat3:c3,count:v}}).sort((a,b)=>b.count-a.count).slice(0,10);
-  const maxCount=sorted[0]?sorted[0].count:1;
-  document.getElementById('reasonList').innerHTML=sorted.map((r,i)=>{
-    const barPct=Math.round(r.count/maxCount*100);
-    return`<div class="reason-item">
+  document.getElementById('reasonList').innerHTML=CONTACT_REASONS.map((r,i)=>{
+    const barPct=Math.round(r.count/CONTACT_REASONS[0].count*100);
+    return `<div class="reason-item">
       <div class="reason-num">${i+1}</div>
       <div class="reason-info">
         <div class="reason-cat3">${r.cat2}</div>
@@ -422,79 +350,43 @@ function renderReasons(){
     </div>`}).join('');
 }
 
-// ===== AGENT RANKING =====
-function renderRanking(data){
-  const agentMap={};
-  data.forEach(r=>{
-    if(!agentMap[r._agent])agentMap[r._agent]={total:0,inb:0,outb:0,answered:0};
-    agentMap[r._agent].total++;
-    if(r._dir==='Incoming')agentMap[r._agent].inb++;
-    if(r._dir==='Outgoing')agentMap[r._agent].outb++;
-    if(r._status==='Answered')agentMap[r._agent].answered++;
-  });
-  const ranked=Object.entries(agentMap).map(([name,d])=>({name,...d})).sort((a,b)=>b.total-a.total);
+// ===== CHART: CSAT by Agent =====
+function renderCSATChart(){
+  const agents=AGENTS.filter(a=>CSAT[a]&&CSAT[a].resp>0);
+  const labels=agents.map(a=>nick(a));
+  const pcts=agents.map(a=>CSAT[a].pct||0);
+  const colors=pcts.map(p=>p>=80?'rgba(16,185,129,.8)':p>=60?'rgba(245,158,11,.8)':'rgba(239,68,68,.8)');
+  if(charts.csat)charts.csat.destroy();
+  charts.csat=new Chart(document.getElementById('cCSAT'),{type:'bar',data:{labels,datasets:[{label:'CSAT %',data:pcts,backgroundColor:colors,borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},datalabels:{color:'#fff',font:{size:11,weight:'800'},anchor:'center',align:'center',formatter:(v,ctx)=>{
+    const a=agents[ctx.dataIndex];const c=CSAT[a];
+    return `${v}%\nSent:${c.sent} Resp:${c.resp}\nCSAT:${c.csat} N:${c.neutral} D:${c.dsat}`;
+  }},tooltip:{backgroundColor:'rgba(13,18,37,.95)',borderColor:'#1c2545',borderWidth:1,padding:10,cornerRadius:8,callbacks:{label:ctx=>{const a=agents[ctx.dataIndex];const c=CSAT[a];return [`CSAT: ${ctx.raw}%`,`Total Sent: ${c.sent}`,`Responses: ${c.resp}`,`CSAT (ดีมาก+เยี่ยมเลย): ${c.csat}`,`Neutral (ดี+พอใช้): ${c.neutral}`,`DSAT (ปรับปรุง): ${c.dsat}`]}}}},scales:{x:{ticks:{color:'#94a3b8',font:{size:11,weight:'600'}},grid:{display:false}},y:{max:100,ticks:{color:'#64748b',font:{size:9},callback:v=>v+'%'},grid:{color:'rgba(28,37,69,.4)'}}}}});
+}
+
+// ===== RANKING =====
+function renderRanking(days,src){
+  const ranked=AGENTS.map(a=>{
+    const total=getTot(src,a,days);
+    const inb=getTot(PROD_IN,a,days);
+    const outb=getTot(PROD_OUT,a,days);
+    const line=getTot(PROD_LINE,a,days);
+    return{name:a,total,inb,outb,line};
+  }).sort((a,b)=>b.total-a.total);
   const max=ranked[0]?ranked[0].total:1;
-  document.getElementById('rankList').innerHTML=ranked.length?ranked.map((r,i)=>{
+  document.getElementById('rankList').innerHTML=ranked.map((r,i)=>{
     const barBg=i===0?'linear-gradient(90deg,#fbbf24,#f59e0b)':i===1?'linear-gradient(90deg,#d1d5db,#9ca3af)':i===2?'linear-gradient(90deg,#f59e0b,#b45309)':'linear-gradient(90deg,var(--cyan),var(--purple))';
-    const ansPct=r.total?(r.answered/r.total*100).toFixed(0)+'%':'0%';
-    return`<div class="rank-item">
+    return `<div class="rank-item">
       <div class="rank-num ${i<3?'rank-'+(i+1):'rank-other'}">${i+1}</div>
       <div class="rank-info">
         <div class="rank-name">${nick(r.name)}</div>
-        <div class="rank-stats">IN:${r.inb} | OUT:${r.outb} | Answered:${ansPct}</div>
+        <div class="rank-stats">IN:${r.inb} | OUT:${r.outb} | LINE:${r.line}</div>
         <div class="rank-bar"><div class="rank-bar-fill" style="width:${(r.total/max*100).toFixed(1)}%;background:${barBg}"></div></div>
       </div>
-      <div class="rank-val">${r.total}</div>
-    </div>`}).join(''):'<div style="padding:20px;text-align:center;color:var(--text3);font-size:12px">No data</div>';
+      <div class="rank-val">${r.total.toLocaleString()}</div>
+    </div>`}).join('');
 }
 
-// ===== CHART: CSAT by Agent =====
-function renderCSATChart(data){
-  const agentCSAT={};
-  data.filter(r=>r._surveySent).forEach(r=>{
-    if(!agentCSAT[r._agent])agentCSAT[r._agent]={sent:0,resp:0,csat:0,neutral:0,dsat:0};
-    agentCSAT[r._agent].sent++;
-    if(r._score!==null&&r._score>0){
-      agentCSAT[r._agent].resp++;
-      if(r._score>=4)agentCSAT[r._agent].csat++;
-      else if(r._score>=2)agentCSAT[r._agent].neutral++;
-      else agentCSAT[r._agent].dsat++;
-    }
-  });
-  const agents=Object.entries(agentCSAT).filter(([,d])=>d.resp>0);
-  const labels=agents.map(([a])=>nick(a));
-  const pcts=agents.map(([,d])=>d.resp?(d.csat/d.resp*100):0);
-  const colors=pcts.map(p=>p>=80?'rgba(16,185,129,.8)':p>=60?'rgba(245,158,11,.8)':'rgba(239,68,68,.8)');
-
-  if(charts.csat)charts.csat.destroy();
-  charts.csat=new Chart(document.getElementById('cCSAT'),{type:'bar',data:{labels,datasets:[{
-    label:'CSAT %',data:pcts,backgroundColor:colors,borderRadius:6,borderSkipped:false
-  }]},options:{responsive:true,maintainAspectRatio:false,
-    plugins:{legend:{display:false},
-      datalabels:{color:'#fff',font:{size:11,weight:'800'},anchor:'center',align:'center',formatter:(v,ctx)=>{
-        const[,d]=agents[ctx.dataIndex];
-        return`${v.toFixed(0)}%\nS:${d.sent} R:${d.resp}\nCSAT:${d.csat} N:${d.neutral} D:${d.dsat}`;
-      }},
-      tooltip:{backgroundColor:'rgba(13,18,37,.95)',borderColor:'#1c2545',borderWidth:1,padding:10,cornerRadius:8,
-        callbacks:{label:ctx=>{const[,d]=agents[ctx.dataIndex];return[`CSAT: ${ctx.raw.toFixed(0)}%`,`Sent: ${d.sent}`,`Responded: ${d.resp}`,`CSAT (4-5): ${d.csat}`,`Neutral (2-3): ${d.neutral}`,`DSAT (1): ${d.dsat}`]}}}
-    },
-    scales:{x:{ticks:{color:'#94a3b8',font:{size:11,weight:'600'}},grid:{display:false}},
-      y:{max:100,ticks:{color:'#64748b',font:{size:9},callback:v=>v+'%'},grid:{color:'rgba(28,37,69,.4)'}}}}});
-}
-
-// ===== TIMESTAMP =====
-function updateTimestamp(){
-  document.getElementById('lastUpdate').textContent='Updated: '+new Date().toLocaleTimeString('th-TH');
-}
-
-// ===== AUTO REFRESH =====
-setInterval(async()=>{
-  try{await loadData();console.log('[Dashboard] Refreshed',new Date().toLocaleTimeString())}
-  catch(e){console.error('[Dashboard] Refresh error:',e)}
-},REFRESH_MS);
-
-// ===== INIT =====
-loadData();
+render();
 </script>
 </body>
 </html>
