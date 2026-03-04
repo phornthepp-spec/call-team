@@ -263,7 +263,7 @@
   .row.checked { background: var(--green-light); }
   .row.applicant { font-weight: 600; }
   .row.applicant:not(.checked) { background: #FFF5F5; }
-  .row.follower { font-weight: 600; }
+  .row.follower { font-weight: 600; padding-left: 38px; }
   .row.follower:not(.checked) { background: #F5F3FF; }
   .row.follower.checked { background: #F0FDF4; }
 
@@ -846,10 +846,28 @@ function renderCards() {
   const vis = attendees.filter(a => matchesFilter(a) && matchesSearch(a));
   if(!vis.length){ contentEl.innerHTML='<div class="name-list"><div class="empty"><p>'+(searchQuery?'ไม่พบ "'+escHtml(searchQuery)+'"':'ไม่มีข้อมูล')+'</p></div></div>'; return; }
 
+  // Group applicant + their followers into one card
   let h='<div class="name-list">';
+  let groupHtml = '';
+  let inGroup = false;
   for(const a of vis) {
-    h+=renderRow(a);
+    const isApp = (a.type||'').trim() === 'ผู้สมัคร';
+    if(isApp) {
+      // Close previous group if open
+      if(inGroup) { h += groupHtml + '</div>'; }
+      groupHtml = '<div class="group">' + renderRow(a);
+      inGroup = true;
+    } else {
+      // Follower
+      if(!inGroup) {
+        // Orphan follower — wrap in own group
+        h += '<div class="group">' + renderRow(a) + '</div>';
+      } else {
+        groupHtml += renderRow(a);
+      }
+    }
   }
+  if(inGroup) { h += groupHtml + '</div>'; }
   h+='</div>';
   contentEl.innerHTML=h;
 }
@@ -901,7 +919,7 @@ function renderRow(a) {
     }
   }
 
-  return '<div class="group"><div class="row '+cls+(ck?' checked':'')+'" data-row="'+a.rowNum+'">'
+  return '<div class="row '+cls+(ck?' checked':'')+'" data-row="'+a.rowNum+'">'
     +'<div class="chk-wrap"><div class="chk'+(ck?' on':'')+'" onclick="toggleCheckIn('+a.rowNum+')">'
       +'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'
     +'</div></div>'
@@ -910,7 +928,7 @@ function renderRow(a) {
       +'<div class="person-meta">'+escHtml(meta)+'</div>'
     +'</div>'
     +tblH
-  +'</div></div>';
+  +'</div>';
 }
 
 function escHtml(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}

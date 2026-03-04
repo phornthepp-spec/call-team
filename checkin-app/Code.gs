@@ -74,8 +74,8 @@ function getAttendees() {
 
   for (var i = 0; i < data.length; i++) {
     var row = data[i];
-    // Column D (row[3]) = ชื่อนามสกุล — skip if empty
-    if (!row[3] || String(row[3]).trim() === '') continue;
+    // Skip only if both name (D) and phone (E) are empty
+    if ((!row[3] || String(row[3]).trim() === '') && (!row[4] || String(row[4]).trim() === '')) continue;
 
     var checkinTimeRaw = row[14];
     var checkinTimeStr = '';
