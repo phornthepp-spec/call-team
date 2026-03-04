@@ -120,9 +120,15 @@
     border-color: rgba(255,255,255,0.5);
     color: var(--green);
   }
+  .stat-card.remain {
+    background: rgba(255,255,255,0.2);
+    border-color: rgba(255,255,255,0.15);
+    color: var(--white);
+  }
   .stat-card.total {
-    background: rgba(255,255,255,0.25);
-    border-color: rgba(255,255,255,0.2);
+    background: rgba(0,0,0,0.15);
+    border-color: rgba(0,0,0,0.1);
+    color: var(--white);
   }
   .stat-num {
     font-size: 26px;
@@ -614,7 +620,7 @@
           <div class="stat-num" id="statChecked">-</div>
           <div class="stat-label">มาแล้ว</div>
         </div>
-        <div class="stat-card">
+        <div class="stat-card remain">
           <div class="stat-num" id="statRemain">-</div>
           <div class="stat-label">ยังไม่มา</div>
         </div>
@@ -969,13 +975,33 @@ function toast(msg,isWarn){
 
 function showSummary(){
   const ci=attendees.filter(a=>a.checkinStatus==='เช็คอินแล้ว');
-  const app=ci.filter(a=>a.type==='ผู้สมัคร');
-  const wId=app.filter(a=>a.memberId.trim()), noId=app.filter(a=>!a.memberId.trim());
-  let t='=== รหัสสมาชิกผู้เข้าร่วมงาน ===\nวันที่: '+new Date().toLocaleDateString('th-TH')+'\n';
-  t+='ผู้สมัครที่มา: '+app.length+' คน (มีรหัส '+wId.length+', ไม่มีรหัส '+noId.length+')\n================================\n\n';
-  if(wId.length){t+='--- รหัสสมาชิก ---\n';wId.forEach(a=>{t+=a.memberId+'\t'+a.name+'\n';});}
-  if(noId.length){t+='\n--- ยังไม่มีรหัส ---\n';noId.forEach(a=>{t+='(ไม่มีรหัส)\t'+a.name+'\n';});}
-  $('modalInfo').textContent='ผู้สมัครเช็คอินแล้ว '+app.length+' คน (มีรหัส '+wId.length+', ไม่มีรหัส '+noId.length+')';
+  const ciApp=ci.filter(a=>(a.type||'').trim()==='ผู้สมัคร');
+  const ciFol=ci.filter(a=>(a.type||'').trim()==='ผู้ติดตาม');
+  const wId=ci.filter(a=>a.memberId && a.memberId.trim());
+  const noId=ci.filter(a=>!a.memberId || !a.memberId.trim());
+
+  let t='=== สรุปผู้เข้าร่วมงาน ===\n';
+  t+='เช็คอินทั้งหมด: '+ci.length+' คน\n';
+  t+='  ผู้สมัคร: '+ciApp.length+' คน\n';
+  t+='  ผู้ติดตาม: '+ciFol.length+' คน\n';
+  t+='มีรหัสสมาชิก: '+wId.length+' / ไม่มีรหัส: '+noId.length+'\n';
+  t+='================================\n\n';
+  if(wId.length){
+    t+='--- มีรหัสสมาชิก ('+wId.length+' คน) ---\n';
+    wId.forEach(a=>{
+      const tp=(a.type||'').trim()==='ผู้สมัคร'?'[สมัคร]':'[ติดตาม]';
+      t+=a.memberId+'\t'+a.name+'\t'+tp+'\n';
+    });
+  }
+  if(noId.length){
+    t+='\n--- ยังไม่มีรหัส ('+noId.length+' คน) ---\n';
+    noId.forEach(a=>{
+      const tp=(a.type||'').trim()==='ผู้สมัคร'?'[สมัคร]':'[ติดตาม]';
+      t+=a.name+'\t'+tp+'\n';
+    });
+  }
+
+  $('modalInfo').textContent='เช็คอินแล้ว '+ci.length+' คน (ผู้สมัคร '+ciApp.length+', ผู้ติดตาม '+ciFol.length+')';
   $('summaryText').value=t; $('modalOverlay').classList.add('show');
 }
 function closeModal(){$('modalOverlay').classList.remove('show');}
