@@ -911,7 +911,7 @@ function confirmMid(rowNum) {
 
 // ── Stats ──
 function updateStats() {
-  const active = attendees.filter(a => (a.shirtSize||'').trim() !== 'ยกเลิกสิทธิ์');
+  const active = attendees.filter(a => (a.shirtSize||'').trim() !== 'เปลี่ยนใจไม่มา');
   const c = active.filter(a=>a.checkinStatus==='เช็คอินแล้ว').length;
   $('statChecked').textContent=c; $('statRemain').textContent=active.length-c;
   $('statTotal').textContent=active.length;
@@ -929,10 +929,10 @@ function matchesSearch(a) {
 
 // ── Render ──
 function renderCards() {
-  // Filter out ยกเลิกสิทธิ์ (Column I / shirtSize field)
+  // Filter out เปลี่ยนใจไม่มา (Column I / shirtSize field)
   const active = attendees.filter(a => {
     const status = (a.shirtSize||'').trim();
-    return status !== 'ยกเลิกสิทธิ์';
+    return status !== 'เปลี่ยนใจไม่มา';
   });
   const vis = active.filter(a => matchesFilter(a) && matchesSearch(a));
   if(!vis.length){ contentEl.innerHTML='<div class="name-list"><div class="empty"><p>'+(searchQuery?'ไม่พบ "'+escHtml(searchQuery)+'"':'ไม่มีข้อมูล')+'</p></div></div>'; return; }
@@ -1010,7 +1010,7 @@ function renderRow(a) {
   }
 
   return '<div class="row-swipe" data-row="'+a.rowNum+'">'
-    +'<div class="swipe-bg" onclick="confirmCancel('+a.rowNum+')">ยกเลิกสิทธิ์</div>'
+    +'<div class="swipe-bg" onclick="confirmCancel('+a.rowNum+')">เปลี่ยนใจไม่มา</div>'
     +'<div class="row '+cls+(ck?' checked':'')+'">'
       +'<div class="chk-wrap"><div class="chk'+(ck?' on':'')+'" onclick="toggleCheckIn('+a.rowNum+')">'
         +'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'
@@ -1051,14 +1051,14 @@ document.addEventListener('touchend', () => {
 function confirmCancel(rowNum) {
   const p = attendees.find(a=>a.rowNum===rowNum);
   if(!p) return;
-  if(!confirm('ยืนยันยกเลิกสิทธิ์ของ '+p.name+' ?')) {
+  if(!confirm('ยืนยันเปลี่ยนใจไม่มาของ '+p.name+' ?')) {
     // Reset swipe
     const wrap = document.querySelector('.row-swipe[data-row="'+rowNum+'"] .row');
     if(wrap) wrap.style.transform='';
     return;
   }
-  p.shirtSize = 'ยกเลิกสิทธิ์';
-  toast('ยกเลิกสิทธิ์: '+p.name);
+  p.shirtSize = 'เปลี่ยนใจไม่มา';
+  toast('เปลี่ยนใจไม่มา: '+p.name);
   updateStats(); renderCards(); resetAutoRefresh();
   pendingRequests++;
   fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'cancelRight',rowNum})})

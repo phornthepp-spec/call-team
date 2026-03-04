@@ -156,7 +156,7 @@ function setMemberId_(rowNum, memberId) {
 
 function cancelRight_(rowNum) {
   var sheet = getSheet_();
-  sheet.getRange(rowNum, 9).setValue('ยกเลิกสิทธิ์');  // I: สถานะสิทธิ์
+  sheet.getRange(rowNum, 9).setValue('เปลี่ยนใจไม่มา');  // I: สถานะสิทธิ์
   SpreadsheetApp.flush();
   return { success: true };
 }
