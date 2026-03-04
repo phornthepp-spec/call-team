@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>LOTTERY PLUS - Event Check-in</title>
+<style>
+  :root {
+    --red: #E32321;
+    --red-dark: #C41E1A;
+    --red-deep: #A01812;
+    --white: #FFFFFF;
+    --off-white: #FAFAFA;
+    --gray-100: #F2F2F2;
+    --gray-200: #E5E5E5;
+    --gray-300: #D4D4D4;
+    --gray-400: #A3A3A3;
+    --gray-500: #737373;
+    --gray-600: #525252;
+    --gray-800: #262626;
+    --green: #16A34A;
+    --green-light: #DCFCE7;
+    --green-dark: #15803D;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { height:100%; overflow:hidden; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    background: var(--white);
+    color: var(--gray-800);
+  }
+
+  /* ─── App Shell ─── */
+  .app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
+  }
+
+  /* ─── Fixed Header Zone ─── */
+  .header-zone {
+    flex-shrink: 0;
+    z-index: 100;
+  }
+
+  /* ─── Header ─── */
+  .header {
+    background: var(--red);
+    color: var(--white);
+    padding: 16px 20px 18px;
+    text-align: center;
+    position: relative;
+  }
+  .live-indicator {
+    position: absolute;
+    right: 14px;
+    top: 14px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+    opacity: 0.85;
+    font-weight: 500;
+  }
+  .live-dot {
+    width: 7px;
+    height: 7px;
+    background: #4ADE80;
+    border-radius: 50%;
+    animation: pulse 1.5s ease-in-out infinite;
+    box-shadow: 0 0 6px rgba(74,222,128,0.5);
+  }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.8)} }
+
+  .brand-logo {
+    width: 56px;
+    height: 56px;
+    background: var(--white);
+    border-radius: 14px;
+    margin: 0 auto 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  .brand-logo svg { width: 32px; height: 32px; }
+  .brand-name {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 3px;
+    line-height: 1.2;
+  }
+  .brand-sub {
+    font-size: 11px;
+    font-weight: 500;
+    opacity: 0.8;
+    letter-spacing: 2px;
+    margin-top: 2px;
+  }
+
+  /* Stats Cards */
+  .stats-bar {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 14px;
+  }
+  .stat-card {
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 8px 20px;
+    text-align: center;
+    min-width: 100px;
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+  .stat-card.green {
+    background: rgba(255,255,255,0.95);
+    border-color: rgba(255,255,255,0.5);
+    color: var(--green);
+  }
+  .stat-num {
+    font-size: 26px;
+    font-weight: 900;
+    line-height: 1.1;
+  }
+  .stat-label {
+    font-size: 11px;
+    font-weight: 600;
+    opacity: 0.9;
+    margin-top: 2px;
+  }
+
+  /* ─── Toolbar ─── */
+  .toolbar {
+    background: var(--white);
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .search-box {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    background: var(--gray-100);
+    border-radius: 10px;
+    padding: 0 12px;
+    border: 2px solid transparent;
+    transition: border-color .2s;
+  }
+  .search-box:focus-within { border-color: var(--red); }
+  .search-box svg { flex-shrink:0; color:var(--gray-400); width:16px; height:16px; }
+  .search-box input {
+    flex: 1;
+    border: none;
+    outline: none;
+    padding: 9px 8px;
+    font-size: 14px;
+    background: transparent;
+    color: var(--gray-800);
+  }
+  .search-box input::placeholder { color: var(--gray-400); }
+  .search-clear {
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: var(--gray-400);
+    cursor: pointer;
+    display: none;
+    padding: 2px;
+    line-height: 1;
+  }
+  .search-clear.show { display: block; }
+  .tabs { display:flex; gap:6px; flex-shrink:0; }
+  .tab {
+    padding: 7px 14px;
+    border-radius: 20px;
+    border: 1.5px solid var(--gray-200);
+    background: var(--white);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gray-500);
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+    transition: all .2s;
+  }
+  .tab:hover { border-color: var(--gray-300); color: var(--gray-600); }
+  .tab.active {
+    background: var(--red);
+    color: var(--white);
+    border-color: var(--red);
+  }
+
+  /* ─── Error ─── */
+  .error-banner {
+    background: #FEF2F2;
+    color: #DC2626;
+    padding: 8px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    display: none;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid #FECACA;
+  }
+  .error-banner.show { display: flex; }
+  .error-banner button {
+    margin-left: auto;
+    background: #DC2626;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 4px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* ─── Scrollable Content ─── */
+  .content-scroll {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    background: var(--off-white);
+  }
+
+  /* ─── Name List (single column, centered) ─── */
+  .name-list {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 8px 12px 80px;
+  }
+
+  /* Group */
+  .group {
+    background: var(--white);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 8px;
+    border: 1px solid var(--gray-200);
+  }
+  .group.all-checked {
+    background: var(--green-light);
+    border-color: #BBF7D0;
+  }
+
+  /* Row */
+  .row {
+    display: flex;
+    align-items: center;
+    padding: 10px 14px;
+    gap: 10px;
+    border-bottom: 1px solid var(--gray-100);
+    min-height: 52px;
+    transition: background .15s;
+  }
+  .row:last-child { border-bottom: none; }
+  .row:active { background: var(--gray-100); }
+  .row.checked { background: var(--green-light); }
+  .row.applicant { font-weight: 600; }
+  .row.applicant:not(.checked) { background: #FFF5F5; }
+  .row.follower .chk-wrap { margin-left: 16px; }
+  .row.follower { color: var(--gray-500); }
+  .row.follower.checked { background: #F0FDF4; }
+
+  /* Checkbox */
+  .chk-wrap { flex-shrink: 0; }
+  .chk {
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+    border: 2.5px solid var(--gray-300);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background: var(--white);
+    transition: all .15s;
+  }
+  .chk:active { transform: scale(0.85); }
+  .chk.on {
+    background: var(--green);
+    border-color: var(--green);
+    box-shadow: 0 1px 4px rgba(22,163,74,0.3);
+  }
+  .chk svg { display: none; }
+  .chk.on svg { display: block; }
+
+  /* Name */
+  .name-area { flex: 1; min-width: 0; overflow: hidden; }
+  .person-name {
+    font-size: 15px;
+    line-height: 1.4;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--gray-800);
+  }
+  .person-meta {
+    font-size: 11px;
+    color: var(--gray-400);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 1px;
+  }
+  .badge {
+    display: inline-block;
+    font-size: 9px;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-weight: 700;
+    vertical-align: middle;
+    margin-left: 6px;
+  }
+  .badge.returning { background: #FEF3C7; color: #D97706; }
+  .badge.first-time { background: #DBEAFE; color: #2563EB; }
+  .check-time {
+    font-size: 11px;
+    color: var(--green-dark);
+    font-weight: 600;
+    margin-left: 4px;
+  }
+
+  /* Member ID */
+  .member-id {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 800;
+    color: #2563EB;
+    background: #EFF6FF;
+    padding: 1px 8px;
+    border-radius: 6px;
+    margin-left: 6px;
+    vertical-align: middle;
+    letter-spacing: 0.5px;
+  }
+  .no-id-warn {
+    display: inline-flex;
+    align-items: center;
+    background: #FEF3C7;
+    color: #D97706;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 8px;
+    border-radius: 6px;
+    margin-left: 6px;
+    vertical-align: middle;
+    cursor: pointer;
+  }
+  .mid-form {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+  .mid-input {
+    width: 100px;
+    height: 26px;
+    border: 2px solid #D97706;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 0 6px;
+    outline: none;
+    background: #FFFBEB;
+  }
+  .mid-input:focus { border-color: var(--red); }
+  .mid-btn {
+    height: 26px;
+    padding: 0 10px;
+    border: none;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .mid-btn.ok { background: var(--green); color: white; }
+  .mid-btn.cancel { background: var(--gray-200); color: var(--gray-600); }
+
+  /* Table Input (applicant only) */
+  .table-wrap { flex-shrink:0; display:flex; align-items:center; gap:3px; }
+  .table-input {
+    width: 38px;
+    height: 28px;
+    text-align: center;
+    border: 2px solid var(--gray-200);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    outline: none;
+    background: var(--white);
+  }
+  .table-input:focus { border-color: var(--red); }
+  .row.checked .table-input { border-color: var(--green); }
+  .table-display {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--green-dark);
+    min-width: 28px;
+    text-align: center;
+    cursor: pointer;
+    padding: 3px 8px;
+    border-radius: 8px;
+    background: var(--green-light);
+    transition: background .15s;
+  }
+  .table-display:hover { background: #BBF7D0; }
+  .tbl-btn {
+    height: 26px;
+    padding: 0 8px;
+    border: none;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .tbl-btn.ok { background: var(--green); color: white; }
+  .tbl-btn.cancel { background: var(--gray-200); color: var(--gray-600); }
+
+  /* Loading / Empty */
+  .empty, .loading-overlay {
+    text-align: center;
+    padding: 60px 16px;
+    color: var(--gray-400);
+  }
+  .empty p { font-size: 14px; }
+  .spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--gray-200);
+    border-top-color: var(--red);
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+    margin: 0 auto 12px;
+  }
+  @keyframes spin { to { transform: rotate(360deg) } }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--gray-800);
+    color: white;
+    padding: 10px 22px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    z-index: 500;
+    transition: transform .3s ease;
+    pointer-events: none;
+    white-space: nowrap;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.warn { background: #DC2626; }
+
+  /* Summary FAB */
+  .btn-summary {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--red);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 12px 20px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(227,35,33,0.4);
+    z-index: 150;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: transform .15s, box-shadow .15s;
+  }
+  .btn-summary:hover { box-shadow: 0 6px 20px rgba(227,35,33,0.5); }
+  .btn-summary:active { transform: scale(0.95); }
+
+  /* Modal */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+    z-index: 300;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: white;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+  .modal-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .modal-header h3 { font-size: 15px; font-weight: 700; }
+  .modal-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--gray-400);
+    line-height: 1;
+  }
+  .modal-body { padding: 14px 18px; overflow-y: auto; flex: 1; }
+  .modal-body textarea {
+    width: 100%;
+    height: 200px;
+    border: 2px solid var(--gray-200);
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 12px;
+    font-family: monospace;
+    resize: vertical;
+    outline: none;
+  }
+  .modal-body textarea:focus { border-color: var(--red); }
+  .modal-info { font-size: 12px; color: var(--gray-500); margin-bottom: 10px; }
+  .modal-footer {
+    padding: 12px 18px;
+    border-top: 1px solid var(--gray-200);
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+  .btn {
+    padding: 9px 22px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: opacity .15s;
+  }
+  .btn:active { opacity: 0.8; }
+  .btn-primary { background: var(--red); color: white; }
+  .btn-secondary { background: var(--gray-100); color: var(--gray-600); }
+
+  /* Mobile responsive tabs */
+  @media (max-width: 480px) {
+    .toolbar { flex-wrap: wrap; }
+    .search-box { flex: 1 1 100%; order: 1; }
+    .tabs { order: 2; width: 100%; justify-content: center; margin-top: 4px; }
+    .brand-name { font-size: 20px; letter-spacing: 2px; }
+    .stat-card { padding: 6px 14px; min-width: 80px; }
+    .stat-num { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- Fixed Header Zone -->
+  <div class="header-zone">
+    <div class="header">
+      <div class="live-indicator"><span class="live-dot"></span><span id="statusText">เชื่อมต่อ...</span></div>
+      <div class="brand-logo">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M12 2L2 7l10 5 10-5-10-5z" fill="#E32321"/>
+          <path d="M2 17l10 5 10-5" stroke="#E32321" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M2 12l10 5 10-5" stroke="#E32321" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="brand-name">LOTTERY PLUS</div>
+      <div class="brand-sub">EVENT CHECK-IN SYSTEM</div>
+      <div class="stats-bar">
+        <div class="stat-card green">
+          <div class="stat-num" id="statChecked">-</div>
+          <div class="stat-label">มาแล้ว</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="statRemain">-</div>
+          <div class="stat-label">ยังไม่มา</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="error-banner" id="errorBanner"><span id="errorText"></span><button onclick="loadData()">ลองใหม่</button></div>
+
+    <div class="toolbar">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="searchInput" placeholder="ค้นหาชื่อ, เบอร์, รหัส...">
+        <button class="search-clear" id="searchClear" onclick="clearSearch()">&times;</button>
+      </div>
+      <div class="tabs">
+        <div class="tab active" data-filter="all">ทั้งหมด</div>
+        <div class="tab" data-filter="pending">ยังไม่มา</div>
+        <div class="tab" data-filter="checked">มาแล้ว</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scrollable Content -->
+  <div class="content-scroll">
+    <div id="content">
+      <div class="name-list">
+        <div class="loading-overlay"><div class="spinner"></div><p>กำลังโหลดข้อมูล...</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<button class="btn-summary" onclick="showSummary()">&#x1F4CB; สรุปรหัสสมาชิก</button>
+
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-header"><h3>สรุปรหัสสมาชิก (ผู้เข้าร่วม)</h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
+    <div class="modal-body"><div class="modal-info" id="modalInfo"></div><textarea id="summaryText" readonly></textarea></div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">ปิด</button><button class="btn btn-primary" onclick="copySummary()">Copy</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API_URL = 'https://script.google.com/macros/s/AKfycbwAO3MgGXR0MN70BhgrnynRbGA6r5y8wZKu5RGlDJmE7NOnQFCvKRBvq1GkPRq_IJjn3A/exec';
+
+let attendees = [];
+let currentFilter = 'all';
+let searchQuery = '';
+let refreshTimer = null;
+let isLoading = false;
+let pendingRequests = 0;
+
+const $ = id => document.getElementById(id);
+const contentEl = $('content');
+const searchInput = $('searchInput');
+const searchClear = $('searchClear');
+const toastEl = $('toast');
+
+document.addEventListener('DOMContentLoaded', () => { loadData(); startAutoRefresh(); });
+
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    currentFilter = tab.dataset.filter;
+    renderCards();
+  });
+});
+
+searchInput.addEventListener('input', () => {
+  searchQuery = searchInput.value.trim().toLowerCase();
+  searchClear.classList.toggle('show', searchQuery.length > 0);
+  renderCards();
+});
+
+function clearSearch() { searchInput.value=''; searchQuery=''; searchClear.classList.remove('show'); renderCards(); }
+
+function startAutoRefresh() {
+  if (refreshTimer) clearInterval(refreshTimer);
+  refreshTimer = setInterval(() => { if (!isLoading && pendingRequests === 0) loadData(true); }, 5000);
+}
+
+function resetAutoRefresh() {
+  startAutoRefresh();
+}
+
+function groupAttendees(list) {
+  const groups = []; let cur = null;
+  for (const a of list) {
+    if (a.type === 'ผู้สมัคร') { cur = { applicant:a, followers:[] }; groups.push(cur); }
+    else if (a.type === 'ผู้ติดตาม') { if (cur) cur.followers.push(a); else groups.push({applicant:null,followers:[a]}); }
+    else { cur = {applicant:a,followers:[]}; groups.push(cur); }
+  }
+  return groups;
+}
+
+// ── Load ──
+async function loadData(silent) {
+  if (isLoading) return;
+  isLoading = true;
+  if (!silent) contentEl.innerHTML = '<div class="name-list"><div class="loading-overlay"><div class="spinner"></div><p>กำลังโหลดข้อมูล...</p></div></div>';
+  try {
+    const res = await fetch(API_URL + '?action=getAttendees');
+    const json = await res.json();
+    if (!json.success) throw new Error(json.error || 'API error');
+    attendees = json.data;
+    $('errorBanner').classList.remove('show');
+    $('statusText').textContent = 'เชื่อมต่อแล้ว';
+    updateStats(); renderCards();
+  } catch (err) {
+    if (!silent) { $('errorText').textContent = 'โหลดไม่ได้: '+err.message; $('errorBanner').classList.add('show'); }
+    $('statusText').textContent = 'ขาดการเชื่อมต่อ';
+  } finally { isLoading = false; }
+}
+
+// ── Check In ──
+function toggleCheckIn(rowNum) {
+  const p = attendees.find(a => a.rowNum === rowNum);
+  if (!p) return;
+  const wasChecked = p.checkinStatus === 'เช็คอินแล้ว';
+  const prev = { s:p.checkinStatus, t:p.checkinTime };
+
+  if (wasChecked) {
+    p.checkinStatus = ''; p.checkinTime = '';
+    toast('ยกเลิก: ' + p.name);
+  } else {
+    p.checkinStatus = 'เช็คอินแล้ว';
+    p.checkinTime = new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    toast('เช็คอิน: ' + p.name);
+    if (!p.memberId.trim()) setTimeout(() => toast('ยังไม่มีรหัสสมาชิก: '+p.name, true), 800);
+  }
+  updateStats();
+  renderCards();
+  resetAutoRefresh();
+
+  const action = wasChecked ? 'undoCheckIn' : 'checkIn';
+  pendingRequests++;
+  fetch(API_URL, { method:'POST', headers:{'Content-Type':'text/plain'}, body:JSON.stringify({action,rowNum,tableNo:p.tableNo||''}) })
+    .then(r=>r.json()).then(j=>{ if(!j.success)throw new Error(j.error); if(!wasChecked&&j.time)p.checkinTime=j.time; })
+    .catch(err=>{ p.checkinStatus=prev.s; p.checkinTime=prev.t; updateStats(); renderCards(); toast('ผิดพลาด: '+err.message); })
+    .finally(()=>{ pendingRequests--; });
+}
+
+// ── Table ──
+function showTblBtns(rowNum) {
+  const ok=$('tbok'+rowNum), no=$('tbno'+rowNum);
+  if(ok)ok.style.display=''; if(no)no.style.display='';
+}
+function confirmTable(rowNum) {
+  const input=$('ti'+rowNum);
+  const v = input ? input.value.replace(/\D/g,'').slice(0,2) : '';
+  if(!v){toast('กรุณาใส่เลขโต๊ะ',true);return;}
+  const p=attendees.find(a=>a.rowNum===rowNum);
+  if(p)p.tableNo=v;
+  toast('โต๊ะ '+v+' บันทึกแล้ว'); renderCards(); resetAutoRefresh();
+  pendingRequests++;
+  fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'setTableNo',rowNum,tableNo:v})})
+    .then(r=>r.json()).then(j=>{if(!j.success)throw new Error(j.error);})
+    .catch(()=>{if(p)p.tableNo='';renderCards();toast('บันทึกโต๊ะไม่สำเร็จ',true);})
+    .finally(()=>{ pendingRequests--; });
+}
+function cancelTable(rowNum) {
+  const ok=$('tbok'+rowNum),no=$('tbno'+rowNum),inp=$('ti'+rowNum);
+  if(ok)ok.style.display='none';if(no)no.style.display='none';if(inp){inp.value='';inp.blur();}
+}
+function editTable(rowNum) {
+  const p=attendees.find(a=>a.rowNum===rowNum), tw=$('tw'+rowNum);
+  if(!tw)return;
+  tw.innerHTML='<input class="table-input" inputmode="numeric" maxlength="2" id="ti'+rowNum+'" value="'+(p?p.tableNo:'')+'">'
+    +'<button class="tbl-btn ok" onclick="confirmTable('+rowNum+')">OK</button>'
+    +'<button class="tbl-btn cancel" onclick="cancelTable('+rowNum+');renderCards()">X</button>';
+  const inp=$('ti'+rowNum); if(inp){inp.focus();inp.select();}
+}
+
+// ── MemberId ──
+function showMidForm(rowNum) {
+  const w=document.querySelector('[data-row="'+rowNum+'"] .no-id-warn');
+  const f=$('midForm'+rowNum), i=$('midVal'+rowNum);
+  if(w)w.style.display='none'; if(f)f.style.display='inline-flex'; if(i)i.focus();
+}
+function cancelMid(rowNum) {
+  const w=document.querySelector('[data-row="'+rowNum+'"] .no-id-warn');
+  const f=$('midForm'+rowNum);
+  if(w)w.style.display=''; if(f)f.style.display='none';
+}
+function confirmMid(rowNum) {
+  const inp=$('midVal'+rowNum), v=inp?inp.value.trim():'';
+  if(!v){toast('กรุณากรอกรหัสสมาชิก',true);return;}
+  const p=attendees.find(a=>a.rowNum===rowNum);
+  if(p)p.memberId=v;
+  toast('บันทึกรหัส '+v); renderCards(); resetAutoRefresh();
+  pendingRequests++;
+  fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'setMemberId',rowNum,memberId:v})})
+    .then(r=>r.json()).then(j=>{if(!j.success)throw new Error(j.error);})
+    .catch(()=>{if(p)p.memberId='';renderCards();toast('บันทึกรหัสไม่สำเร็จ',true);})
+    .finally(()=>{ pendingRequests--; });
+}
+
+// ── Stats ──
+function updateStats() {
+  const c=attendees.filter(a=>a.checkinStatus==='เช็คอินแล้ว').length;
+  $('statChecked').textContent=c; $('statRemain').textContent=attendees.length-c;
+}
+
+function matchesFilter(a) {
+  if(currentFilter==='checked')return a.checkinStatus==='เช็คอินแล้ว';
+  if(currentFilter==='pending')return a.checkinStatus!=='เช็คอินแล้ว';
+  return true;
+}
+function matchesSearch(a) {
+  if(!searchQuery)return true;
+  return a.name.toLowerCase().includes(searchQuery)||a.phone.includes(searchQuery)||a.memberId.toLowerCase().includes(searchQuery)||String(a.order).includes(searchQuery);
+}
+
+// ── Render ──
+function renderCards() {
+  const groups = groupAttendees(attendees);
+  const fg = groups.filter(g => {
+    const m = g.applicant ? [g.applicant,...g.followers] : g.followers;
+    return m.some(a => matchesFilter(a) && matchesSearch(a));
+  });
+  if(!fg.length){ contentEl.innerHTML='<div class="name-list"><div class="empty"><p>'+(searchQuery?'ไม่พบ "'+escHtml(searchQuery)+'"':'ไม่มีข้อมูล')+'</p></div></div>'; return; }
+
+  let h='<div class="name-list">';
+  for(const g of fg){
+    const m = g.applicant?[g.applicant,...g.followers]:g.followers;
+    const vis = m.filter(a=>matchesFilter(a)&&matchesSearch(a));
+    if(!vis.length)continue;
+    const allC = vis.every(a=>a.checkinStatus==='เช็คอินแล้ว');
+    h+='<div class="group'+(allC?' all-checked':'')+'">';
+    for(const a of vis) h+=renderRow(a);
+    h+='</div>';
+  }
+  h+='</div>';
+  contentEl.innerHTML=h;
+}
+
+function renderRow(a) {
+  const ck = a.checkinStatus==='เช็คอินแล้ว';
+  const isApp = a.type==='ผู้สมัคร';
+  const isRet = a.visited&&a.visited!==''&&a.visited!=='ไม่เคย'&&a.visited!=='ยังไม่เคย'&&a.visited!=='ไม่เคยมา';
+  const cls = isApp?'applicant':'follower';
+
+  let meta='';
+  if(isApp){
+    const p=[]; if(a.phone)p.push(a.phone.replace(/\t/g,'').trim()); if(a.shirtSize)p.push(a.shirtSize);
+    meta=p.join(' · ');
+  } else {
+    const p=[]; if(a.shirtSize)p.push(a.shirtSize);
+    meta='↳ ผู้ติดตาม'+(p.length?' · '+p.join(' · '):'');
+  }
+
+  const visitB = isRet?'<span class="badge returning">★ เคยมา</span>':'<span class="badge first-time">✦ ใหม่</span>';
+  const timeS = ck?'<span class="check-time">✓ '+escHtml(a.checkinTime)+'</span>':'';
+
+  const hasMid = a.memberId.trim();
+  let midH='';
+  if(hasMid){
+    midH='<span class="member-id">'+escHtml(a.memberId)+'</span>';
+  } else if(ck){
+    midH='<span class="no-id-warn" onclick="showMidForm('+a.rowNum+')">! ไม่มีรหัส — กดเพิ่ม</span>'
+      +'<span class="mid-form" id="midForm'+a.rowNum+'" style="display:none">'
+        +'<input class="mid-input" id="midVal'+a.rowNum+'" placeholder="กรอกรหัส...">'
+        +'<button class="mid-btn ok" onclick="confirmMid('+a.rowNum+')">ยืนยัน</button>'
+        +'<button class="mid-btn cancel" onclick="cancelMid('+a.rowNum+')">ยกเลิก</button>'
+      +'</span>';
+  }
+
+  let tblH='';
+  if(isApp){
+    if(a.tableNo.trim()){
+      tblH='<div class="table-wrap" id="tw'+a.rowNum+'"><span class="table-display" onclick="editTable('+a.rowNum+')">'+escHtml(a.tableNo)+'</span></div>';
+    } else {
+      tblH='<div class="table-wrap" id="tw'+a.rowNum+'"><input class="table-input" inputmode="numeric" maxlength="2" id="ti'+a.rowNum+'" placeholder="--" onfocus="showTblBtns('+a.rowNum+')">'
+        +'<button class="tbl-btn ok" id="tbok'+a.rowNum+'" style="display:none" onclick="confirmTable('+a.rowNum+')">OK</button>'
+        +'<button class="tbl-btn cancel" id="tbno'+a.rowNum+'" style="display:none" onclick="cancelTable('+a.rowNum+')">X</button></div>';
+    }
+  }
+
+  return '<div class="row '+cls+(ck?' checked':'')+'" data-row="'+a.rowNum+'">'
+    +'<div class="chk-wrap"><div class="chk'+(ck?' on':'')+'" onclick="toggleCheckIn('+a.rowNum+')">'
+      +'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'
+    +'</div></div>'
+    +'<div class="name-area">'
+      +'<div class="person-name">'+escHtml(a.name)+midH+visitB+timeS+'</div>'
+      +'<div class="person-meta">#'+a.order+' '+escHtml(meta)+'</div>'
+    +'</div>'
+    +tblH
+  +'</div>';
+}
+
+function escHtml(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+
+function toast(msg,isWarn){
+  toastEl.textContent=msg; toastEl.classList.toggle('warn',!!isWarn); toastEl.classList.add('show');
+  setTimeout(()=>{toastEl.classList.remove('show');toastEl.classList.remove('warn');},2500);
+}
+
+function showSummary(){
+  const ci=attendees.filter(a=>a.checkinStatus==='เช็คอินแล้ว');
+  const app=ci.filter(a=>a.type==='ผู้สมัคร');
+  const wId=app.filter(a=>a.memberId.trim()), noId=app.filter(a=>!a.memberId.trim());
+  let t='=== รหัสสมาชิกผู้เข้าร่วมงาน ===\nวันที่: '+new Date().toLocaleDateString('th-TH')+'\n';
+  t+='ผู้สมัครที่มา: '+app.length+' คน (มีรหัส '+wId.length+', ไม่มีรหัส '+noId.length+')\n================================\n\n';
+  if(wId.length){t+='--- รหัสสมาชิก ---\n';wId.forEach(a=>{t+=a.memberId+'\t'+a.name+'\n';});}
+  if(noId.length){t+='\n--- ยังไม่มีรหัส ---\n';noId.forEach(a=>{t+='(ไม่มีรหัส)\t'+a.name+'\n';});}
+  $('modalInfo').textContent='ผู้สมัครเช็คอินแล้ว '+app.length+' คน (มีรหัส '+wId.length+', ไม่มีรหัส '+noId.length+')';
+  $('summaryText').value=t; $('modalOverlay').classList.add('show');
+}
+function closeModal(){$('modalOverlay').classList.remove('show');}
+function copySummary(){$('summaryText').select();document.execCommand('copy');toast('Copy แล้ว!');}
+</script>
+</body>
+</html>
