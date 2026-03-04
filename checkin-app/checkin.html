@@ -219,6 +219,41 @@
     cursor: pointer;
   }
 
+  /* ─── Pull to Refresh ─── */
+  .ptr-indicator {
+    text-align: center;
+    height: 0;
+    overflow: hidden;
+    transition: height .25s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--off-white);
+    color: var(--gray-400);
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .ptr-indicator .ptr-spinner {
+    width: 22px;
+    height: 22px;
+    border: 2.5px solid var(--gray-200);
+    border-top-color: var(--red);
+    border-radius: 50%;
+    margin-right: 8px;
+    display: none;
+  }
+  .ptr-indicator.refreshing .ptr-spinner {
+    display: inline-block;
+    animation: spin .7s linear infinite;
+  }
+  .ptr-indicator .ptr-arrow {
+    margin-right: 8px;
+    transition: transform .2s;
+    font-size: 16px;
+  }
+  .ptr-indicator.ready .ptr-arrow { transform: rotate(180deg); }
+  .ptr-indicator.refreshing .ptr-arrow { display: none; }
+
   /* ─── Scrollable Content ─── */
   .content-scroll {
     flex: 1;
@@ -652,7 +687,12 @@
   </div>
 
   <!-- Scrollable Content -->
-  <div class="content-scroll">
+  <div class="content-scroll" id="contentScroll">
+    <div class="ptr-indicator" id="ptrIndicator">
+      <span class="ptr-arrow">↓</span>
+      <span class="ptr-spinner"></span>
+      <span class="ptr-text">ดึงลงเพื่อรีเฟรช</span>
+    </div>
     <div id="content">
       <div class="name-list">
         <div class="loading-overlay"><div class="spinner"></div><p>กำลังโหลดข้อมูล...</p></div>
@@ -1067,6 +1107,62 @@ function showSummary(){
 }
 function closeModal(){$('modalOverlay').classList.remove('show');}
 function copySummary(){$('summaryText').select();document.execCommand('copy');toast('Copy แล้ว!');}
+
+// ── Pull to Refresh ──
+(function(){
+  const scroller = $('contentScroll');
+  const indicator = $('ptrIndicator');
+  const ptrText = indicator.querySelector('.ptr-text');
+  const THRESHOLD = 70;
+  let ptrStartY = 0;
+  let ptrPulling = false;
+  let ptrRefreshing = false;
+
+  scroller.addEventListener('touchstart', function(e) {
+    if (ptrRefreshing) return;
+    if (scroller.scrollTop <= 0) {
+      ptrStartY = e.touches[0].clientY;
+      ptrPulling = true;
+    }
+  }, {passive:true});
+
+  scroller.addEventListener('touchmove', function(e) {
+    if (!ptrPulling || ptrRefreshing) return;
+    const dy = e.touches[0].clientY - ptrStartY;
+    if (dy > 0 && scroller.scrollTop <= 0) {
+      const dist = Math.min(dy * 0.5, 120);
+      indicator.style.height = dist + 'px';
+      indicator.classList.toggle('ready', dist >= THRESHOLD);
+      ptrText.textContent = dist >= THRESHOLD ? 'ปล่อยเพื่อรีเฟรช' : 'ดึงลงเพื่อรีเฟรช';
+    } else {
+      indicator.style.height = '0px';
+      indicator.classList.remove('ready');
+    }
+  }, {passive:true});
+
+  scroller.addEventListener('touchend', async function() {
+    if (!ptrPulling || ptrRefreshing) return;
+    ptrPulling = false;
+    const h = parseFloat(indicator.style.height) || 0;
+    if (h >= THRESHOLD) {
+      ptrRefreshing = true;
+      indicator.classList.remove('ready');
+      indicator.classList.add('refreshing');
+      indicator.style.height = '50px';
+      ptrText.textContent = 'กำลังรีเฟรช...';
+      await loadData(true);
+      indicator.classList.remove('refreshing');
+      indicator.style.height = '0px';
+      ptrText.textContent = 'ดึงลงเพื่อรีเฟรช';
+      ptrRefreshing = false;
+      toast('รีเฟรชแล้ว');
+      resetAutoRefresh();
+    } else {
+      indicator.style.height = '0px';
+      indicator.classList.remove('ready');
+    }
+  });
+})();
 </script>
 </body>
 </html>
