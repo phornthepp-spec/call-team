@@ -461,6 +461,30 @@
   }
   @keyframes spin { to { transform: rotate(360deg) } }
 
+  /* Swipe row */
+  .row-swipe {
+    position: relative;
+    overflow: hidden;
+  }
+  .row-swipe .row {
+    position: relative;
+    z-index: 1;
+    transition: transform .25s ease;
+  }
+  .row-swipe .swipe-bg {
+    position: absolute;
+    top: 0; right: 0; bottom: 0;
+    width: 120px;
+    background: #DC2626;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
+    z-index: 0;
+  }
+
   /* Toast */
   .toast {
     position: fixed;
@@ -482,28 +506,25 @@
   .toast.show { transform: translateX(-50%) translateY(0); }
   .toast.warn { background: #DC2626; }
 
-  /* Summary FAB */
+  /* Summary button in header */
   .btn-summary {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: var(--red);
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: rgba(255,255,255,0.2);
     color: white;
-    border: none;
-    border-radius: 50px;
-    padding: 12px 20px;
-    font-size: 13px;
-    font-weight: 700;
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 8px;
+    padding: 5px 10px;
+    font-size: 11px;
+    font-weight: 600;
     cursor: pointer;
-    box-shadow: 0 4px 14px rgba(227,35,33,0.4);
     z-index: 150;
     display: flex;
     align-items: center;
-    gap: 6px;
-    transition: transform .15s, box-shadow .15s;
+    gap: 4px;
   }
-  .btn-summary:hover { box-shadow: 0 6px 20px rgba(227,35,33,0.5); }
-  .btn-summary:active { transform: scale(0.95); }
+  .btn-summary:active { opacity: 0.7; }
 
   /* Modal */
   .modal-overlay {
@@ -594,6 +615,7 @@
   <!-- Fixed Header Zone -->
   <div class="header-zone">
     <div class="header">
+      <button class="btn-summary" onclick="showSummary()">&#x1F4CB; สรุป</button>
       <div class="live-indicator"><span class="live-dot"></span><span id="statusText">เชื่อมต่อ...</span></div>
       <div class="brand-name">LOTTERY PLUS</div>
       <div class="brand-sub">EVENT CHECK-IN SYSTEM</div>
@@ -638,8 +660,6 @@
     </div>
   </div>
 </div>
-
-<button class="btn-summary" onclick="showSummary()">&#x1F4CB; สรุปรหัสสมาชิก</button>
 
 <div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
   <div class="modal">
@@ -851,9 +871,10 @@ function confirmMid(rowNum) {
 
 // ── Stats ──
 function updateStats() {
-  const c=attendees.filter(a=>a.checkinStatus==='เช็คอินแล้ว').length;
-  $('statChecked').textContent=c; $('statRemain').textContent=attendees.length-c;
-  $('statTotal').textContent=attendees.length;
+  const active = attendees.filter(a => (a.shirtSize||'').trim() !== 'ยกเลิกสิทธิ์');
+  const c = active.filter(a=>a.checkinStatus==='เช็คอินแล้ว').length;
+  $('statChecked').textContent=c; $('statRemain').textContent=active.length-c;
+  $('statTotal').textContent=active.length;
 }
 
 function matchesFilter(a) {
@@ -868,7 +889,12 @@ function matchesSearch(a) {
 
 // ── Render ──
 function renderCards() {
-  const vis = attendees.filter(a => matchesFilter(a) && matchesSearch(a));
+  // Filter out ยกเลิกสิทธิ์ (Column I / shirtSize field)
+  const active = attendees.filter(a => {
+    const status = (a.shirtSize||'').trim();
+    return status !== 'ยกเลิกสิทธิ์';
+  });
+  const vis = active.filter(a => matchesFilter(a) && matchesSearch(a));
   if(!vis.length){ contentEl.innerHTML='<div class="name-list"><div class="empty"><p>'+(searchQuery?'ไม่พบ "'+escHtml(searchQuery)+'"':'ไม่มีข้อมูล')+'</p></div></div>'; return; }
 
   // Group applicant + their followers into one card
@@ -899,38 +925,36 @@ function renderCards() {
 
 function renderRow(a) {
   const ck = a.checkinStatus==='เช็คอินแล้ว';
-  const isApp = a.type==='ผู้สมัคร';
+  const isApp = (a.type||'').trim()==='ผู้สมัคร';
   const isRet = a.visited&&a.visited!==''&&a.visited!=='ไม่เคย'&&a.visited!=='ยังไม่เคย'&&a.visited!=='ไม่เคยมา';
   const cls = isApp?'applicant':'follower';
 
-  // Type badge
   const typeBadge = isApp
     ? '<span class="type-badge applicant-badge">ผู้สมัคร</span>'
     : '<span class="type-badge follower-badge">ผู้ติดตาม</span>';
 
-  // Meta line: #order · phone · shirtSize (filter out ยืนยันสิทธิ์)
+  const timeS = ck?'<span class="check-time">✓ '+escHtml(a.checkinTime)+'</span>':'';
+
+  // Meta line: #order · phone · memberId · visitBadge
   let metaParts=['#'+a.order];
   const ph = a.phone ? a.phone.replace(/\t/g,'').trim() : '';
   if(ph) metaParts.push(ph);
-  const shirt = a.shirtSize ? a.shirtSize.trim() : '';
-  if(shirt && shirt !== 'ยืนยันสิทธิ์') metaParts.push(shirt);
-  const meta = metaParts.join(' · ');
-
-  const visitB = isRet?'<span class="badge returning">★ เคยมา</span>':'<span class="badge first-time">✦ ใหม่</span>';
-  const timeS = ck?'<span class="check-time">✓ '+escHtml(a.checkinTime)+'</span>':'';
+  let metaHtml = escHtml(metaParts.join(' · '));
 
   const hasMid = a.memberId ? a.memberId.trim() : '';
-  let midH='';
   if(hasMid){
-    midH='<span class="member-id">'+escHtml(a.memberId)+'</span>';
+    metaHtml+=' <span class="member-id">'+escHtml(a.memberId)+'</span>';
   } else if(ck){
-    midH='<span class="no-id-warn" onclick="showMidForm('+a.rowNum+')">! ไม่มีรหัส — กดเพิ่ม</span>'
+    metaHtml+=' <span class="no-id-warn" onclick="event.stopPropagation();showMidForm('+a.rowNum+')">! ไม่มีรหัส</span>'
       +'<span class="mid-form" id="midForm'+a.rowNum+'" style="display:none">'
         +'<input class="mid-input" id="midVal'+a.rowNum+'" placeholder="กรอกรหัส...">'
         +'<button class="mid-btn ok" onclick="confirmMid('+a.rowNum+')">ยืนยัน</button>'
         +'<button class="mid-btn cancel" onclick="cancelMid('+a.rowNum+')">ยกเลิก</button>'
       +'</span>';
   }
+
+  const visitB = isRet?'<span class="badge returning">★ เคยมา</span>':'<span class="badge first-time">✦ ใหม่</span>';
+  metaHtml += ' ' + visitB;
 
   // Table number: only for ผู้สมัคร
   let tblH='';
@@ -945,16 +969,62 @@ function renderRow(a) {
     }
   }
 
-  return '<div class="row '+cls+(ck?' checked':'')+'" data-row="'+a.rowNum+'">'
-    +'<div class="chk-wrap"><div class="chk'+(ck?' on':'')+'" onclick="toggleCheckIn('+a.rowNum+')">'
-      +'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'
-    +'</div></div>'
-    +'<div class="name-area">'
-      +'<div class="person-name">'+typeBadge+escHtml(a.name)+midH+visitB+timeS+'</div>'
-      +'<div class="person-meta">'+escHtml(meta)+'</div>'
+  return '<div class="row-swipe" data-row="'+a.rowNum+'">'
+    +'<div class="swipe-bg" onclick="confirmCancel('+a.rowNum+')">ยกเลิกสิทธิ์</div>'
+    +'<div class="row '+cls+(ck?' checked':'')+'">'
+      +'<div class="chk-wrap"><div class="chk'+(ck?' on':'')+'" onclick="toggleCheckIn('+a.rowNum+')">'
+        +'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'
+      +'</div></div>'
+      +'<div class="name-area">'
+        +'<div class="person-name">'+typeBadge+escHtml(a.name)+timeS+'</div>'
+        +'<div class="person-meta">'+metaHtml+'</div>'
+      +'</div>'
+      +tblH
     +'</div>'
-    +tblH
   +'</div>';
+}
+
+// ── Swipe to cancel ──
+let swipeStartX = 0;
+let swipeEl = null;
+document.addEventListener('touchstart', e => {
+  const wrap = e.target.closest('.row-swipe');
+  if(!wrap) return;
+  swipeStartX = e.touches[0].clientX;
+  swipeEl = wrap.querySelector('.row');
+}, {passive:true});
+document.addEventListener('touchmove', e => {
+  if(!swipeEl) return;
+  const dx = e.touches[0].clientX - swipeStartX;
+  if(dx < 0) swipeEl.style.transform = 'translateX('+Math.max(dx,-120)+'px)';
+  else swipeEl.style.transform = '';
+}, {passive:true});
+document.addEventListener('touchend', () => {
+  if(swipeEl){
+    const cur = parseFloat(swipeEl.style.transform.replace(/[^-\d.]/g,''))||0;
+    if(cur < -60) swipeEl.style.transform='translateX(-120px)';
+    else swipeEl.style.transform='';
+    swipeEl=null;
+  }
+});
+
+function confirmCancel(rowNum) {
+  const p = attendees.find(a=>a.rowNum===rowNum);
+  if(!p) return;
+  if(!confirm('ยืนยันยกเลิกสิทธิ์ของ '+p.name+' ?')) {
+    // Reset swipe
+    const wrap = document.querySelector('.row-swipe[data-row="'+rowNum+'"] .row');
+    if(wrap) wrap.style.transform='';
+    return;
+  }
+  p.shirtSize = 'ยกเลิกสิทธิ์';
+  toast('ยกเลิกสิทธิ์: '+p.name);
+  updateStats(); renderCards(); resetAutoRefresh();
+  pendingRequests++;
+  fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'cancelRight',rowNum})})
+    .then(r=>r.json()).then(j=>{if(!j.success)throw new Error(j.error);})
+    .catch(()=>{p.shirtSize='ยืนยันสิทธิ์';updateStats();renderCards();toast('ยกเลิกไม่สำเร็จ',true);})
+    .finally(()=>{pendingRequests--;});
 }
 
 function escHtml(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}

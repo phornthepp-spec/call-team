@@ -46,6 +46,9 @@ function doPost(e) {
       case 'setMemberId':
         result = setMemberId_(body.rowNum, body.memberId);
         break;
+      case 'cancelRight':
+        result = cancelRight_(body.rowNum);
+        break;
       default:
         result = { success: false, error: 'Unknown action: ' + action };
     }
@@ -147,6 +150,13 @@ function setTableNo_(rowNum, tableNo) {
 function setMemberId_(rowNum, memberId) {
   var sheet = getSheet_();
   sheet.getRange(rowNum, 2).setValue(memberId);  // B: รหัสสมาชิก
+  SpreadsheetApp.flush();
+  return { success: true };
+}
+
+function cancelRight_(rowNum) {
+  var sheet = getSheet_();
+  sheet.getRange(rowNum, 9).setValue('ยกเลิกสิทธิ์');  // I: สถานะสิทธิ์
   SpreadsheetApp.flush();
   return { success: true };
 }
