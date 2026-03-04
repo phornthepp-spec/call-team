@@ -787,6 +787,13 @@ function confirmTable(rowNum) {
   const input=$('ti'+rowNum);
   const v = input ? input.value.trim() : '';
   if(!v){toast('กรุณาใส่เลขโต๊ะ',true);return;}
+  // Check duplicate table number
+  const dup = attendees.find(a => a.rowNum !== rowNum && a.tableNo && a.tableNo.trim() === v);
+  if(dup){
+    toast('โต๊ะ '+v+' ถูกใช้แล้วโดย '+dup.name, true);
+    if(input){ input.style.borderColor='#DC2626'; input.focus(); }
+    return;
+  }
   const p=attendees.find(a=>a.rowNum===rowNum);
   if(p)p.tableNo=v;
   toast('โต๊ะ '+v+' บันทึกแล้ว'); renderCards(); resetAutoRefresh();
