@@ -73,30 +73,33 @@
   }
   @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.8)} }
 
-  .brand-logo {
-    width: 56px;
-    height: 56px;
-    background: var(--white);
-    border-radius: 14px;
-    margin: 0 auto 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  .brand-thai {
+    text-align: center;
   }
-  .brand-logo svg { width: 32px; height: 32px; }
-  .brand-name {
-    font-size: 22px;
-    font-weight: 800;
-    letter-spacing: 3px;
-    line-height: 1.2;
-  }
-  .brand-sub {
-    font-size: 11px;
-    font-weight: 500;
-    opacity: 0.8;
+  .brand-main {
+    font-size: 30px;
+    font-weight: 900;
+    font-style: italic;
     letter-spacing: 2px;
+    line-height: 1.2;
+    text-shadow: 1px 2px 4px rgba(0,0,0,0.2);
+  }
+  .brand-icon {
+    display: inline-block;
+    font-style: normal;
+    margin: 0 -2px;
+  }
+  .brand-slogan {
+    font-size: 16px;
+    font-weight: 500;
+    font-style: italic;
+    opacity: 0.9;
     margin-top: 2px;
+    letter-spacing: 1px;
+  }
+  .brand-bold {
+    font-size: 24px;
+    font-weight: 900;
   }
 
   /* Stats Cards */
@@ -593,7 +596,7 @@
     .toolbar { flex-wrap: wrap; }
     .search-box { flex: 1 1 100%; order: 1; }
     .tabs { order: 2; width: 100%; justify-content: center; margin-top: 4px; }
-    .brand-name { font-size: 20px; letter-spacing: 2px; }
+    .brand-main { font-size: 24px; }
     .stat-card { padding: 6px 14px; min-width: 80px; }
     .stat-num { font-size: 22px; }
   }
@@ -606,15 +609,10 @@
   <div class="header-zone">
     <div class="header">
       <div class="live-indicator"><span class="live-dot"></span><span id="statusText">เชื่อมต่อ...</span></div>
-      <div class="brand-logo">
-        <svg viewBox="0 0 24 24" fill="none">
-          <path d="M12 2L2 7l10 5 10-5-10-5z" fill="#E32321"/>
-          <path d="M2 17l10 5 10-5" stroke="#E32321" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M2 12l10 5 10-5" stroke="#E32321" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
+      <div class="brand-thai">
+        <div class="brand-main">ล<span class="brand-icon">&#x2766;</span>ตเตอรี่พลัส</div>
+        <div class="brand-slogan">ความหวังของคนจะ<span class="brand-bold">รวย</span></div>
       </div>
-      <div class="brand-name">LOTTERY PLUS</div>
-      <div class="brand-sub">EVENT CHECK-IN SYSTEM</div>
       <div class="stats-bar">
         <div class="stat-card green">
           <div class="stat-num" id="statChecked">-</div>
@@ -704,9 +702,17 @@ searchInput.addEventListener('input', () => {
 
 function clearSearch() { searchInput.value=''; searchQuery=''; searchClear.classList.remove('show'); renderCards(); }
 
+function isUserEditing() {
+  const active = document.activeElement;
+  if (!active) return false;
+  return active.closest && active.closest('.table-wrap, .mid-form, .mid-input');
+}
+
 function startAutoRefresh() {
   if (refreshTimer) clearInterval(refreshTimer);
-  refreshTimer = setInterval(() => { if (!isLoading && pendingRequests === 0) loadData(true); }, 5000);
+  refreshTimer = setInterval(() => {
+    if (!isLoading && pendingRequests === 0 && !isUserEditing()) loadData(true);
+  }, 5000);
 }
 
 function resetAutoRefresh() {
@@ -750,7 +756,8 @@ async function loadData(silent) {
     }
     $('errorBanner').classList.remove('show');
     $('statusText').textContent = 'เชื่อมต่อแล้ว';
-    updateStats(); renderCards();
+    updateStats();
+    if (!isUserEditing()) renderCards();
   } catch (err) {
     if (!silent) { $('errorText').textContent = 'โหลดไม่ได้: '+err.message; $('errorBanner').classList.add('show'); }
     $('statusText').textContent = 'ขาดการเชื่อมต่อ';
