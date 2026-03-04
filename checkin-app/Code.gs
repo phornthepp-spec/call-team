@@ -74,8 +74,12 @@ function getAttendees() {
 
   for (var i = 0; i < data.length; i++) {
     var row = data[i];
-    // Skip only if both name (D) and phone (E) are empty
-    if ((!row[3] || String(row[3]).trim() === '') && (!row[4] || String(row[4]).trim() === '')) continue;
+    // Skip only if row is completely empty (no data in columns A-F)
+    var hasData = false;
+    for (var c = 0; c <= 5; c++) {
+      if (row[c] && String(row[c]).trim() !== '') { hasData = true; break; }
+    }
+    if (!hasData) continue;
 
     var checkinTimeRaw = row[14];
     var checkinTimeStr = '';

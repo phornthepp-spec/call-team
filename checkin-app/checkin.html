@@ -883,11 +883,12 @@ function renderRow(a) {
     ? '<span class="type-badge applicant-badge">ผู้สมัคร</span>'
     : '<span class="type-badge follower-badge">ผู้ติดตาม</span>';
 
-  // Meta line: #order · phone · shirtSize
+  // Meta line: #order · phone · shirtSize (filter out ยืนยันสิทธิ์)
   let metaParts=['#'+a.order];
   const ph = a.phone ? a.phone.replace(/\t/g,'').trim() : '';
   if(ph) metaParts.push(ph);
-  if(a.shirtSize) metaParts.push(a.shirtSize);
+  const shirt = a.shirtSize ? a.shirtSize.trim() : '';
+  if(shirt && shirt !== 'ยืนยันสิทธิ์') metaParts.push(shirt);
   const meta = metaParts.join(' · ');
 
   const visitB = isRet?'<span class="badge returning">★ เคยมา</span>':'<span class="badge first-time">✦ ใหม่</span>';
