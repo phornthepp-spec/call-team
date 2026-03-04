@@ -445,6 +445,7 @@
     cursor: pointer;
   }
   .tbl-btn.ok { background: var(--green); color: white; }
+  .tbl-btn.del { background: var(--red); color: white; }
   .tbl-btn.cancel { background: var(--gray-200); color: var(--gray-600); }
 
   /* Loading / Empty */
@@ -807,11 +808,22 @@ function cancelTable(rowNum) {
   const ok=$('tbok'+rowNum),no=$('tbno'+rowNum),inp=$('ti'+rowNum);
   if(ok)ok.style.display='none';if(no)no.style.display='none';if(inp){inp.value='';inp.blur();}
 }
+function clearTable(rowNum) {
+  const p=attendees.find(a=>a.rowNum===rowNum);
+  if(p)p.tableNo='';
+  toast('ลบเลขโต๊ะแล้ว'); renderCards(); resetAutoRefresh();
+  pendingRequests++;
+  fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'setTableNo',rowNum,tableNo:''})})
+    .then(r=>r.json()).then(j=>{if(!j.success)throw new Error(j.error);})
+    .catch(()=>{if(p)p.tableNo='';renderCards();toast('ลบโต๊ะไม่สำเร็จ',true);})
+    .finally(()=>{ pendingRequests--; });
+}
 function editTable(rowNum) {
   const p=attendees.find(a=>a.rowNum===rowNum), tw=$('tw'+rowNum);
   if(!tw)return;
-  tw.innerHTML='<input class="table-input" inputmode="numeric" maxlength="2" id="ti'+rowNum+'" value="'+(p?p.tableNo:'')+'">'
+  tw.innerHTML='<input class="table-input" id="ti'+rowNum+'" value="'+(p?p.tableNo:'')+'">'
     +'<button class="tbl-btn ok" onclick="confirmTable('+rowNum+')">OK</button>'
+    +'<button class="tbl-btn del" onclick="clearTable('+rowNum+')">ลบ</button>'
     +'<button class="tbl-btn cancel" onclick="cancelTable('+rowNum+');renderCards()">X</button>';
   const inp=$('ti'+rowNum); if(inp){inp.focus();inp.select();}
 }
