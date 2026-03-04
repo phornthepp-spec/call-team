@@ -263,8 +263,8 @@
   .row.checked { background: var(--green-light); }
   .row.applicant { font-weight: 600; }
   .row.applicant:not(.checked) { background: #FFF5F5; }
-  .row.follower .chk-wrap { margin-left: 16px; }
-  .row.follower { color: var(--gray-500); }
+  .row.follower { font-weight: 600; }
+  .row.follower:not(.checked) { background: #F5F3FF; }
   .row.follower.checked { background: #F0FDF4; }
 
   /* Checkbox */
@@ -319,6 +319,26 @@
   }
   .badge.returning { background: #FEF3C7; color: #D97706; }
   .badge.first-time { background: #DBEAFE; color: #2563EB; }
+
+  /* Type badge */
+  .type-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 6px;
+    vertical-align: middle;
+    margin-right: 6px;
+    letter-spacing: 0.3px;
+  }
+  .type-badge.applicant-badge {
+    background: var(--red);
+    color: white;
+  }
+  .type-badge.follower-badge {
+    background: #6366F1;
+    color: white;
+  }
   .check-time {
     font-size: 11px;
     color: var(--green-dark);
@@ -808,22 +828,12 @@ function matchesSearch(a) {
 
 // ── Render ──
 function renderCards() {
-  const groups = groupAttendees(attendees);
-  const fg = groups.filter(g => {
-    const m = g.applicant ? [g.applicant,...g.followers] : g.followers;
-    return m.some(a => matchesFilter(a) && matchesSearch(a));
-  });
-  if(!fg.length){ contentEl.innerHTML='<div class="name-list"><div class="empty"><p>'+(searchQuery?'ไม่พบ "'+escHtml(searchQuery)+'"':'ไม่มีข้อมูล')+'</p></div></div>'; return; }
+  const vis = attendees.filter(a => matchesFilter(a) && matchesSearch(a));
+  if(!vis.length){ contentEl.innerHTML='<div class="name-list"><div class="empty"><p>'+(searchQuery?'ไม่พบ "'+escHtml(searchQuery)+'"':'ไม่มีข้อมูล')+'</p></div></div>'; return; }
 
   let h='<div class="name-list">';
-  for(const g of fg){
-    const m = g.applicant?[g.applicant,...g.followers]:g.followers;
-    const vis = m.filter(a=>matchesFilter(a)&&matchesSearch(a));
-    if(!vis.length)continue;
-    const allC = vis.every(a=>a.checkinStatus==='เช็คอินแล้ว');
-    h+='<div class="group'+(allC?' all-checked':'')+'">';
-    for(const a of vis) h+=renderRow(a);
-    h+='</div>';
+  for(const a of vis) {
+    h+=renderRow(a);
   }
   h+='</div>';
   contentEl.innerHTML=h;
@@ -835,14 +845,16 @@ function renderRow(a) {
   const isRet = a.visited&&a.visited!==''&&a.visited!=='ไม่เคย'&&a.visited!=='ยังไม่เคย'&&a.visited!=='ไม่เคยมา';
   const cls = isApp?'applicant':'follower';
 
-  let meta='';
-  if(isApp){
-    const p=[]; if(a.phone)p.push(a.phone.replace(/\t/g,'').trim()); if(a.shirtSize)p.push(a.shirtSize);
-    meta=p.join(' · ');
-  } else {
-    const p=[]; if(a.shirtSize)p.push(a.shirtSize);
-    meta='↳ ผู้ติดตาม'+(p.length?' · '+p.join(' · '):'');
-  }
+  // Type badge
+  const typeBadge = isApp
+    ? '<span class="type-badge applicant-badge">ผู้สมัคร</span>'
+    : '<span class="type-badge follower-badge">ผู้ติดตาม</span>';
+
+  // Meta line
+  let metaParts=[];
+  if(a.phone)metaParts.push(a.phone.replace(/\t/g,'').trim());
+  if(a.shirtSize)metaParts.push(a.shirtSize);
+  const meta = metaParts.join(' · ');
 
   const visitB = isRet?'<span class="badge returning">★ เคยมา</span>':'<span class="badge first-time">✦ ใหม่</span>';
   const timeS = ck?'<span class="check-time">✓ '+escHtml(a.checkinTime)+'</span>':'';
@@ -871,16 +883,16 @@ function renderRow(a) {
     }
   }
 
-  return '<div class="row '+cls+(ck?' checked':'')+'" data-row="'+a.rowNum+'">'
+  return '<div class="group"><div class="row '+cls+(ck?' checked':'')+'" data-row="'+a.rowNum+'">'
     +'<div class="chk-wrap"><div class="chk'+(ck?' on':'')+'" onclick="toggleCheckIn('+a.rowNum+')">'
       +'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'
     +'</div></div>'
     +'<div class="name-area">'
-      +'<div class="person-name">'+escHtml(a.name)+midH+visitB+timeS+'</div>'
-      +'<div class="person-meta">#'+a.order+' '+escHtml(meta)+'</div>'
+      +'<div class="person-name">'+typeBadge+escHtml(a.name)+midH+visitB+timeS+'</div>'
+      +'<div class="person-meta">#'+a.order+(meta?' · '+escHtml(meta):'')+'</div>'
     +'</div>'
     +tblH
-  +'</div>';
+  +'</div></div>';
 }
 
 function escHtml(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
