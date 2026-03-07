@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login — PDF Reader</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #06081a;
+    color: #e0e0e0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .login-card {
+    background: #0d1225;
+    border: 1px solid rgba(0,229,255,.15);
+    border-radius: 16px;
+    padding: 40px 36px;
+    width: 100%;
+    max-width: 380px;
+    box-shadow: 0 8px 32px rgba(0,0,0,.4);
+  }
+  .login-header {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+  .login-logo {
+    width: 56px; height: 56px;
+    background: linear-gradient(135deg, #00e5ff 0%, #007acc 100%);
+    border-radius: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 700;
+    color: #06081a;
+    margin-bottom: 16px;
+  }
+  .login-header h1 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #00e5ff;
+    letter-spacing: 2px;
+  }
+  .login-header p {
+    font-size: 13px;
+    color: #888;
+    margin-top: 4px;
+  }
+  .form-group {
+    margin-bottom: 20px;
+  }
+  .form-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #aaa;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .form-group input[type="text"],
+  .form-group input[type="password"] {
+    width: 100%;
+    padding: 12px 14px;
+    background: #161b33;
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 8px;
+    color: #e0e0e0;
+    font-size: 15px;
+    outline: none;
+    transition: border-color .2s;
+  }
+  .form-group input:focus {
+    border-color: #00e5ff;
+  }
+  .form-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+  }
+  .checkbox-group input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #00e5ff;
+    cursor: pointer;
+  }
+  .checkbox-group span {
+    font-size: 13px;
+    color: #aaa;
+    user-select: none;
+  }
+  .link-btn {
+    background: none;
+    border: none;
+    color: #00e5ff;
+    font-size: 13px;
+    cursor: pointer;
+    padding: 0;
+    text-decoration: none;
+    transition: opacity .2s;
+  }
+  .link-btn:hover { opacity: .7; }
+  .btn-submit {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #00e5ff 0%, #007acc 100%);
+    border: none;
+    border-radius: 8px;
+    color: #06081a;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: opacity .2s;
+    margin-top: 4px;
+  }
+  .btn-submit:hover { opacity: .9; }
+  .btn-submit:disabled { opacity: .5; cursor: not-allowed; }
+  .msg {
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-bottom: 16px;
+    display: none;
+    text-align: center;
+  }
+  .msg.show { display: block; }
+  .msg.error { background: rgba(255,82,82,.12); color: #ff5252; }
+  .msg.success { background: rgba(16,185,129,.12); color: #10b981; }
+  .footer-link {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 13px;
+    color: #888;
+  }
+  .footer-link .link-btn { font-weight: 600; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+</style>
+</head>
+<body>
+
+<div class="login-card">
+  <div class="login-header">
+    <div class="login-logo">P</div>
+    <h1>PDF READER</h1>
+    <p>SCB Payment Report Parser</p>
+  </div>
+
+  <div class="msg" id="msgBox"></div>
+
+  <!-- LOGIN PANEL -->
+  <div class="panel active" id="panelLogin">
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="loginUser">Username</label>
+        <input type="text" id="loginUser" name="username" autocomplete="username" autofocus required>
+      </div>
+      <div class="form-group">
+        <label for="loginPass">Password</label>
+        <input type="password" id="loginPass" name="password" autocomplete="current-password" required>
+      </div>
+      <div class="form-row">
+        <label class="checkbox-group">
+          <input type="checkbox" id="rememberMe">
+          <span>Remember me</span>
+        </label>
+        <button type="button" class="link-btn" id="showForgot">Forgot password?</button>
+      </div>
+      <button type="submit" class="btn-submit" id="btnLogin">LOGIN</button>
+    </form>
+    <div class="footer-link">
+      Don't have an account? <button type="button" class="link-btn" id="showRegister">Register</button>
+    </div>
+  </div>
+
+  <!-- REGISTER PANEL -->
+  <div class="panel" id="panelRegister">
+    <form id="registerForm">
+      <div class="form-group">
+        <label for="regUser">Username</label>
+        <input type="text" id="regUser" name="username" autocomplete="username" required minlength="3">
+      </div>
+      <div class="form-group">
+        <label for="regDisplay">Display Name</label>
+        <input type="text" id="regDisplay" name="display_name" autocomplete="name" placeholder="optional">
+      </div>
+      <div class="form-group">
+        <label for="regPass">Password</label>
+        <input type="password" id="regPass" name="password" autocomplete="new-password" required minlength="4">
+      </div>
+      <div class="form-group">
+        <label for="regPass2">Confirm Password</label>
+        <input type="password" id="regPass2" autocomplete="new-password" required minlength="4">
+      </div>
+      <button type="submit" class="btn-submit" id="btnRegister">CREATE ACCOUNT</button>
+    </form>
+    <div class="footer-link">
+      Already have an account? <button type="button" class="link-btn" id="showLoginFromReg">Login</button>
+    </div>
+  </div>
+
+  <!-- FORGOT PASSWORD PANEL -->
+  <div class="panel" id="panelForgot">
+    <form id="forgotForm">
+      <p style="font-size:12px;color:#aaa;margin-bottom:16px;line-height:1.5;">
+        To reset your password, enter your username, the <strong style="color:#e0e0e0;">admin password</strong> for verification, and your new password.
+      </p>
+      <div class="form-group">
+        <label for="forgotUser">Your Username</label>
+        <input type="text" id="forgotUser" name="username" autocomplete="username" required>
+      </div>
+      <div class="form-group">
+        <label for="forgotAdminPw">Admin Password (for verification)</label>
+        <input type="password" id="forgotAdminPw" required>
+      </div>
+      <div class="form-group">
+        <label for="forgotNewPw">New Password</label>
+        <input type="password" id="forgotNewPw" autocomplete="new-password" required minlength="4">
+      </div>
+      <button type="submit" class="btn-submit" id="btnForgot">RESET PASSWORD</button>
+    </form>
+    <div class="footer-link">
+      <button type="button" class="link-btn" id="showLoginFromForgot">Back to Login</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Detect base path from current URL (e.g. /pdf-reader)
+  const B = window.location.pathname.replace(/\/login\.html.*$/, '');
+  const msgBox = document.getElementById('msgBox');
+
+  function showMsg(text, type) {
+    msgBox.textContent = text;
+    msgBox.className = 'msg show ' + type;
+  }
+  function hideMsg() {
+    msgBox.className = 'msg';
+  }
+
+  // Panel switching
+  function showPanel(id) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    hideMsg();
+  }
+
+  document.getElementById('showRegister').addEventListener('click', () => showPanel('panelRegister'));
+  document.getElementById('showLoginFromReg').addEventListener('click', () => showPanel('panelLogin'));
+  document.getElementById('showForgot').addEventListener('click', () => showPanel('panelForgot'));
+  document.getElementById('showLoginFromForgot').addEventListener('click', () => showPanel('panelLogin'));
+
+  // LOGIN
+  document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    hideMsg();
+    const btn = document.getElementById('btnLogin');
+    btn.disabled = true;
+    btn.textContent = 'Logging in...';
+
+    try {
+      const res = await fetch(B + '/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: document.getElementById('loginUser').value,
+          password: document.getElementById('loginPass').value,
+          remember: document.getElementById('rememberMe').checked
+        })
+      });
+      const data = await res.json();
+      if (res.ok && data.ok) {
+        window.location.href = B + '/';
+      } else {
+        showMsg(data.error || 'Login failed', 'error');
+      }
+    } catch (err) {
+      showMsg('Connection error', 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'LOGIN';
+    }
+  });
+
+  // REGISTER
+  document.getElementById('registerForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    hideMsg();
+
+    const password = document.getElementById('regPass').value;
+    const password2 = document.getElementById('regPass2').value;
+
+    if (password !== password2) {
+      showMsg('Passwords do not match', 'error');
+      return;
+    }
+
+    const btn = document.getElementById('btnRegister');
+    btn.disabled = true;
+    btn.textContent = 'Creating...';
+
+    try {
+      const res = await fetch(B + '/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: document.getElementById('regUser').value,
+          password: password,
+          display_name: document.getElementById('regDisplay').value || undefined
+        })
+      });
+      const data = await res.json();
+      if (res.ok && data.ok) {
+        showMsg('Account created! You can now login.', 'success');
+        document.getElementById('registerForm').reset();
+        setTimeout(() => showPanel('panelLogin'), 1500);
+      } else {
+        showMsg(data.error || 'Registration failed', 'error');
+      }
+    } catch (err) {
+      showMsg('Connection error', 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'CREATE ACCOUNT';
+    }
+  });
+
+  // FORGOT PASSWORD
+  document.getElementById('forgotForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    hideMsg();
+    const btn = document.getElementById('btnForgot');
+    btn.disabled = true;
+    btn.textContent = 'Resetting...';
+
+    try {
+      const res = await fetch(B + '/api/auth/forgot', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: document.getElementById('forgotUser').value,
+          adminPassword: document.getElementById('forgotAdminPw').value,
+          newPassword: document.getElementById('forgotNewPw').value
+        })
+      });
+      const data = await res.json();
+      if (res.ok && data.ok) {
+        showMsg(data.message, 'success');
+        document.getElementById('forgotForm').reset();
+        setTimeout(() => showPanel('panelLogin'), 2000);
+      } else {
+        showMsg(data.error || 'Reset failed', 'error');
+      }
+    } catch (err) {
+      showMsg('Connection error', 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'RESET PASSWORD';
+    }
+  });
+
+</script>
+
+</body>
+</html>

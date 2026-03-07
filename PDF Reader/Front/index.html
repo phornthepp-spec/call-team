@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCB PDF Payment Report Reader</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="logo">P</div>
+    <div>
+      <h1>PDF READER</h1>
+      <div class="header-sub">SCB Payment Report Parser</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <span class="user-badge" id="userBadge"></span>
+    <button class="btn btn-admin" id="btnAdmin" style="display:none" title="Admin Panel">Admin</button>
+    <button class="btn btn-logout" id="btnLogout" title="Logout">Logout</button>
+  </div>
+</div>
+
+<div class="container">
+  <!-- Upload Zone -->
+  <div class="upload-zone" id="uploadZone">
+    <div class="upload-icon">📄</div>
+    <div class="upload-title">ลากไฟล์ PDF มาวางที่นี่</div>
+    <div class="upload-sub">หรือคลิกเพื่อเลือกไฟล์ — รองรับเฉพาะไฟล์ .pdf</div>
+    <input type="file" id="fileInput" accept=".pdf">
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-section" id="progressSection">
+    <div class="progress-card">
+      <div class="progress-label" id="progressLabel">กำลังประมวลผล...</div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill"></div></div>
+      <div class="progress-text" id="progressText">0%</div>
+    </div>
+  </div>
+
+  <!-- Summary -->
+  <div class="summary-section" id="summarySection">
+    <div class="summary-grid">
+      <div class="summary-card sc-cyan">
+        <div class="summary-label">จำนวนรายการ</div>
+        <div class="summary-value" id="sumTotal">0</div>
+        <div class="summary-sub">Total Records</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">ยอดรวมทั้งหมด</div>
+        <div class="summary-value" id="sumAmount" style="color:var(--text)">0.00</div>
+        <div class="summary-sub">Total Amount</div>
+      </div>
+      <div class="summary-card sc-green">
+        <div class="summary-label">สำเร็จ</div>
+        <div class="summary-value" id="sumSuccess">0</div>
+        <div class="summary-sub">Success</div>
+      </div>
+      <div class="summary-card sc-red">
+        <div class="summary-label">ไม่สำเร็จ</div>
+        <div class="summary-value" id="sumFail">0</div>
+        <div class="summary-sub">Failed</div>
+      </div>
+      <div class="summary-card sc-yellow">
+        <div class="summary-label">จำนวนหน้า</div>
+        <div class="summary-value" id="sumPages">0</div>
+        <div class="summary-sub">Pages Processed</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Debug -->
+  <div class="debug-section" id="debugSection">
+    <div class="debug-card">
+      <h3 id="debugToggle">🔍 Debug: Raw Text Items (หน้าแรก) — คลิกเพื่อซ่อน/แสดง</h3>
+      <div id="debugContent">
+        <div class="debug-info" id="debugInfo"></div>
+        <div class="debug-pre" id="debugPre"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="table-section" id="tableSection">
+    <div class="table-card">
+      <div class="table-header">
+        <div class="table-title">📋 ข้อมูลที่ดึงได้</div>
+        <div class="table-actions">
+          <button class="btn" id="btnVerify" style="display:none">🔍 Verify</button>
+          <button class="btn" id="btnRefresh" style="display:none">🔄 Refresh</button>
+          <button class="btn" id="btnReset" title="อัปโหลดไฟล์ใหม่">❌ อัปโหลดใหม่</button>
+          <button class="btn btn-primary" id="btnExport">⬇ Export CSV</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>เลขที่</th>
+              <th>ชื่อผู้รับเงิน</th>
+              <th>บัญชี/พร้อมเพย์</th>
+              <th>รหัส/สาขา</th>
+              <th>จำนวนเงินทั้งหมด</th>
+              <th>จำนวนเงินใบแจ้งหนี้</th>
+              <th>ภาษีมูลค่าเพิ่ม</th>
+              <th>ภาษีหัก ณ ที่จ่าย</th>
+              <th>เงินที่จ่ายทั้งหมด</th>
+              <th>ค่าธรรมเนียม</th>
+              <th>สถานะ</th>
+              <th>เหตุผล</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+      <div class="pagination" id="pagination">
+        <div class="page-info" id="pageInfo">-</div>
+        <div class="page-btns" id="pageBtns"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Verification Section -->
+  <div class="verify-section" id="verifySection">
+    <div class="verify-pdf">
+      <div class="verify-pdf-header">
+        <span>PDF Preview</span>
+        <div class="verify-pdf-nav">
+          <button id="pdfPrev" title="หน้าก่อน">&larr;</button>
+          <span id="pdfPageLabel">-</span>
+          <button id="pdfNext" title="หน้าถัดไป">&rarr;</button>
+        </div>
+      </div>
+      <div class="pdf-canvas-wrap" id="pdfCanvasWrap">
+        <canvas id="pdfCanvas"></canvas>
+        <canvas id="overlayCanvas"></canvas>
+      </div>
+      <div class="col-legend" id="colLegend"></div>
+    </div>
+    <div class="verify-right">
+      <div class="verify-panel">
+        <div class="verify-panel-header">
+          <span>Validation</span>
+          <span id="validationCount" style="font-size:10px;color:var(--text3)"></span>
+        </div>
+        <div class="verify-panel-body" id="validationBody">
+          <div class="rd-empty">กด Verify เพื่อตรวจสอบ</div>
+        </div>
+      </div>
+      <div class="verify-panel">
+        <div class="verify-panel-header">
+          <span>Row Detail</span>
+          <span id="rowDetailLabel" style="font-size:10px;color:var(--text3)"></span>
+        </div>
+        <div class="verify-panel-body" id="rowDetailBody">
+          <div class="rd-empty">คลิกแถวในตารางเพื่อดูรายละเอียด</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Admin Modal -->
+<div class="modal-overlay" id="adminModal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h2>Admin Panel</h2>
+      <button class="modal-close" id="adminClose">&times;</button>
+    </div>
+    <div class="modal-tabs">
+      <button class="modal-tab active" data-tab="logs">Login Logs</button>
+      <button class="modal-tab" data-tab="users">Users</button>
+    </div>
+    <div class="modal-body">
+      <!-- Login Logs Tab -->
+      <div class="tab-panel active" id="tabLogs">
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Username</th>
+                <th>Status</th>
+                <th>IP</th>
+                <th>User Agent</th>
+              </tr>
+            </thead>
+            <tbody id="logsBody"></tbody>
+          </table>
+        </div>
+        <div class="admin-pagination">
+          <button class="btn" id="logsPrev" disabled>&larr; Prev</button>
+          <span id="logsInfo" style="font-size:12px;color:#888;">-</span>
+          <button class="btn" id="logsNext">Next &rarr;</button>
+        </div>
+      </div>
+      <!-- Users Tab -->
+      <div class="tab-panel" id="tabUsers">
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Display Name</th>
+                <th>Role</th>
+                <th>Created</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="usersBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
