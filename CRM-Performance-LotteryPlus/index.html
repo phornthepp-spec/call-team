@@ -6,36 +6,37 @@
 <title>Lottery Plus - CRM Performance</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#030712;--bg2:#0f172a;--card:#1e293b;--red:#dc2626;--cyan:#06b6d4;--text:#f1f5f9;--text2:#94a3b8;--green:#22c55e;--warn:#f59e0b;--border:rgba(148,163,184,.12);--glass:rgba(30,41,59,.65);--sidebar:320px;--radius:12px}
+:root{--bg:#ffffff;--bg2:#f1f5f9;--card:#ffffff;--red:#dc2626;--cyan:#dc2626;--text:#1e293b;--text2:#64748b;--green:#16a34a;--warn:#d97706;--border:rgba(0,0,0,.08);--glass:rgba(255,255,255,.85);--sidebar:320px;--radius:12px}
 html{font-size:14px}
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 input,select,button,textarea{font-family:inherit;font-size:.875rem}
 .mono{font-family:'JetBrains Mono',monospace}
 ::-webkit-scrollbar{width:6px;height:6px}
-::-webkit-scrollbar-track{background:var(--bg2)}
-::-webkit-scrollbar-thumb{background:var(--text2);border-radius:3px}
-.glass{background:var(--glass);backdrop-filter:blur(16px);border:1px solid var(--border);border-radius:var(--radius)}
+::-webkit-scrollbar-track{background:#f1f5f9}
+::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}
+.glass{background:var(--glass);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 1px 3px rgba(0,0,0,.06)}
 .btn{padding:8px 20px;border:none;border-radius:8px;cursor:pointer;font-weight:600;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
 .btn-red{background:linear-gradient(135deg,#dc2626,#ea580c);color:#fff}
 .btn-red:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(220,38,38,.4)}
 .btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border)}
-.btn-ghost:hover{border-color:var(--cyan);color:var(--cyan)}
+.btn-ghost:hover{border-color:var(--red);color:var(--red)}
 .btn-sm{padding:5px 12px;font-size:.75rem}
-.btn-cyan{background:var(--cyan);color:#030712}
-.btn-green{background:var(--green);color:#030712}
-.input{width:100%;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);outline:none;transition:border-color .2s}
-.input:focus{border-color:var(--cyan)}
+.btn-cyan{background:var(--cyan);color:#fff}
+.btn-green{background:var(--green);color:#fff}
+.input{width:100%;padding:10px 14px;background:#f8fafc;border:1px solid var(--border);border-radius:8px;color:var(--text);outline:none;transition:border-color .2s}
+.input:focus{border-color:var(--red)}
 .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.7rem;font-weight:600;letter-spacing:.3px}
-.badge-red{background:rgba(220,38,38,.15);color:#f87171;border:1px solid rgba(220,38,38,.3)}
-.badge-cyan{background:rgba(6,182,212,.15);color:#22d3ee;border:1px solid rgba(6,182,212,.3)}
-.badge-green{background:rgba(34,197,94,.15);color:#4ade80;border:1px solid rgba(34,197,94,.3)}
-.badge-warn{background:rgba(245,158,11,.15);color:#fbbf24;border:1px solid rgba(245,158,11,.3)}
+.badge-red{background:rgba(220,38,38,.1);color:#dc2626;border:1px solid rgba(220,38,38,.2)}
+.badge-cyan{background:rgba(220,38,38,.1);color:#dc2626;border:1px solid rgba(220,38,38,.2)}
+.badge-green{background:rgba(22,163,74,.1);color:#16a34a;border:1px solid rgba(22,163,74,.2)}
+.badge-warn{background:rgba(217,119,6,.1);color:#d97706;border:1px solid rgba(217,119,6,.2)}
 label{font-size:.8rem;color:var(--text2);margin-bottom:4px;display:block;font-weight:500}
 .form-group{margin-bottom:14px}
 .checkbox-label{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.85rem;color:var(--text)}
-.checkbox-label input[type="checkbox"]{accent-color:var(--cyan);width:16px;height:16px}
+.checkbox-label input[type="checkbox"]{accent-color:var(--red);width:16px;height:16px}
 .fade-in{animation:fadeIn .4s ease}
 @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
@@ -43,36 +44,36 @@ label{font-size:.8rem;color:var(--text2);margin-bottom:4px;display:block;font-we
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
 
 /* Login Page */
-#loginPage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:1000;background:var(--bg)}
+#loginPage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:1000;background:linear-gradient(135deg,#fef2f2,#ffffff,#fff1f2)}
 .login-bg{position:absolute;inset:0;overflow:hidden}
-.login-bg::before{content:'';position:absolute;width:500px;height:500px;background:radial-gradient(circle,rgba(220,38,38,.08),transparent 70%);top:20%;left:10%;animation:float 8s ease-in-out infinite}
-.login-bg::after{content:'';position:absolute;width:400px;height:400px;background:radial-gradient(circle,rgba(6,182,212,.06),transparent 70%);bottom:10%;right:10%;animation:float 6s ease-in-out infinite reverse}
-.grid-lines{position:absolute;inset:0;background-image:linear-gradient(rgba(148,163,184,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(148,163,184,.03) 1px,transparent 1px);background-size:60px 60px}
+.login-bg::before{content:'';position:absolute;width:500px;height:500px;background:radial-gradient(circle,rgba(220,38,38,.06),transparent 70%);top:20%;left:10%;animation:float 8s ease-in-out infinite}
+.login-bg::after{content:'';position:absolute;width:400px;height:400px;background:radial-gradient(circle,rgba(220,38,38,.04),transparent 70%);bottom:10%;right:10%;animation:float 6s ease-in-out infinite reverse}
+.grid-lines{position:absolute;inset:0;background-image:linear-gradient(rgba(0,0,0,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,.02) 1px,transparent 1px);background-size:60px 60px}
 .login-card{position:relative;width:380px;max-width:90vw;padding:40px;text-align:center}
 .login-logo{font-size:1.8rem;font-weight:800;background:linear-gradient(135deg,#dc2626,#ea580c,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:2px;margin-bottom:6px}
 .login-sub{color:var(--text2);font-size:.75rem;margin-bottom:30px;letter-spacing:1px}
 .login-card .form-group{text-align:left}
 .login-card .btn-red{width:100%;justify-content:center;padding:12px;font-size:.95rem;margin-top:8px}
 .forgot-link{color:var(--text2);font-size:.75rem;margin-top:14px;cursor:pointer;transition:color .2s}
-.forgot-link:hover{color:var(--cyan)}
+.forgot-link:hover{color:var(--red)}
 
 /* App Layout */
 #app{display:none;min-height:100vh}
-.sidebar{position:fixed;left:0;top:0;bottom:0;width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100;transition:transform .3s, border-right-color .3s}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100;transition:transform .3s, border-right-color .3s;box-shadow:2px 0 8px rgba(0,0,0,.04)}
 .sidebar-logo{padding:24px 20px;border-bottom:1px solid var(--border)}
 .sidebar-logo h1{font-size:1.2rem;font-weight:800;background:linear-gradient(135deg,#dc2626,#ea580c,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:1.5px}
 .sidebar-logo p{font-size:.65rem;color:var(--text2);margin-top:2px;letter-spacing:.5px}
 .nav-items{flex:1;padding:16px 0}
 .nav-item{display:flex;align-items:center;gap:12px;padding:12px 20px;color:var(--text2);cursor:pointer;transition:all .2s;border-left:3px solid transparent;font-size:.85rem;font-weight:500}
-.nav-item:hover{color:var(--text);background:rgba(241,245,249,.03)}
+.nav-item:hover{color:var(--text);background:rgba(0,0,0,.03)}
 .nav-item.active{color:var(--text);border-left-color:var(--red);background:rgba(220,38,38,.05)}
 .nav-item span:first-child{font-size:1.1rem;width:24px;text-align:center}
 .sidebar-footer{padding:16px 20px;border-top:1px solid var(--border)}
 .user-info{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-.user-avatar{width:36px;height:36px;background:linear-gradient(135deg,var(--red),var(--cyan));border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.75rem}
+.user-avatar{width:36px;height:36px;background:linear-gradient(135deg,var(--red),#ea580c);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.75rem;color:#fff}
 .user-name{font-size:.8rem;font-weight:600}
 .user-team{font-size:.65rem;color:var(--text2)}
-.logout-btn{width:100%;padding:8px;background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.2);color:#f87171;border-radius:8px;cursor:pointer;font-size:.75rem;font-weight:600;transition:all .2s}
+.logout-btn{width:100%;padding:8px;background:rgba(220,38,38,.06);border:1px solid rgba(220,38,38,.15);color:#dc2626;border-radius:8px;cursor:pointer;font-size:.75rem;font-weight:600;transition:all .2s}
 .logout-btn:hover{background:rgba(220,38,38,.2)}
 .main{margin-left:var(--sidebar);min-height:100vh;padding:24px 28px}
 .page{display:none}
@@ -91,12 +92,12 @@ label{font-size:.8rem;color:var(--text2);margin-bottom:4px;display:block;font-we
 .right-col{display:flex;flex-direction:column;gap:14px;margin-left:auto;max-width:420px;width:100%}
 .right-col .prod-mini{justify-content:flex-end}
 .prod-mini{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.prod-chip{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 14px;border-radius:12px;background:linear-gradient(145deg,rgba(30,41,59,.8),rgba(15,23,42,.9));border:1px solid rgba(148,163,184,.08);position:relative;overflow:hidden;min-width:70px;transition:all .25s}
-.prod-chip:hover{border-color:rgba(148,163,184,.2);transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,.3)}
+.prod-chip{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 14px;border-radius:12px;background:#ffffff;border:1px solid rgba(0,0,0,.08);position:relative;overflow:hidden;min-width:70px;transition:all .25s;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.prod-chip:hover{border-color:rgba(0,0,0,.15);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.1)}
 .prod-chip::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:2px 2px 0 0}
-.prod-chip:nth-child(1)::before{background:linear-gradient(90deg,#f87171,#fb923c)}
-.prod-chip:nth-child(2)::before{background:linear-gradient(90deg,#22d3ee,#3b82f6)}
-.prod-chip:nth-child(3)::before{background:linear-gradient(90deg,#4ade80,#22c55e)}
+.prod-chip:nth-child(1)::before{background:linear-gradient(90deg,#dc2626,#ef4444)}
+.prod-chip:nth-child(2)::before{background:linear-gradient(90deg,#dc2626,#f87171)}
+.prod-chip:nth-child(3)::before{background:linear-gradient(90deg,#16a34a,#22c55e)}
 .prod-chip:nth-child(4)::before{background:linear-gradient(90deg,#a855f7,#ec4899)}
 .prod-chip-val{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:1.1rem;line-height:1}
 .prod-chip-label{font-size:.58rem;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;font-weight:500}
@@ -104,27 +105,27 @@ label{font-size:.8rem;color:var(--text2);margin-bottom:4px;display:block;font-we
 .autocomplete-list{position:absolute;top:100%;left:0;right:0;max-height:200px;overflow-y:auto;background:var(--bg2);border:1px solid var(--border);border-radius:8px;z-index:50;display:none}
 .autocomplete-list.show{display:block}
 .ac-item{padding:8px 14px;cursor:pointer;font-size:.8rem;display:flex;gap:8px;transition:background .15s}
-.ac-item:hover,.ac-item.selected{background:rgba(6,182,212,.1)}
+.ac-item:hover,.ac-item.selected{background:rgba(220,38,38,.06)}
 .ac-item .ac-cat1{color:var(--cyan);min-width:60px;font-weight:600}
 .ac-item .ac-cat2{color:var(--text)}
 .ac-item .ac-cat3{color:var(--text2);font-size:.75rem}
 .submit-area{display:flex;gap:10px;margin-top:20px}
 .wf-box{margin-top:16px;display:none}
 .wf-box.show{display:block}
-.wf-card{padding:16px 18px;border:1px solid rgba(34,197,94,.15);border-radius:10px;background:rgba(34,197,94,.03);position:relative}
-.wf-title{font-size:.72rem;font-weight:700;color:#4ade80;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;display:flex;align-items:center;gap:6px}
-.wf-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(34,197,94,.25),transparent)}
+.wf-card{padding:16px 18px;border:1px solid rgba(220,38,38,.15);border-radius:10px;background:rgba(220,38,38,.03);position:relative}
+.wf-title{font-size:.72rem;font-weight:700;color:#dc2626;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.wf-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(220,38,38,.25),transparent)}
 .wf-content{font-size:.8rem;color:var(--text);line-height:1.7;white-space:pre-wrap;word-break:break-word}
 .global-search{margin-bottom:20px;position:relative;max-width:420px}
 .global-search input{width:100%;padding:12px 16px 12px 40px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:.85rem;outline:none;transition:all .25s}
-.global-search input:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(6,182,212,.1)}
+.global-search input:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(220,38,38,.08)}
 .global-search input::placeholder{color:var(--text2)}
 .global-search .search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text2);font-size:.9rem;pointer-events:none}
-.search-results{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--bg2);border:1px solid var(--border);border-radius:12px;max-height:320px;overflow-y:auto;z-index:60;display:none;box-shadow:0 12px 40px rgba(0,0,0,.4)}
+.search-results{position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border:1px solid var(--border);border-radius:12px;max-height:320px;overflow-y:auto;z-index:60;display:none;box-shadow:0 8px 30px rgba(0,0,0,.12)}
 .search-results.show{display:block}
 .search-result-item{padding:12px 18px;cursor:pointer;transition:background .15s;border-bottom:1px solid var(--border);display:flex;gap:12px;align-items:center}
 .search-result-item:last-child{border-bottom:none}
-.search-result-item:hover{background:rgba(6,182,212,.06)}
+.search-result-item:hover{background:rgba(220,38,38,.04)}
 .sr-info{flex:1;min-width:0}
 .sr-primary{font-size:.85rem;font-weight:500;color:var(--text)}
 .sr-secondary{font-size:.7rem;color:var(--text2);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -140,12 +141,12 @@ label{font-size:.8rem;color:var(--text2);margin-bottom:4px;display:block;font-we
 .cat-tab.active{color:var(--red);border-bottom-color:var(--red)}
 .cat-search-box{margin-bottom:16px}
 .cat-row{display:grid;grid-template-columns:80px 1fr 1fr;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;font-size:.85rem;align-items:center}
-.cat-row:hover{background:rgba(6,182,212,.06)}
+.cat-row:hover{background:rgba(220,38,38,.04)}
 .cat-row-header{font-size:.7rem;color:var(--text2);text-transform:uppercase;letter-spacing:.3px;font-weight:600;cursor:default;background:var(--bg2);position:sticky;top:0;z-index:1}
 .cat-row-header:hover{background:var(--bg2)}
-.cat-badge-info{background:rgba(220,38,38,.15);color:#f87171;padding:3px 10px;border-radius:12px;font-size:.7rem;font-weight:600;text-align:center}
-.cat-badge-problem{background:rgba(245,158,11,.15);color:#fbbf24;padding:3px 10px;border-radius:12px;font-size:.7rem;font-weight:600;text-align:center}
-.cat-badge-request{background:rgba(6,182,212,.15);color:#22d3ee;padding:3px 10px;border-radius:12px;font-size:.7rem;font-weight:600;text-align:center}
+.cat-badge-info{background:rgba(220,38,38,.1);color:#dc2626;padding:3px 10px;border-radius:12px;font-size:.7rem;font-weight:600;text-align:center}
+.cat-badge-problem{background:rgba(217,119,6,.1);color:#d97706;padding:3px 10px;border-radius:12px;font-size:.7rem;font-weight:600;text-align:center}
+.cat-badge-request{background:rgba(220,38,38,.1);color:#dc2626;padding:3px 10px;border-radius:12px;font-size:.7rem;font-weight:600;text-align:center}
 
 /* Dashboard */
 .filters-bar{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;align-items:flex-end}
@@ -156,21 +157,21 @@ label{font-size:.8rem;color:var(--text2);margin-bottom:4px;display:block;font-we
 .summary-card .sc-label{font-size:.7rem;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
 .summary-card .sc-value{font-size:1.8rem;font-weight:700;font-family:'JetBrains Mono',monospace}
 .summary-card .sc-sub{font-size:.7rem;color:var(--text2);margin-top:4px}
-.sc-red .sc-value{color:#f87171}
-.sc-cyan .sc-value{color:#22d3ee}
-.sc-green .sc-value{color:#4ade80}
-.sc-warn .sc-value{color:#fbbf24}
+.sc-red .sc-value{color:#dc2626}
+.sc-cyan .sc-value{color:#dc2626}
+.sc-green .sc-value{color:#16a34a}
+.sc-warn .sc-value{color:#d97706}
 .chart-section{margin-bottom:24px}
 .chart-container{padding:20px;max-height:360px}
 .chart-container canvas{max-height:300px}
 .section-title{font-size:1rem;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px}
-.section-title span{color:var(--cyan)}
+.section-title span{color:var(--red)}
 .data-table{width:100%;border-collapse:collapse;font-size:.78rem}
 .data-table th{background:var(--bg2);color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.3px;padding:10px 12px;text-align:left;position:sticky;top:0;font-size:.7rem}
 .data-table td{padding:8px 12px;border-bottom:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:.75rem}
-.data-table tr:hover td{background:rgba(6,182,212,.03)}
+.data-table tr:hover td{background:rgba(220,38,38,.03)}
 .pct-up{color:var(--green)}
-.pct-down{color:#f87171}
+.pct-down{color:#dc2626}
 .table-wrap{overflow-x:auto;max-height:500px;overflow-y:auto}
 .table-wrap .glass{padding:0;overflow:hidden}
 
@@ -182,7 +183,7 @@ label{font-size:.8rem;color:var(--text2);margin-bottom:4px;display:block;font-we
 .admin-actions{display:flex;gap:6px}
 
 /* Modal */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:500;display:none;align-items:center;justify-content:center}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);backdrop-filter:blur(4px);z-index:500;display:none;align-items:center;justify-content:center}
 .modal-overlay.show{display:flex}
 .modal{width:420px;max-width:92vw;padding:28px;animation:fadeIn .3s ease}
 .modal h3{font-size:1.1rem;margin-bottom:16px}
@@ -191,24 +192,24 @@ label{font-size:.8rem;color:var(--text2);margin-bottom:4px;display:block;font-we
 /* Toast */
 .toast-container{position:fixed;top:20px;right:20px;z-index:600;display:flex;flex-direction:column;gap:8px}
 .toast{padding:12px 20px;border-radius:10px;font-size:.8rem;font-weight:500;animation:fadeIn .3s ease;display:flex;align-items:center;gap:8px;max-width:340px}
-.toast-success{background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:#4ade80}
-.toast-error{background:rgba(220,38,38,.15);border:1px solid rgba(220,38,38,.3);color:#f87171}
+.toast-success{background:#f0fdf4;border:1px solid rgba(22,163,74,.25);color:#16a34a;box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.toast-error{background:#fef2f2;border:1px solid rgba(220,38,38,.25);color:#dc2626;box-shadow:0 4px 12px rgba(0,0,0,.1)}
 
 /* Customer Profile - Inside Sidebar */
 @keyframes cpPopIn{0%{transform:translateY(30px) scale(.9);opacity:0}50%{transform:translateY(-5px) scale(1.02);opacity:1}100%{transform:translateY(0) scale(1);opacity:1}}
 @keyframes cpPopOut{0%{transform:translateY(0) scale(1);opacity:1}100%{transform:translateY(30px) scale(.9);opacity:0}}
-@keyframes neonPulse{0%,100%{box-shadow:0 0 12px rgba(34,197,94,.2),0 0 30px rgba(34,197,94,.08)}50%{box-shadow:0 0 20px rgba(34,197,94,.35),0 0 50px rgba(34,197,94,.12)}}
+@keyframes neonPulse{0%,100%{box-shadow:2px 0 8px rgba(0,0,0,.04)}50%{box-shadow:2px 0 12px rgba(0,0,0,.06)}}
 @keyframes glowLine{0%{background-position:-200% 0}100%{background-position:200% 0}}
-@keyframes avatarGlow{0%,100%{box-shadow:0 0 15px rgba(34,197,94,.3),0 4px 12px rgba(0,0,0,.3)}50%{box-shadow:0 0 25px rgba(34,197,94,.5),0 4px 16px rgba(0,0,0,.3)}}
-.cp-panel{position:absolute;left:0;right:0;bottom:0;top:50%;z-index:10;display:flex;flex-direction:column;background:var(--bg2);border-top:1px solid rgba(34,197,94,.2);border-radius:12px 12px 0 0;transform:translateY(30px) scale(.9);opacity:0;pointer-events:none;overflow:hidden}
+@keyframes avatarGlow{0%,100%{box-shadow:0 2px 8px rgba(220,38,38,.15)}50%{box-shadow:0 2px 12px rgba(220,38,38,.25)}}
+.cp-panel{position:absolute;left:0;right:0;bottom:0;z-index:10;display:flex;flex-direction:column;background:#fff;border-top:1px solid rgba(220,38,38,.15);border-radius:12px 12px 0 0;transform:translateY(30px) scale(.9);opacity:0;pointer-events:none;overflow:hidden;box-shadow:0 -4px 20px rgba(0,0,0,.08)}
 .cp-panel.show{transform:translateY(0) scale(1);opacity:1;pointer-events:auto;animation:cpPopIn .45s cubic-bezier(.34,1.56,.64,1) forwards}
 .cp-panel.closing{animation:cpPopOut .25s ease forwards;pointer-events:none}
-.cp-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#22c55e,#4ade80,#22c55e,transparent);background-size:200% 100%;animation:glowLine 3s linear infinite;z-index:3}
-.cp-panel::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(34,197,94,.3),transparent);z-index:3}
-.sidebar.cp-active{border-right-color:rgba(34,197,94,.25);animation:neonPulse 3s ease-in-out infinite}
-.cp-header{background:linear-gradient(135deg,rgba(34,197,94,.08),rgba(6,182,212,.04));padding:20px 18px;display:flex;gap:14px;align-items:center;border-bottom:1px solid rgba(34,197,94,.15);position:relative;overflow:hidden}
-.cp-header::before{content:'';position:absolute;top:-50px;right:-50px;width:120px;height:120px;background:radial-gradient(circle,rgba(34,197,94,.1),transparent 70%);border-radius:50%}
-.cp-avatar{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:800;color:#fff;flex-shrink:0;border:2px solid rgba(34,197,94,.4);animation:avatarGlow 3s ease-in-out infinite}
+.cp-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#dc2626,#ef4444,#dc2626,transparent);background-size:200% 100%;animation:glowLine 3s linear infinite;z-index:3}
+.cp-panel::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(220,38,38,.2),transparent);z-index:3}
+.sidebar.cp-active{border-right-color:rgba(220,38,38,.15)}
+.cp-header{background:linear-gradient(135deg,rgba(220,38,38,.04),rgba(220,38,38,.02));padding:20px 18px;display:flex;gap:14px;align-items:center;border-bottom:1px solid rgba(220,38,38,.1);position:relative;overflow:hidden}
+.cp-header::before{content:'';position:absolute;top:-50px;right:-50px;width:120px;height:120px;background:radial-gradient(circle,rgba(220,38,38,.06),transparent 70%);border-radius:50%}
+.cp-avatar{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:800;color:#fff;flex-shrink:0;border:2px solid rgba(220,38,38,.3);animation:avatarGlow 3s ease-in-out infinite}
 .cp-info{flex:1;min-width:0;position:relative;z-index:1}
 .cp-name{font-size:.95rem;font-weight:700;color:#f1f5f9}
 .cp-meta{display:flex;flex-direction:column;gap:4px;margin-top:6px}
@@ -216,29 +217,149 @@ label{font-size:.8rem;color:var(--text2);margin-bottom:4px;display:block;font-we
 .cp-meta-item .cp-icon{font-size:.75rem}
 .cp-body{flex:1;overflow-y:auto;padding:14px 16px}
 .cp-stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:14px}
-.cp-stat{background:var(--bg);border:1px solid rgba(34,197,94,.1);border-radius:8px;padding:10px 6px;text-align:center;transition:all .25s}
-.cp-stat:hover{border-color:rgba(34,197,94,.35);box-shadow:0 0 10px rgba(34,197,94,.08)}
+.cp-stat{background:#f8fafc;border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:10px 6px;text-align:center;transition:all .25s}
+.cp-stat:hover{border-color:rgba(220,38,38,.2);box-shadow:0 2px 8px rgba(0,0,0,.06)}
 .cp-stat-val{font-size:1rem;font-weight:700;font-family:'JetBrains Mono',monospace;line-height:1.2}
-.cp-stat-val.neon{color:#4ade80;text-shadow:0 0 10px rgba(34,197,94,.4)}
-.cp-stat-val.cyan{color:#22d3ee;text-shadow:0 0 10px rgba(6,182,212,.3)}
-.cp-stat-val.gold{color:#fbbf24;text-shadow:0 0 10px rgba(245,158,11,.3)}
+.cp-stat-val.neon{color:#dc2626}
+.cp-stat-val.cyan{color:#dc2626}
+.cp-stat-val.gold{color:#d97706}
 .cp-stat-label{font-size:.55rem;color:var(--text2);margin-top:3px;text-transform:uppercase;letter-spacing:.3px}
-.cp-orders-title{font-size:.7rem;font-weight:600;color:#4ade80;text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
-.cp-orders-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(34,197,94,.3),transparent)}
+.cp-orders-title{font-size:.7rem;font-weight:600;color:#dc2626;text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.cp-orders-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(220,38,38,.2),transparent)}
 .cp-order-row{display:grid;grid-template-columns:82px 1fr 50px 62px;gap:4px;padding:7px 8px;border-bottom:1px solid var(--border);font-size:.7rem;align-items:center;transition:background .15s}
-.cp-order-row:hover{background:rgba(34,197,94,.04)}
+.cp-order-row:hover{background:rgba(220,38,38,.03)}
 .cp-order-row:last-child{border-bottom:none}
-.cp-order-row.header{font-size:.6rem;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.2px;background:rgba(34,197,94,.04);border-radius:6px;margin-bottom:3px;border-bottom:none}
-.cp-order-id{font-family:'JetBrains Mono',monospace;color:#4ade80;font-size:.65rem}
+.cp-order-row.header{font-size:.6rem;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.2px;background:rgba(220,38,38,.03);border-radius:6px;margin-bottom:3px;border-bottom:none}
+.cp-order-id{font-family:'JetBrains Mono',monospace;color:#dc2626;font-size:.65rem}
 .cp-order-date{color:var(--text2);font-size:.65rem}
 .cp-order-qty{font-family:'JetBrains Mono',monospace;text-align:center;font-size:.68rem}
-.cp-order-amt{font-family:'JetBrains Mono',monospace;text-align:right;font-weight:600;color:#4ade80;font-size:.68rem}
-mark{background:rgba(34,197,94,.25);color:#4ade80;border-radius:2px;padding:0 2px;font-weight:600;text-shadow:0 0 8px rgba(34,197,94,.4)}
-.cp-close{position:absolute;top:12px;right:12px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:6px;color:#4ade80;cursor:pointer;font-size:.95rem;padding:4px 10px;transition:all .2s;z-index:4}
-.cp-close:hover{background:rgba(34,197,94,.15);border-color:rgba(34,197,94,.4);box-shadow:0 0 12px rgba(34,197,94,.2)}
-.cp-footer{padding:10px 16px;border-top:1px solid rgba(34,197,94,.12);background:rgba(34,197,94,.03);display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.cp-order-amt{font-family:'JetBrains Mono',monospace;text-align:right;font-weight:600;color:#dc2626;font-size:.68rem}
+mark{background:rgba(220,38,38,.12);color:#dc2626;border-radius:2px;padding:0 2px;font-weight:600}
+.cp-close{position:absolute;top:12px;right:12px;background:rgba(220,38,38,.06);border:1px solid rgba(220,38,38,.15);border-radius:6px;color:#dc2626;cursor:pointer;font-size:.95rem;padding:4px 10px;transition:all .2s;z-index:4}
+.cp-close:hover{background:rgba(220,38,38,.1);border-color:rgba(220,38,38,.3)}
+.cp-footer{padding:10px 16px;border-top:1px solid rgba(0,0,0,.06);background:rgba(0,0,0,.02);display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
 .cp-footer-stat{font-size:.65rem;color:var(--text2);display:flex;align-items:center;gap:3px}
-.cp-footer-stat b{color:#4ade80;font-family:'JetBrains Mono',monospace}
+.cp-footer-stat b{color:#dc2626;font-family:'JetBrains Mono',monospace}
+.cp-nickname{font-size:.72rem;color:var(--text2);font-weight:400}
+.cp-segment-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.58rem;font-weight:600;letter-spacing:.3px}
+.cp-engage-list{margin-bottom:12px}
+.cp-engage-item{display:flex;justify-content:space-between;align-items:center;padding:5px 8px;border-bottom:1px solid var(--border);font-size:.72rem}
+.cp-engage-item:last-child{border-bottom:none}
+.cp-engage-label{color:var(--text2)}
+.cp-engage-val{font-family:'JetBrains Mono',monospace;color:var(--text);font-weight:500;font-size:.68rem}
+.cp-engage-val.danger{color:#dc2626}
+.cp-engage-val.warn{color:#d97706}
+.cp-lastdigit{background:rgba(220,38,38,.08);color:#dc2626;padding:2px 8px;border-radius:6px;font-weight:700;font-size:.75rem;letter-spacing:1px}
+.cp-gender-icon{font-size:.7rem}
+
+/* Customer Dashboard */
+@keyframes dataLoad{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+
+.holo-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);backdrop-filter:blur(6px);z-index:700;display:none;align-items:center;justify-content:center;padding:16px}
+.holo-overlay.show{display:flex}
+.holo-dash{width:96vw;max-width:1440px;height:92vh;max-height:920px;background:#f8fafc;border:1px solid rgba(0,0,0,.1);border-radius:16px;position:relative;overflow:hidden;display:flex;flex-direction:column;animation:fadeIn .5s ease;box-shadow:0 20px 60px rgba(0,0,0,.15)}
+.holo-dash::before{content:none}
+.holo-dash::after{content:none}
+.holo-grid-bg{display:none}
+.holo-corner{display:none}
+.holo-corner::before,.holo-corner::after{display:none}
+.holo-corner-tl,.holo-corner-tr,.holo-corner-bl,.holo-corner-br{display:none}
+.holo-header{padding:14px 24px;border-bottom:1px solid rgba(0,0,0,.08);display:flex;align-items:center;justify-content:space-between;position:relative;z-index:5;flex-shrink:0;background:linear-gradient(135deg,#dc2626,#b91c1c)}
+.holo-title{display:flex;align-items:center;gap:16px}
+.holo-title h2{font-size:1.2rem;font-weight:800;letter-spacing:3px;color:#fff}
+.holo-title .holo-sub{font-size:.7rem;color:rgba(255,255,255,.7);letter-spacing:2px;text-transform:uppercase}
+.holo-close{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:8px;cursor:pointer;font-size:1.05rem;padding:8px 16px;transition:all .2s;z-index:6}
+.holo-close:hover{background:rgba(255,255,255,.25)}
+.holo-body{flex:1;display:grid;grid-template-columns:260px auto 1fr;gap:16px;padding:16px 24px;overflow-y:auto;position:relative;z-index:5}
+.holo-section{background:#ffffff;border:1px solid rgba(0,0,0,.08);border-radius:12px;padding:20px;position:relative;overflow:hidden;transition:border-color .3s;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.holo-section:hover{border-color:rgba(0,0,0,.15)}
+.holo-section::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:2px 2px 0 0}
+.sec-profile::before{background:linear-gradient(90deg,#dc2626,#ef4444)}
+.sec-reward::before{background:linear-gradient(90deg,#dc2626,#f97316)}
+.sec-reward{width:fit-content;min-width:420px}
+.sec-top::before{background:linear-gradient(90deg,#ef4444,#ec4899)}
+.sec-purchase::before{background:linear-gradient(90deg,#dc2626,#b91c1c)}
+.holo-purchase-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+.holo-order-row{padding:10px 12px;border-bottom:1px solid rgba(0,0,0,.06);cursor:pointer;transition:background .2s,border-color .2s;border-radius:6px;margin-bottom:4px;background:rgba(0,0,0,.02)}
+.holo-order-row:hover{background:rgba(220,38,38,.04);border-color:rgba(220,38,38,.15)}
+.holo-order-row.active{background:rgba(220,38,38,.04);border-color:rgba(220,38,38,.1)}
+.holo-order-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.holo-order-id{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:#dc2626;font-weight:600}
+.holo-order-date{font-size:.68rem;color:var(--text2)}
+.holo-order-summary{display:flex;justify-content:space-between;align-items:center;margin-top:5px;font-size:.75rem}
+.holo-order-qty{color:var(--text2)}
+.holo-order-total{font-family:'JetBrains Mono',monospace;font-weight:700;color:#dc2626}
+.holo-order-detail{max-height:0;overflow:hidden;transition:max-height .35s ease,padding .35s ease;padding:0 8px}
+.holo-order-detail.open{max-height:400px;padding:8px}
+.holo-order-detail-inner{background:#f8fafc;border:1px solid rgba(0,0,0,.06);border-radius:6px;padding:8px 10px}
+.holo-order-ticket{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid rgba(148,163,184,.04);font-size:.73rem}
+.holo-order-ticket:last-child{border-bottom:none}
+.holo-order-ticket-num{font-family:'JetBrains Mono',monospace;color:#d97706;font-weight:600;letter-spacing:1px}
+.holo-order-ticket-price{font-family:'JetBrains Mono',monospace;color:var(--text2);font-size:.7rem}
+.holo-order-expand-icon{font-size:.7rem;color:var(--text2);transition:transform .3s}
+.holo-order-row.active .holo-order-expand-icon{transform:rotate(180deg);color:#dc2626}
+.btn-view-orders{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:rgba(220,38,38,.06);border:1px solid rgba(220,38,38,.15);color:#dc2626;border-radius:8px;cursor:pointer;font-size:.72rem;font-weight:600;transition:all .2s;letter-spacing:.3px}
+.btn-view-orders:hover{background:rgba(220,38,38,.1)}
+.orders-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);backdrop-filter:blur(4px);z-index:800;display:none;align-items:center;justify-content:center;padding:20px}
+.orders-modal-overlay.show{display:flex}
+.orders-modal{width:580px;max-width:95vw;max-height:80vh;background:#ffffff;border:1px solid rgba(0,0,0,.1);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;animation:fadeIn .3s ease;box-shadow:0 20px 60px rgba(0,0,0,.15)}
+.orders-modal-header{padding:16px 20px;border-bottom:1px solid rgba(0,0,0,.08);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.orders-modal-header h3{font-size:.9rem;font-weight:700;color:#dc2626;letter-spacing:1px;display:flex;align-items:center;gap:8px}
+.orders-modal-body{flex:1;overflow-y:auto;padding:12px 16px}
+.orders-modal-close{background:rgba(220,38,38,.06);border:1px solid rgba(220,38,38,.15);color:#dc2626;border-radius:6px;cursor:pointer;font-size:.85rem;padding:6px 12px;transition:all .2s}
+.orders-modal-close:hover{background:rgba(220,38,38,.1)}
+.holo-sec-title{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:16px;display:flex;align-items:center;gap:8px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.holo-sec-title .sec-icon{font-size:1.1rem}
+.sec-profile .holo-sec-title{color:#dc2626}
+.sec-reward .holo-sec-title{color:#dc2626}
+.sec-top .holo-sec-title{color:#dc2626}
+.sec-purchase .holo-sec-title{color:#dc2626}
+.holo-avatar-wrap{display:flex;flex-direction:column;align-items:center;margin-bottom:14px}
+.holo-avatar-big{width:84px;height:84px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem;font-weight:800;color:#fff;border:2px solid rgba(220,38,38,.25);box-shadow:0 4px 16px rgba(0,0,0,.1);margin-bottom:10px}
+.holo-cust-name{font-size:1.1rem;font-weight:700;text-align:center}
+.holo-cust-nick{font-size:.82rem;color:var(--text2);text-align:center;margin-top:3px}
+.holo-segment{display:inline-block;padding:5px 14px;border-radius:20px;font-size:.7rem;font-weight:600;letter-spacing:.3px;margin-top:8px}
+.holo-profile-list{display:flex;flex-direction:column}
+.holo-profile-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(148,163,184,.05);font-size:.82rem}
+.holo-profile-row:last-child{border-bottom:none}
+.holo-plabel{color:var(--text2);font-size:.78rem}
+.holo-pval{font-family:'JetBrains Mono',monospace;color:var(--text);font-weight:500;font-size:.8rem}
+.holo-fav-nums{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;justify-content:center}
+.holo-fav-num{font-family:'JetBrains Mono',monospace;font-size:1.1rem;font-weight:800;color:#dc2626;background:rgba(220,38,38,.06);border:1.5px solid rgba(220,38,38,.2);padding:6px 12px;border-radius:8px;letter-spacing:1px;min-width:38px;text-align:center}
+.holo-reward-hero{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.holo-rh-card{background:rgba(220,38,38,.03);border:1px solid rgba(220,38,38,.1);border-radius:8px;padding:8px 6px;text-align:center}
+.holo-rh-val{font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:800;color:#dc2626}
+.holo-rh-label{font-size:.6rem;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-top:3px}
+.holo-reward-list{display:flex;flex-direction:column}
+.holo-reward-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(148,163,184,.05);font-size:.82rem;align-items:center}
+.holo-reward-row:last-child{border-bottom:none}
+.holo-rlabel{color:var(--text2);font-size:.78rem}
+.holo-rval{font-family:'JetBrains Mono',monospace;font-weight:600;font-size:.85rem}
+.holo-rval.glow-cyan{color:#dc2626}
+.holo-rval.glow-green{color:#16a34a}
+.holo-rval.glow-gold{color:#d97706}
+.holo-chart-block{margin-bottom:16px}
+.holo-chart-head{font-size:.75rem;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.holo-chart-head b{font-family:'JetBrains Mono',monospace;font-size:.9rem}
+.holo-chart-head .top-num{color:#dc2626}
+.holo-chart-head .top-count{color:var(--text);font-size:.8rem}
+.holo-bar-chart{display:flex;flex-direction:column;gap:6px}
+.holo-bar-row{display:flex;align-items:center;gap:8px;font-size:.8rem}
+.holo-bar-label{width:36px;font-family:'JetBrains Mono',monospace;color:var(--text2);text-align:right;font-size:.78rem;flex-shrink:0}
+.holo-bar-track{flex:1;height:20px;background:#f1f5f9;border-radius:3px;overflow:hidden}
+.holo-bar-fill{height:100%;border-radius:3px;animation:dataLoad .8s ease forwards}
+.bar-red{background:linear-gradient(90deg,#b91c1c,#dc2626,#ef4444)}
+.bar-cyan{background:linear-gradient(90deg,#dc2626,#ef4444,#f87171)}
+.holo-bar-val{font-family:'JetBrains Mono',monospace;color:var(--text2);font-size:.72rem;width:40px;flex-shrink:0}
+.holo-purchase-item{padding:12px 0;border-bottom:1px solid rgba(0,0,0,.06)}
+.holo-purchase-item:last-child{border-bottom:none}
+.holo-purchase-label{font-size:.7rem;color:var(--text2);text-transform:uppercase;letter-spacing:.3px;margin-bottom:5px}
+.holo-purchase-val{font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:600;color:#dc2626}
+.holo-purchase-val.dim{color:var(--text)}
+.holo-purchase-val.warn{color:#d97706}
+.holo-purchase-val.danger{color:#dc2626}
+@media(max-width:1100px){.holo-body{grid-template-columns:1fr 1fr}}
+@media(max-width:700px){.holo-body{grid-template-columns:1fr;padding:10px}.holo-purchase-grid{grid-template-columns:1fr}}
 
 /* Responsive */
 @media(max-width:768px){
@@ -274,7 +395,7 @@ mark{background:rgba(34,197,94,.25);color:#4ade80;border-radius:2px;padding:0 2p
     <button class="btn btn-red" onclick="doLogin()">เข้าสู่ระบบ</button>
     <div style="display:flex;justify-content:space-between;margin-top:14px">
       <div class="forgot-link" onclick="showModal('forgotModal')">ลืมรหัสผ่าน?</div>
-      <div class="forgot-link" onclick="showRegister()" style="color:var(--cyan)">สมัครสมาชิก</div>
+      <div class="forgot-link" onclick="showRegister()" style="color:var(--red)">สมัครสมาชิก</div>
     </div>
   </div>
 
@@ -407,6 +528,28 @@ mark{background:rgba(34,197,94,.25);color:#4ade80;border-radius:2px;padding:0 2p
 </div>
 
 <div class="toast-container" id="toasts"></div>
+
+<!-- Sci-Fi Customer Dashboard Modal -->
+<div class="holo-overlay" id="holoDash" onclick="if(event.target===this)closeHoloDash()">
+  <div class="holo-dash">
+    <div class="holo-grid-bg"></div>
+    <div class="holo-corner holo-corner-tl"></div>
+    <div class="holo-corner holo-corner-tr"></div>
+    <div class="holo-corner holo-corner-bl"></div>
+    <div class="holo-corner holo-corner-br"></div>
+    <div class="holo-header">
+      <div class="holo-title">
+        <div><h2>LOTTERY PLUS</h2><div class="holo-sub">Customer Intelligence System</div></div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn btn-sm" onclick="copyHoloDashImage()" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:.75rem;transition:all .2s" onmouseover="this.style.background='rgba(255,255,255,.25)'" onmouseout="this.style.background='rgba(255,255,255,.15)'">&#128203; Copy ภาพ</button>
+        <button class="btn btn-sm" onclick="saveHoloDashImage()" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:.75rem;transition:all .2s" onmouseover="this.style.background='rgba(255,255,255,.25)'" onmouseout="this.style.background='rgba(255,255,255,.15)'">&#128190; Save ภาพ</button>
+        <button class="holo-close" onclick="closeHoloDash()">&times; CLOSE</button>
+      </div>
+    </div>
+    <div class="holo-body" id="holoBody"></div>
+  </div>
+</div>
 
 <script>
 const CONFIG = { APPS_SCRIPT_URL: '', DEMO_MODE: true };
@@ -716,87 +859,43 @@ const OPC_ROOMS = ['VIP 1','VIP 2','VIP 3','VIP 4','VIP 5','VIP 6','VIP 7','VIP 
 const SM_TYPES = ['Facebook Pages','Facebook Groups','TikTok','YouTube','Social Listening','KOL/Influencer','Line OA','Outbound Call'];
 const SM_PAGES = ['ลอตเตอรี่พลัส (2.5 ล้าน)','ลอตเตอรี่พลัส(ใหม่)','ลอตเตอรี่พลัสOfficial','ชุมชนชาวลอตเตอรี่พลัส','ลอตเตอรี่พลัส Live','นกพลัส','FB : นอท พันธ์ธวัช นาควิสุทธิ์','เฮี้ยน','แม่ตุ๊กตาพารวย','นกพลัส Live','นอท พันธ์ธวัช','กลุ่มลอตเตอรี่พลัส 2.9 หมื่น','กลุ่มลอตเตอรี่พลัส 1.4 แสน','กลุ่มลอตเตอรี่พลัส 7.2 หมื่น','กลุ่มนกพลัส official 1.2 หมื่น','กลุ่มนกพลัส official 1.9 หมื่น','กลุ่มลอตเตอรี่พลัส 4.3 แสน','กลุ่มทำนายฝัน by ลอตเตอรี่พลัส','ลิงก์ข่าว/เพจพรีเซ็นเตอร์'];
 
+const SEGMENT_CONFIG = {
+  '3.Potential Loyalist':{color:'#4ade80',bg:'rgba(34,197,94,.15)',border:'rgba(34,197,94,.3)',label:'Potential Loyalist',avatar:'#22c55e'},
+  '6.Customers Low Frequency':{color:'#60a5fa',bg:'rgba(59,130,246,.15)',border:'rgba(59,130,246,.3)',label:'Low Frequency',avatar:'#3b82f6'},
+  '7.Promising':{color:'#22d3ee',bg:'rgba(6,182,212,.15)',border:'rgba(6,182,212,.3)',label:'Promising',avatar:'#06b6d4'},
+  '8.Need Attention':{color:'#fbbf24',bg:'rgba(245,158,11,.15)',border:'rgba(245,158,11,.3)',label:'Need Attention',avatar:'#f59e0b'},
+  '9.About To Sleep':{color:'#c084fc',bg:'rgba(168,85,247,.15)',border:'rgba(168,85,247,.3)',label:'About To Sleep',avatar:'#a855f7'},
+  '12.Hibernating Customers':{color:'#9ca3af',bg:'rgba(107,114,128,.15)',border:'rgba(107,114,128,.3)',label:'Hibernating',avatar:'#6b7280'},
+  '13.Lost Customers':{color:'#f87171',bg:'rgba(239,68,68,.15)',border:'rgba(239,68,68,.3)',label:'Lost Customer',avatar:'#ef4444'}
+};
+const SEGMENT_NEW = {color:'#2dd4bf',bg:'rgba(45,212,191,.15)',border:'rgba(45,212,191,.3)',label:'New Customer',avatar:'#14b8a6'};
+
+function getSegmentInfo(seg) { return SEGMENT_CONFIG[seg] || SEGMENT_NEW; }
+function fmtGender(g) { return g==='FEMALE'?'หญิง':g==='MALE'?'ชาย':'ไม่ระบุ'; }
+function fmtDate(d) { if(!d) return '-'; return new Date(d).toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'2-digit'}); }
+
 const MOCK_CUSTOMERS = [
-  {id:'C001',memberId:'LTP-2024-00158',name:'ณัฐพล จันทร์สว่าง',phone:'089-555-1234',avatar:'#3b82f6',initials:'ณจ',
-   orders:[
-     {orderId:'ORD-780123',date:'2026-02-28',qty:5,amount:500},
-     {orderId:'ORD-776890',date:'2026-02-14',qty:3,amount:300},
-     {orderId:'ORD-770045',date:'2026-01-30',qty:10,amount:1000},
-     {orderId:'ORD-765210',date:'2026-01-16',qty:2,amount:200},
-     {orderId:'ORD-760088',date:'2026-01-02',qty:8,amount:800}
-   ]},
-  {id:'C002',memberId:'LTP-2024-00247',name:'สุภาพร แก้วมณี',phone:'091-234-5678',avatar:'#ec4899',initials:'สก',
-   orders:[
-     {orderId:'ORD-781501',date:'2026-03-05',qty:20,amount:2000},
-     {orderId:'ORD-778200',date:'2026-02-20',qty:15,amount:1500},
-     {orderId:'ORD-772300',date:'2026-02-06',qty:10,amount:1000},
-     {orderId:'ORD-768100',date:'2026-01-22',qty:25,amount:2500},
-     {orderId:'ORD-762050',date:'2026-01-08',qty:12,amount:1200}
-   ]},
-  {id:'C003',memberId:'LTP-2024-00389',name:'วิทยา ศรีสุข',phone:'086-789-0123',avatar:'#22c55e',initials:'วศ',
-   orders:[
-     {orderId:'ORD-780900',date:'2026-03-01',qty:2,amount:200},
-     {orderId:'ORD-775600',date:'2026-02-12',qty:3,amount:300},
-     {orderId:'ORD-769400',date:'2026-01-25',qty:1,amount:100},
-     {orderId:'ORD-764300',date:'2026-01-12',qty:2,amount:200},
-     {orderId:'ORD-758900',date:'2025-12-28',qty:5,amount:500}
-   ]},
-  {id:'C004',memberId:'LTP-2024-00412',name:'พรพิมล ธนากร',phone:'095-456-7890',avatar:'#f59e0b',initials:'พธ',
-   orders:[
-     {orderId:'ORD-782100',date:'2026-03-06',qty:50,amount:5000},
-     {orderId:'ORD-779500',date:'2026-02-22',qty:30,amount:3000},
-     {orderId:'ORD-774200',date:'2026-02-08',qty:40,amount:4000},
-     {orderId:'ORD-769800',date:'2026-01-26',qty:35,amount:3500},
-     {orderId:'ORD-765500',date:'2026-01-14',qty:45,amount:4500}
-   ]},
-  {id:'C005',memberId:'LTP-2024-00578',name:'ธนชัย เลิศวิไล',phone:'082-111-2233',avatar:'#a855f7',initials:'ธล',
-   orders:[
-     {orderId:'ORD-781200',date:'2026-03-03',qty:8,amount:800},
-     {orderId:'ORD-777800',date:'2026-02-18',qty:6,amount:600},
-     {orderId:'ORD-773100',date:'2026-02-04',qty:10,amount:1000},
-     {orderId:'ORD-768500',date:'2026-01-20',qty:5,amount:500},
-     {orderId:'ORD-763200',date:'2026-01-06',qty:7,amount:700}
-   ]},
-  {id:'C006',memberId:'LTP-2024-00634',name:'อารยา สมบูรณ์ดี',phone:'098-333-4455',avatar:'#14b8a6',initials:'อส',
-   orders:[
-     {orderId:'ORD-780500',date:'2026-02-27',qty:3,amount:300},
-     {orderId:'ORD-776200',date:'2026-02-13',qty:5,amount:500},
-     {orderId:'ORD-771800',date:'2026-01-29',qty:2,amount:200},
-     {orderId:'ORD-767300',date:'2026-01-18',qty:4,amount:400},
-     {orderId:'ORD-762900',date:'2026-01-04',qty:6,amount:600}
-   ]},
-  {id:'C007',memberId:'LTP-2024-00715',name:'กฤษฎา พันธุ์ทอง',phone:'063-222-8899',avatar:'#e11d48',initials:'กพ',
-   orders:[
-     {orderId:'ORD-782400',date:'2026-03-07',qty:100,amount:10000},
-     {orderId:'ORD-778900',date:'2026-02-21',qty:80,amount:8000},
-     {orderId:'ORD-774600',date:'2026-02-09',qty:60,amount:6000},
-     {orderId:'ORD-770200',date:'2026-01-27',qty:90,amount:9000},
-     {orderId:'ORD-766000',date:'2026-01-15',qty:75,amount:7500}
-   ]},
-  {id:'C008',memberId:'LTP-2024-00893',name:'จิราภา วงษ์สกุล',phone:'097-666-7788',avatar:'#f97316',initials:'จว',
-   orders:[
-     {orderId:'ORD-781800',date:'2026-03-04',qty:15,amount:1500},
-     {orderId:'ORD-777400',date:'2026-02-16',qty:12,amount:1200},
-     {orderId:'ORD-773500',date:'2026-02-05',qty:20,amount:2000},
-     {orderId:'ORD-769000',date:'2026-01-23',qty:10,amount:1000},
-     {orderId:'ORD-764800',date:'2026-01-10',qty:18,amount:1800}
-   ]},
-  {id:'C009',memberId:'LTP-2025-00021',name:'สมศักดิ์ รุ่งเรืองกิจ',phone:'084-888-9900',avatar:'#6366f1',initials:'สร',
-   orders:[
-     {orderId:'ORD-780200',date:'2026-02-26',qty:4,amount:400},
-     {orderId:'ORD-775900',date:'2026-02-11',qty:6,amount:600},
-     {orderId:'ORD-771500',date:'2026-01-28',qty:3,amount:300},
-     {orderId:'ORD-767000',date:'2026-01-17',qty:5,amount:500},
-     {orderId:'ORD-762600',date:'2026-01-03',qty:2,amount:200}
-   ]},
-  {id:'C010',memberId:'LTP-2025-00105',name:'มนัสนันท์ ศิริประภา',phone:'061-444-5566',avatar:'#0ea5e9',initials:'มศ',
-   orders:[
-     {orderId:'ORD-782000',date:'2026-03-06',qty:7,amount:700},
-     {orderId:'ORD-779200',date:'2026-02-19',qty:10,amount:1000},
-     {orderId:'ORD-774000',date:'2026-02-07',qty:8,amount:800},
-     {orderId:'ORD-769600',date:'2026-01-24',qty:12,amount:1200},
-     {orderId:'ORD-765200',date:'2026-01-12',qty:9,amount:900}
-   ]}
+  {id:'P9139687',name:'อรวรรณ ประดุจชน',nickName:'หนูนา',initials:'อป',gender:'FEMALE',age:34,phone:'092-615-2361',birthday:'1992-07-19',countPrize:0,totalPrize:0,countRound:29,segment:'3.Potential Loyalist',totalItem:97,totalPrice:10185,lastRoundSpend:4,aovPerRound:3.34,createdAt:'2024-08-11',firstBuy:'2024-08-23',lastBuy:'2026-03-06',roundNotBuy:1,lotteryCount:2,lastTwoDigit:'85'},
+  {id:'P7204017',name:'เฉลิมศักดิ์ ลู่วิจิตรบรรจง',nickName:'จู',initials:'เล',gender:'MALE',age:41,phone:'083-788-1916',birthday:'1985-12-17',countPrize:0,totalPrize:0,countRound:43,segment:'3.Potential Loyalist',totalItem:55,totalPrice:5775,lastRoundSpend:2,aovPerRound:1.28,createdAt:'2023-09-23',firstBuy:'2024-01-08',lastBuy:'2026-03-05',roundNotBuy:1,lotteryCount:1,lastTwoDigit:'29'},
+  {id:'P12267613',name:'นริศรา สีสวาด',nickName:'มิ้ลค์',initials:'นส',gender:'FEMALE',age:32,phone:'098-868-9483',birthday:'1994-07-13',countPrize:0,totalPrize:0,countRound:11,segment:'9.About To Sleep',totalItem:51,totalPrice:5355,lastRoundSpend:0,aovPerRound:4.64,createdAt:'2025-07-01',firstBuy:'2025-07-01',lastBuy:'2026-03-07',roundNotBuy:7,lotteryCount:2,lastTwoDigit:'96'},
+  {id:'P13056837',name:'สิริรัตน์ หว่างจ้อย',nickName:'ป๊อป',initials:'สห',gender:'FEMALE',age:30,phone:'095-359-6352',birthday:'1996-04-17',countPrize:5,totalPrize:12000,countRound:8,segment:'3.Potential Loyalist',totalItem:239,totalPrice:25095,lastRoundSpend:51,aovPerRound:29.88,createdAt:'2025-11-16',firstBuy:'2025-11-27',lastBuy:'2026-03-07',roundNotBuy:1,lotteryCount:3,lastTwoDigit:'79'},
+  {id:'P10757449',name:'ชวนากร เล็กแจ่ม',nickName:'เอิร์ธ',initials:'ชล',gender:'MALE',age:30,phone:'094-829-8964',birthday:'1996-02-04',countPrize:10,totalPrize:38000,countRound:25,segment:'3.Potential Loyalist',totalItem:678,totalPrice:71190,lastRoundSpend:29,aovPerRound:27.12,createdAt:'2025-01-14',firstBuy:'2025-01-14',lastBuy:'2026-03-05',roundNotBuy:1,lotteryCount:6,lastTwoDigit:'89'},
+  {id:'P10584403',name:'ณัฐพงษ์ ศักดิ์จันทร์',nickName:'แนน',initials:'ณศ',gender:'MALE',age:31,phone:'082-097-1944',birthday:'1995-12-14',countPrize:4,totalPrize:10000,countRound:30,segment:'3.Potential Loyalist',totalItem:168,totalPrice:17640,lastRoundSpend:5,aovPerRound:5.6,createdAt:'2024-12-25',firstBuy:'2024-12-28',lastBuy:'2026-03-06',roundNotBuy:1,lotteryCount:1,lastTwoDigit:'39'},
+  {id:'P12481721',name:'ณรงค์ศักดิ์ สังสุด',nickName:'SPY',initials:'ณส',gender:'MALE',age:35,phone:'082-005-3873',birthday:'1991-09-25',countPrize:0,totalPrize:0,countRound:6,segment:'7.Promising',totalItem:62,totalPrice:6510,lastRoundSpend:4,aovPerRound:10.33,createdAt:'2025-07-29',firstBuy:'2025-07-30',lastBuy:'2026-03-06',roundNotBuy:1,lotteryCount:5,lastTwoDigit:'51'},
+  {id:'P7187314',name:'สมัชชา ประสงค์สุข',nickName:'ก๊อด',initials:'สป',gender:'UNSPECIFIED',age:31,phone:'091-886-3756',birthday:'1995-07-31',countPrize:0,totalPrize:0,countRound:16,segment:'9.About To Sleep',totalItem:155,totalPrice:16275,lastRoundSpend:0,aovPerRound:9.69,createdAt:'2023-09-18',firstBuy:'2023-09-22',lastBuy:'2026-03-05',roundNotBuy:43,lotteryCount:10,lastTwoDigit:'41'},
+  {id:'P12765967',name:'MinKo Naing',nickName:'โอ',initials:'MN',gender:'MALE',age:40,phone:'082-458-7101',birthday:'1986-03-12',countPrize:0,totalPrize:0,countRound:12,segment:'3.Potential Loyalist',totalItem:82,totalPrice:8610,lastRoundSpend:3,aovPerRound:6.83,createdAt:'2025-09-15',firstBuy:'2025-09-15',lastBuy:'2026-03-06',roundNotBuy:1,lotteryCount:8,lastTwoDigit:'35'},
+  {id:'P13519082',name:'Sabrine Bouras',nickName:'Sabrine',initials:'SB',gender:'FEMALE',age:48,phone:'094-705-745',birthday:'1978-03-14',countPrize:0,totalPrize:0,countRound:1,segment:null,totalItem:3,totalPrice:315,lastRoundSpend:0,aovPerRound:3,createdAt:'2026-03-08',firstBuy:'2026-03-08',lastBuy:'2026-03-08',roundNotBuy:0,lotteryCount:1,lastTwoDigit:'56'},
+  {id:'P12479796',name:'นิดานุช ลุงย่า',nickName:'ทิพย์',initials:'นล',gender:'FEMALE',age:32,phone:'097-969-6349',birthday:'1994-08-09',countPrize:0,totalPrize:0,countRound:2,segment:null,totalItem:8,totalPrice:840,lastRoundSpend:0,aovPerRound:4,createdAt:'2025-07-29',firstBuy:'2026-02-28',lastBuy:'2026-03-05',roundNotBuy:0,lotteryCount:1,lastTwoDigit:'34'},
+  {id:'P9014828',name:'สมหญิง แซ่โซ้ง',nickName:'น้องหญิง',initials:'สซ',gender:'FEMALE',age:37,phone:'092-665-5291',birthday:'1989-05-14',countPrize:0,totalPrize:0,countRound:20,segment:'3.Potential Loyalist',totalItem:308,totalPrice:32315,lastRoundSpend:16,aovPerRound:15.4,createdAt:'2024-07-31',firstBuy:'2024-07-31',lastBuy:'2026-03-07',roundNotBuy:1,lotteryCount:1,lastTwoDigit:'80'},
+  {id:'P12752403',name:'สมคิด สุวรรณรังศรี',nickName:'กุ่ย',initials:'สส',gender:'UNSPECIFIED',age:53,phone:'092-525-3363',birthday:'1973-08-11',countPrize:4,totalPrize:10000,countRound:12,segment:'3.Potential Loyalist',totalItem:129,totalPrice:13545,lastRoundSpend:12,aovPerRound:10.75,createdAt:'2025-09-12',firstBuy:'2025-09-14',lastBuy:'2026-03-07',roundNotBuy:1,lotteryCount:1,lastTwoDigit:'37'},
+  {id:'P8433137',name:'ปรีดาวรรณ สุขเกษม',nickName:'อ้อ',initials:'ปส',gender:'FEMALE',age:48,phone:'063-939-6355',birthday:'1978-01-03',countPrize:2,totalPrize:8000,countRound:25,segment:'8.Need Attention',totalItem:95,totalPrice:9975,lastRoundSpend:0,aovPerRound:3.8,createdAt:'2024-03-31',firstBuy:'2024-03-31',lastBuy:'2026-03-06',roundNotBuy:22,lotteryCount:3,lastTwoDigit:'07'},
+  {id:'P13209317',name:'สุดสงวน นโนธรรม',nickName:'แต๋ว',initials:'สน',gender:'UNSPECIFIED',age:75,phone:'082-565-4954',birthday:'1951-11-23',countPrize:12,totalPrize:48000,countRound:5,segment:'3.Potential Loyalist',totalItem:144,totalPrice:15120,lastRoundSpend:32,aovPerRound:28.8,createdAt:'2025-12-27',firstBuy:'2025-12-27',lastBuy:'2026-03-08',roundNotBuy:1,lotteryCount:8,lastTwoDigit:'29'},
+  {id:'P9115645',name:'พัชดา แฟรนซัน',nickName:'ดา',initials:'พฟ',gender:'FEMALE',age:44,phone:'096-250-9678',birthday:'1982-12-22',countPrize:3,totalPrize:6000,countRound:14,segment:'13.Lost Customers',totalItem:63,totalPrice:6615,lastRoundSpend:0,aovPerRound:4.5,createdAt:'2024-08-09',firstBuy:'2025-02-16',lastBuy:'2026-03-07',roundNotBuy:25,lotteryCount:3,lastTwoDigit:'97'},
+  {id:'P6557984',name:'ชัยยะ เคหะนันท์',nickName:'Ya',initials:'ชค',gender:'UNSPECIFIED',age:54,phone:'088-215-9824',birthday:'1972-04-24',countPrize:15,totalPrize:40000,countRound:57,segment:'3.Potential Loyalist',totalItem:1696,totalPrice:178080,lastRoundSpend:14,aovPerRound:29.75,createdAt:'2023-07-23',firstBuy:'2023-09-23',lastBuy:'2026-03-06',roundNotBuy:1,lotteryCount:5,lastTwoDigit:'30'},
+  {id:'P8400905',name:'สุวณีย์ วรโชติภัสร์สกุล',nickName:'ณี',initials:'สว',gender:'FEMALE',age:44,phone:'096-228-9338',birthday:'1982-02-09',countPrize:0,totalPrize:0,countRound:13,segment:'13.Lost Customers',totalItem:57,totalPrice:5985,lastRoundSpend:0,aovPerRound:4.38,createdAt:'2024-03-26',firstBuy:'2024-03-26',lastBuy:'2026-03-08',roundNotBuy:33,lotteryCount:4,lastTwoDigit:'56'},
+  {id:'P8851103',name:'มลฑาทิพย์ แสนเทพ',nickName:'แพรว',initials:'มแ',gender:'FEMALE',age:25,phone:'099-140-7495',birthday:'2001-03-29',countPrize:0,totalPrize:0,countRound:8,segment:'6.Customers Low Frequency',totalItem:14,totalPrice:1470,lastRoundSpend:1,aovPerRound:1.75,createdAt:'2024-07-14',firstBuy:'2025-09-01',lastBuy:'2026-03-07',roundNotBuy:1,lotteryCount:1,lastTwoDigit:'72'},
+  {id:'P11975611',name:'กาญจนา ศิริบูรณ์',nickName:'ญาดา',initials:'กศ',gender:'FEMALE',age:42,phone:'064-048-5401',birthday:'1984-04-14',countPrize:0,totalPrize:0,countRound:4,segment:'6.Customers Low Frequency',totalItem:37,totalPrice:3885,lastRoundSpend:3,aovPerRound:9.25,createdAt:'2025-05-30',firstBuy:'2025-06-20',lastBuy:'2026-03-06',roundNotBuy:1,lotteryCount:9,lastTwoDigit:'42'},
+  {id:'P7011085',name:'สุปราณี ซ่านะ',nickName:'มุก',initials:'สซ',gender:'FEMALE',age:45,phone:'061-307-4808',birthday:'1981-06-04',countPrize:0,totalPrize:0,countRound:8,segment:'12.Hibernating Customers',totalItem:14,totalPrice:1470,lastRoundSpend:0,aovPerRound:1.75,createdAt:'2023-09-03',firstBuy:'2024-01-07',lastBuy:'2026-03-05',roundNotBuy:51,lotteryCount:1,lastTwoDigit:'45'}
 ];
 
 const MOCK_USERS = [
@@ -999,17 +1098,29 @@ function renderEntryPage() {
   let html = `<div class="entry-layout">`;
   // Left column
   html += `<div>`;
-  html += `<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
-      <span style="font-size:1.15rem;font-weight:800;color:${teamColor};letter-spacing:.5px">${team}</span>
-      <span style="font-family:'JetBrains Mono',monospace;font-size:.95rem;color:var(--cyan);background:rgba(6,182,212,.1);padding:8px 18px;border-radius:20px;border:1px solid rgba(6,182,212,.25);font-weight:800;letter-spacing:.5px">งวด ${period}</span>
+  const isSpecialist = team === 'Specialist';
+  const displayTeam = isSpecialist ? ENTRY_TEAMS[0] : team;
+  const displayColor = isSpecialist ? TEAM_COLORS['Specialist'] : teamColor;
+  if (isSpecialist) {
+    html += `<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+      <select id="specialistTeamSelect" class="input" style="width:auto;min-width:160px;font-size:1rem;font-weight:700;color:${displayColor};border-color:${displayColor}44;background:var(--bg)" onchange="onSpecialistTeamChange()">
+        ${ENTRY_TEAMS.map(t => `<option value="${t}" style="color:var(--text)">${t}</option>`).join('')}
+      </select>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:.95rem;color:#dc2626;background:rgba(220,38,38,.06);padding:8px 18px;border-radius:20px;border:1px solid rgba(220,38,38,.15);font-weight:800;letter-spacing:.5px">งวด ${period}</span>
     </div>`;
+  } else {
+    html += `<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+      <span style="font-size:1.15rem;font-weight:800;color:${teamColor};letter-spacing:.5px">${team}</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:.95rem;color:#dc2626;background:rgba(220,38,38,.06);padding:8px 18px;border-radius:20px;border:1px solid rgba(220,38,38,.15);font-weight:800;letter-spacing:.5px">งวด ${period}</span>
+    </div>`;
+  }
   html += `<div class="global-search">
     <span class="search-icon">&#128269;</span>
     <input type="text" id="globalSearchInput" placeholder="ค้นหา รหัสสมาชิก / ชื่อ-นามสกุล / เบอร์โทรศัพท์ / หมายเลขออเดอร์..." autocomplete="off">
     <div class="search-results" id="globalSearchResults"></div>
   </div>`;
-  html += `<div class="entry-form"><div class="glass">`;
-  html += buildTeamFields(team);
+  html += `<div class="entry-form"><div class="glass" id="entryFormInner">`;
+  html += buildTeamFields(isSpecialist ? displayTeam : team);
   html += `<div class="submit-area"><button class="btn btn-red" onclick="submitEntry()">บันทึก</button><button class="btn btn-ghost" onclick="clearForm()">ล้าง</button></div>`;
   html += `</div></div>`;
   html += `</div>`;
@@ -1101,10 +1212,10 @@ function initGlobalSearch() {
     // Search customers first
     const custMatched = MOCK_CUSTOMERS.filter(c =>
       c.name.toLowerCase().includes(q) ||
-      c.memberId.toLowerCase().includes(q) ||
+      c.id.toLowerCase().includes(q) ||
+      c.nickName.toLowerCase().includes(q) ||
       c.phone.replace(/-/g,'').includes(q.replace(/-/g,'')) ||
-      c.phone.includes(q) ||
-      c.orders.some(o => o.orderId.toLowerCase().includes(q))
+      c.phone.includes(q)
     );
     // Search entries
     const entries = getEntries();
@@ -1122,14 +1233,15 @@ function initGlobalSearch() {
     // Customer results section
     if (custMatched.length) {
       html += '<div style="padding:8px 18px;font-size:.68rem;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;font-weight:600;border-bottom:1px solid var(--border);background:var(--bg)">ลูกค้า</div>';
-      html += custMatched.map(c =>
-        `<div class="search-result-item" onclick="showCustomerProfile('${c.id}')">
-          <div style="width:32px;height:32px;border-radius:50%;background:${c.avatar};display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:#fff;flex-shrink:0">${c.initials}</div>
-          <div class="sr-info"><div class="sr-primary">${highlightText(c.name,q)}</div>
-          <div class="sr-secondary">${highlightText(c.memberId,q)} &bull; ${highlightText(c.phone,q)}</div></div>
-          <span class="sr-badge" style="background:rgba(6,182,212,.12);color:var(--cyan);border:1px solid rgba(6,182,212,.25)">Customer</span>
-        </div>`
-      ).join('');
+      html += custMatched.map(c => {
+        const seg = getSegmentInfo(c.segment);
+        return `<div class="search-result-item" onclick="showCustomerProfile('${c.id}')">
+          <div style="width:32px;height:32px;border-radius:50%;background:${seg.avatar};display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:#fff;flex-shrink:0">${c.initials}</div>
+          <div class="sr-info"><div class="sr-primary">${highlightText(c.name,q)} <span style="color:var(--text2);font-size:.7rem">(${c.nickName})</span></div>
+          <div class="sr-secondary">${highlightText(c.id,q)} &bull; ${highlightText(c.phone,q)}</div></div>
+          <span class="sr-badge" style="background:${seg.bg};color:${seg.color};border:1px solid ${seg.border}">${seg.label}</span>
+        </div>`;
+      }).join('');
     }
     // Entry results section
     if (entryMatched.length) {
@@ -1161,10 +1273,10 @@ function initGlobalSearch() {
       // Find first matching customer
       const cust = MOCK_CUSTOMERS.find(c =>
         c.name.toLowerCase().includes(q) ||
-        c.memberId.toLowerCase().includes(q) ||
+        c.id.toLowerCase().includes(q) ||
+        c.nickName.toLowerCase().includes(q) ||
         c.phone.replace(/-/g,'').includes(q.replace(/-/g,'')) ||
-        c.phone.includes(q) ||
-        c.orders.some(o => o.orderId.toLowerCase().includes(q))
+        c.phone.includes(q)
       );
       if (cust) {
         results.classList.remove('show');
@@ -1209,55 +1321,337 @@ function renderCustomerProfile(cust, query) {
   const sidebar = document.getElementById('sidebar');
   if (!panel) return;
   const q = query || '';
-  const h = (text) => highlightText(text, q);
-  const totalOrders = cust.orders.length;
-  const totalQty = cust.orders.reduce((s, o) => s + o.qty, 0);
-  const totalAmt = cust.orders.reduce((s, o) => s + o.amount, 0);
-  const avgQtyPerOrder = totalOrders > 0 ? (totalQty / totalOrders).toFixed(1) : 0;
-  const avgAmtPerOrder = totalOrders > 0 ? Math.round(totalAmt / totalOrders) : 0;
-  const periods = [...new Set(cust.orders.map(o => getPeriod(new Date(o.date))))];
-  const avgPerPeriod = periods.length > 0 ? Math.round(totalAmt / periods.length) : 0;
+  const h = (text) => highlightText(String(text||''), q);
+  const seg = getSegmentInfo(cust.segment);
+  const genderIcon = cust.gender==='FEMALE'?'\u{2640}\u{FE0F}':cust.gender==='MALE'?'\u{2642}\u{FE0F}':'\u{26AB}';
+  const daysSinceJoined = Math.floor((new Date() - new Date(cust.createdAt)) / 86400000);
+  const roundNotBuyClass = cust.roundNotBuy >= 20 ? 'danger' : cust.roundNotBuy >= 5 ? 'warn' : '';
 
   let html = `<button class="cp-close" onclick="hideCustomerProfile()" title="ปิด">&times;</button>`;
   html += `<div class="cp-header">
-    <div class="cp-avatar" style="background:linear-gradient(135deg,${cust.avatar},${cust.avatar}dd)">${cust.initials}</div>
+    <div class="cp-avatar" style="background:linear-gradient(135deg,${seg.avatar},${seg.avatar}dd)">${cust.initials}</div>
     <div class="cp-info">
-      <div class="cp-name">${h(cust.name)}</div>
+      <div class="cp-name" style="cursor:pointer;transition:color .2s" onclick="openCustomerDashboard('${cust.id}')" onmouseover="this.style.color='#dc2626'" onmouseout="this.style.color=''">${h(cust.name)} <span class="cp-nickname">(${h(cust.nickName)})</span></div>
       <div class="cp-meta">
-        <span class="cp-meta-item"><span class="cp-icon">\u{1F194}</span> ${h(cust.memberId)}</span>
+        <span class="cp-meta-item"><span class="cp-icon">\u{1F194}</span> ${h(cust.id)}</span>
         <span class="cp-meta-item"><span class="cp-icon">\u{1F4F1}</span> ${h(cust.phone)}</span>
+        <span class="cp-meta-item"><span class="cp-gender-icon">${genderIcon}</span> ${fmtGender(cust.gender)} &bull; ${cust.age} ปี</span>
       </div>
+      <div style="margin-top:6px"><span class="cp-segment-badge" style="background:${seg.bg};color:${seg.color};border:1px solid ${seg.border}">${seg.label}</span></div>
     </div>
   </div>`;
   html += `<div class="cp-body">`;
   html += `<div class="cp-stats-grid">
-    <div class="cp-stat"><div class="cp-stat-val neon">${avgQtyPerOrder}</div><div class="cp-stat-label">ใบ/ครั้ง</div></div>
-    <div class="cp-stat"><div class="cp-stat-val cyan">\u{0E3F}${avgAmtPerOrder.toLocaleString()}</div><div class="cp-stat-label">เฉลี่ย/ครั้ง</div></div>
-    <div class="cp-stat"><div class="cp-stat-val gold">\u{0E3F}${avgPerPeriod.toLocaleString()}</div><div class="cp-stat-label">เฉลี่ย/งวด</div></div>
+    <div class="cp-stat"><div class="cp-stat-val neon">${cust.totalItem.toLocaleString()}</div><div class="cp-stat-label">สลากรวม</div></div>
+    <div class="cp-stat"><div class="cp-stat-val cyan">\u{0E3F}${cust.totalPrice.toLocaleString()}</div><div class="cp-stat-label">ยอดรวม</div></div>
+    <div class="cp-stat"><div class="cp-stat-val gold">${cust.countRound}</div><div class="cp-stat-label">จำนวนงวด</div></div>
+    <div class="cp-stat"><div class="cp-stat-val neon">${cust.aovPerRound}</div><div class="cp-stat-label">ใบ/งวด</div></div>
+    <div class="cp-stat"><div class="cp-stat-val cyan">${cust.countPrize||0}</div><div class="cp-stat-label">ถูกรางวัล</div></div>
+    <div class="cp-stat"><div class="cp-stat-val gold">\u{0E3F}${(cust.totalPrize||0).toLocaleString()}</div><div class="cp-stat-label">เงินรางวัล</div></div>
   </div>`;
-  html += `<div class="cp-orders-title">5 คำสั่งซื้อล่าสุด</div>`;
-  html += `<div class="cp-order-row header"><span>Order ID</span><span>วันที่</span><span style="text-align:center">จำนวน</span><span style="text-align:right">ยอดเงิน</span></div>`;
-  cust.orders.forEach(o => {
-    const d = new Date(o.date).toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'2-digit'});
-    html += `<div class="cp-order-row">
-      <span class="cp-order-id">${h(o.orderId)}</span>
-      <span class="cp-order-date">${d}</span>
-      <span class="cp-order-qty">${o.qty} ใบ</span>
-      <span class="cp-order-amt">\u{0E3F}${o.amount.toLocaleString()}</span>
-    </div>`;
-  });
+  html += `<div class="cp-orders-title">\u{1F4C5} ข้อมูลการมีส่วนร่วม</div>`;
+  html += `<div class="cp-engage-list">
+    <div class="cp-engage-item"><span class="cp-engage-label">สมัครสมาชิก</span><span class="cp-engage-val">${fmtDate(cust.createdAt)}</span></div>
+    <div class="cp-engage-item"><span class="cp-engage-label">ซื้อครั้งแรก</span><span class="cp-engage-val">${fmtDate(cust.firstBuy)}</span></div>
+    <div class="cp-engage-item"><span class="cp-engage-label">ซื้อล่าสุด</span><span class="cp-engage-val">${fmtDate(cust.lastBuy)}</span></div>
+    <div class="cp-engage-item"><span class="cp-engage-label">งวดที่ไม่ซื้อ</span><span class="cp-engage-val ${roundNotBuyClass}">${cust.roundNotBuy||0} งวด</span></div>
+  </div>`;
+  html += `<div class="cp-orders-title">\u{1F3B0} งวดปัจจุบัน</div>`;
+  html += `<div class="cp-engage-list">
+    <div class="cp-engage-item"><span class="cp-engage-label">ซื้องวดนี้</span><span class="cp-engage-val">${cust.lastRoundSpend||0} ใบ</span></div>
+    <div class="cp-engage-item"><span class="cp-engage-label">ซื้อเฉลี่ยต่องวด</span><span class="cp-engage-val">${cust.aovPerRound||0} ใบ</span></div>
+    <div class="cp-engage-item"><span class="cp-engage-label">เลขท้าย 2 ตัว</span><span class="cp-lastdigit">${cust.lastTwoDigit||'-'}</span></div>
+  </div>`;
   html += `</div>`;
   html += `<div class="cp-footer">
-    <span class="cp-footer-stat">รวม <b>${totalOrders}</b> ออเดอร์</span>
+    <span class="cp-footer-stat">สมาชิก <b>${daysSinceJoined}</b> วัน</span>
     <span style="color:var(--border)">&bull;</span>
-    <span class="cp-footer-stat">รวม <b>${totalQty}</b> ใบ</span>
+    <span class="cp-footer-stat">ซื้อ <b>${cust.countRound}</b> งวด</span>
     <span style="color:var(--border)">&bull;</span>
-    <span class="cp-footer-stat">รวม <b>\u{0E3F}${totalAmt.toLocaleString()}</b></span>
+    <span class="cp-footer-stat">รวม <b>\u{0E3F}${cust.totalPrice.toLocaleString()}</b></span>
   </div>`;
   panel.innerHTML = html;
   panel.classList.remove('closing');
   panel.classList.add('show');
   sidebar.classList.add('cp-active');
+}
+
+function openCustomerDashboard(custId) {
+  const cust = MOCK_CUSTOMERS.find(c => c.id === custId);
+  if (!cust) return;
+  const seg = getSegmentInfo(cust.segment);
+  const daysSinceJoined = Math.floor((new Date() - new Date(cust.createdAt)) / 86400000);
+  const genderTh = fmtGender(cust.gender);
+  const genderIcon = cust.gender==='FEMALE'?'\u{2640}\u{FE0F}':cust.gender==='MALE'?'\u{2642}\u{FE0F}':'\u{26AB}';
+  const td = cust.lastTwoDigit || '00';
+  const tdInt = parseInt(td) || 0;
+  // Generate mock top 2-digit numbers
+  const mock2d = [
+    {num:td, count:Math.max(1,Math.round(cust.totalItem*0.12))},
+    {num:String((tdInt+17)%100).padStart(2,'0'), count:Math.max(1,Math.round(cust.totalItem*0.09))},
+    {num:String((tdInt+33)%100).padStart(2,'0'), count:Math.max(1,Math.round(cust.totalItem*0.07))},
+    {num:String((tdInt+51)%100).padStart(2,'0'), count:Math.max(1,Math.round(cust.totalItem*0.06))},
+    {num:String((tdInt+68)%100).padStart(2,'0'), count:Math.max(1,Math.round(cust.totalItem*0.05))}
+  ];
+  // Generate mock top 3-digit numbers
+  const mock3d = [
+    {num:td+'9', count:Math.max(1,Math.round(cust.totalItem*0.05))},
+    {num:'7'+td, count:Math.max(1,Math.round(cust.totalItem*0.038))},
+    {num:td+'3', count:Math.max(1,Math.round(cust.totalItem*0.03))},
+    {num:'5'+td, count:Math.max(1,Math.round(cust.totalItem*0.025))},
+    {num:td+'1', count:Math.max(1,Math.round(cust.totalItem*0.02))}
+  ];
+  const max2d = mock2d[0].count;
+  const max3d = mock3d[0].count;
+  const favNums = [td, String((tdInt+17)%100).padStart(2,'0'), String((tdInt+33)%100).padStart(2,'0'), String((tdInt+51)%100).padStart(2,'0'), String((tdInt+68)%100).padStart(2,'0')];
+  const roundNotBuyClass = cust.roundNotBuy>=20?'danger':cust.roundNotBuy>=5?'warn':'dim';
+
+  let html = '';
+  // 1. Customer Profile
+  html += `<div class="holo-section sec-profile">
+    <div class="holo-sec-title"><span class="sec-icon">\u{1F464}</span> Customer Profile</div>
+    <div class="holo-avatar-wrap">
+      <div class="holo-avatar-big" style="background:linear-gradient(135deg,${seg.avatar},${seg.avatar}cc)">${cust.initials}</div>
+      <div class="holo-cust-name">${cust.name}</div>
+      <div class="holo-cust-nick">${genderIcon} ${cust.nickName}</div>
+      <span class="holo-segment" style="background:${seg.bg};color:${seg.color};border:1px solid ${seg.border}">${seg.label}</span>
+    </div>
+    <div class="holo-profile-list">
+      <div class="holo-profile-row"><span class="holo-plabel">รหัสสมาชิก</span><span class="holo-pval" style="color:#dc2626">${cust.id}</span></div>
+      <div class="holo-profile-row"><span class="holo-plabel">ชื่อเล่น</span><span class="holo-pval">${cust.nickName}</span></div>
+      <div class="holo-profile-row"><span class="holo-plabel">วันเดือนปีเกิด</span><span class="holo-pval">${fmtDate(cust.birthday)}</span></div>
+      <div class="holo-profile-row"><span class="holo-plabel">อายุ</span><span class="holo-pval">${cust.age} ปี</span></div>
+      <div class="holo-profile-row"><span class="holo-plabel">เพศ</span><span class="holo-pval">${genderTh}</span></div>
+      <div class="holo-profile-row"><span class="holo-plabel">เบอร์โทร</span><span class="holo-pval">${cust.phone}</span></div>
+    </div>
+    <div style="margin-top:10px;text-align:center">
+      <div style="font-size:.68rem;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">5 อันดับเลขที่ชอบ</div>
+      <div style="display:flex;gap:8px;justify-content:center">${favNums.slice(0,3).map(n=>`<span class="holo-fav-num">${n}</span>`).join('')}</div>
+      <div style="display:flex;gap:8px;justify-content:center;margin-top:8px">${favNums.slice(3,5).map(n=>`<span class="holo-fav-num">${n}</span>`).join('')}</div>
+    </div>
+  </div>`;
+
+  // 2. Reward Summary + Top Number (merged)
+  html += `<div class="holo-section sec-reward">
+    <div class="holo-sec-title"><span class="sec-icon">\u{1F3C6}</span> Reward Summary</div>
+    <div class="holo-reward-hero">
+      <div class="holo-rh-card"><div class="holo-rh-val">${(cust.countPrize||0).toLocaleString()}</div><div class="holo-rh-label">ครั้งที่ถูกรางวัล</div></div>
+      <div class="holo-rh-card"><div class="holo-rh-val">\u{0E3F}${(cust.totalPrize||0).toLocaleString()}</div><div class="holo-rh-label">ยอดรวมรางวัล</div></div>
+    </div>
+    <div class="holo-reward-list">
+      <div class="holo-reward-row"><span class="holo-rlabel">งวดซื้อสะสม</span><span class="holo-rval glow-cyan">${cust.countRound} งวด</span></div>
+      <div class="holo-reward-row"><span class="holo-rlabel">RFM Segment</span><span class="holo-rval" style="color:${seg.color}">${seg.label}</span></div>
+      <div class="holo-reward-row"><span class="holo-rlabel">จำนวนใบสะสม</span><span class="holo-rval glow-green">${cust.totalItem.toLocaleString()} ใบ</span></div>
+      <div class="holo-reward-row"><span class="holo-rlabel">จำนวนเงินสะสม</span><span class="holo-rval glow-gold">\u{0E3F}${cust.totalPrice.toLocaleString()}</span></div>
+      <div class="holo-reward-row"><span class="holo-rlabel">จำนวนใบที่ซื้อล่าสุด</span><span class="holo-rval glow-cyan">${cust.lastRoundSpend||0} ใบ</span></div>
+      <div class="holo-reward-row"><span class="holo-rlabel">AOV (ใบ/งวด)</span><span class="holo-rval glow-green">${cust.aovPerRound}</span></div>
+    </div>
+    <div style="margin-top:18px;padding-top:16px;border-top:1px solid rgba(239,68,68,.12)">
+      <div class="holo-sec-title sec-top" style="margin-bottom:12px"><span class="sec-icon">\u{1F3B2}</span> Top Number</div>
+      <div class="holo-chart-block">
+        <div class="holo-chart-head"><span>อันดับเลขท้าย 3 ตัว</span><span><b class="top-num">${mock3d[0].num}</b> <span class="top-count">${mock3d[0].count.toLocaleString()} ใบ</span></span></div>
+        <div class="holo-bar-chart">
+          ${mock3d.map((d,i)=>`<div class="holo-bar-row">
+            <span class="holo-bar-label">${d.num}</span>
+            <div class="holo-bar-track"><div class="holo-bar-fill bar-red" style="width:${(d.count/max3d*100).toFixed(1)}%;animation-delay:${i*0.1}s"></div></div>
+            <span class="holo-bar-val">${d.count.toLocaleString()}</span>
+          </div>`).join('')}
+        </div>
+      </div>
+      <div class="holo-chart-block" style="margin-bottom:0">
+        <div class="holo-chart-head"><span>อันดับเลขท้าย 2 ตัว</span><span><b class="top-num">${mock2d[0].num}</b> <span class="top-count">${mock2d[0].count.toLocaleString()} ใบ</span></span></div>
+        <div class="holo-bar-chart">
+          ${mock2d.map((d,i)=>`<div class="holo-bar-row">
+            <span class="holo-bar-label">${d.num}</span>
+            <div class="holo-bar-track"><div class="holo-bar-fill bar-cyan" style="width:${(d.count/max2d*100).toFixed(1)}%;animation-delay:${i*0.1}s"></div></div>
+            <span class="holo-bar-val">${d.count.toLocaleString()}</span>
+          </div>`).join('')}
+        </div>
+      </div>
+    </div>
+  </div>`;
+
+  // 4. Generate mock orders data
+  const orderCount = 3 + Math.floor(Math.random() * 6);
+  const ticketPrice = 120;
+  const baseDate = new Date();
+  const mockOrders = [];
+  for (let i = 0; i < orderCount; i++) {
+    const oDate = new Date(baseDate);
+    oDate.setDate(oDate.getDate() - Math.floor(Math.random() * 14));
+    oDate.setHours(Math.floor(Math.random() * 12) + 8, Math.floor(Math.random() * 60));
+    const qty = 1 + Math.floor(Math.random() * Math.max(1, (cust.lastRoundSpend || 5) / 2));
+    const tickets = [];
+    for (let t = 0; t < qty; t++) {
+      const useNum = favNums[Math.floor(Math.random() * favNums.length)];
+      const prefix = String(Math.floor(Math.random() * 10000)).padStart(4, '0');
+      tickets.push({ num: prefix + useNum, price: ticketPrice });
+    }
+    mockOrders.push({
+      orderId: 'ORD-' + String(baseDate.getFullYear()).slice(2) + String(oDate.getMonth()+1).padStart(2,'0') + '-' + String(1000 + i + Math.floor(Math.random()*9000)),
+      date: oDate, qty, total: qty * ticketPrice, tickets
+    });
+  }
+  mockOrders.sort((a, b) => b.date - a.date);
+  window._holoOrders = mockOrders;
+  const latestOrder = mockOrders[0];
+
+  // 5. Purchase + Recent Orders (merged)
+  html += `<div class="holo-section sec-purchase">
+    <div class="holo-sec-title"><span class="sec-icon">\u{1F4B3}</span> Purchase</div>
+    <div class="holo-purchase-grid">
+      <div class="holo-purchase-item"><div class="holo-purchase-label">วันที่สมัคร</div><div class="holo-purchase-val dim">${fmtDate(cust.createdAt)}</div></div>
+      <div class="holo-purchase-item"><div class="holo-purchase-label">ซื้อครั้งแรก</div><div class="holo-purchase-val dim">${fmtDate(cust.firstBuy)}</div></div>
+    </div>
+    <div class="holo-purchase-grid">
+      <div class="holo-purchase-item"><div class="holo-purchase-label">ซื้อครั้งล่าสุด</div><div class="holo-purchase-val">${fmtDate(cust.lastBuy)}</div></div>
+      <div class="holo-purchase-item"><div class="holo-purchase-label">งวดที่หายไปสะสม</div><div class="holo-purchase-val ${roundNotBuyClass}">${cust.roundNotBuy||0} งวด</div></div>
+    </div>
+    <div class="holo-purchase-grid" style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(0,0,0,.06)">
+      <div class="holo-purchase-item"><div class="holo-purchase-label">สมาชิกมาแล้ว</div><div class="holo-purchase-val">${daysSinceJoined.toLocaleString()} วัน</div></div>
+      <div class="holo-purchase-item"><div class="holo-purchase-label">ซื้อเฉลี่ยต่องวด</div><div class="holo-purchase-val">${cust.aovPerRound} ใบ</div></div>
+    </div>
+    <div class="holo-purchase-grid">
+      <div class="holo-purchase-item"><div class="holo-purchase-label">เลขท้าย 2 ตัวล่าสุด</div><div class="holo-purchase-val" style="font-size:1.1rem;color:#dc2626">${cust.lastTwoDigit||'-'}</div></div>
+    </div>
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(0,0,0,.06)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="font-size:.75rem;font-weight:700;color:#dc2626;display:flex;align-items:center;gap:6px;letter-spacing:.5px">\u{1F6D2} รายการคำสั่งซื้อล่าสุด</div>
+        <button class="btn-view-orders" onclick="openOrdersModal()">\u{1F4CB} ดูทั้งหมด (${mockOrders.length})</button>
+      </div>
+      <div class="holo-order-row" id="orow-${latestOrder.orderId}" onclick="toggleOrderDetail('${latestOrder.orderId}')">
+        <div class="holo-order-head">
+          <span class="holo-order-id">${latestOrder.orderId}</span>
+          <span class="holo-order-expand-icon">\u25BC</span>
+        </div>
+        <div class="holo-order-summary">
+          <span class="holo-order-date">${latestOrder.date.toLocaleDateString('th-TH',{day:'2-digit',month:'short',year:'numeric'})} ${latestOrder.date.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'})}</span>
+          <span class="holo-order-qty">${latestOrder.qty} ใบ</span>
+          <span class="holo-order-total">\u{0E3F}${latestOrder.total.toLocaleString()}</span>
+        </div>
+      </div>
+      <div class="holo-order-detail" id="odet-${latestOrder.orderId}">
+        <div class="holo-order-detail-inner">
+          ${latestOrder.tickets.map(t => `<div class="holo-order-ticket"><span class="holo-order-ticket-num">${t.num}</span><span class="holo-order-ticket-price">\u{0E3F}${t.price}</span></div>`).join('')}
+          <div style="display:flex;justify-content:space-between;padding-top:6px;margin-top:4px;border-top:1px solid rgba(0,0,0,.06);font-size:.73rem;font-weight:700">
+            <span style="color:var(--text2)">รวม ${latestOrder.qty} ใบ</span>
+            <span style="color:#dc2626;font-family:'JetBrains Mono',monospace">\u{0E3F}${latestOrder.total.toLocaleString()}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+
+  document.getElementById('holoBody').innerHTML = html;
+  document.getElementById('holoDash').classList.add('show');
+}
+function closeHoloDash() { document.getElementById('holoDash').classList.remove('show'); closeOrdersModal(); }
+function toggleOrderDetail(orderId) {
+  const row = document.getElementById('orow-' + orderId);
+  const det = document.getElementById('odet-' + orderId);
+  if (!row || !det) return;
+  const isOpen = det.classList.contains('open');
+  document.querySelectorAll('.holo-order-detail.open').forEach(d => d.classList.remove('open'));
+  document.querySelectorAll('.holo-order-row.active').forEach(r => r.classList.remove('active'));
+  if (!isOpen) { det.classList.add('open'); row.classList.add('active'); }
+}
+function openOrdersModal() {
+  let overlay = document.getElementById('ordersModalOverlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'ordersModalOverlay';
+    overlay.className = 'orders-modal-overlay';
+    overlay.onclick = function(e) { if (e.target === overlay) closeOrdersModal(); };
+    document.body.appendChild(overlay);
+  }
+  const orders = window._holoOrders || [];
+  const totalQty = orders.reduce((s,o) => s + o.qty, 0);
+  const totalPrice = orders.reduce((s,o) => s + o.total, 0);
+  const ordersListHtml = orders.map(o => `
+    <div class="holo-order-row" id="modal-orow-${o.orderId}" onclick="toggleOrderDetail('modal-${o.orderId}')">
+      <div class="holo-order-head">
+        <span class="holo-order-id">${o.orderId}</span>
+        <span class="holo-order-expand-icon">\u25BC</span>
+      </div>
+      <div class="holo-order-summary">
+        <span class="holo-order-date">${o.date.toLocaleDateString('th-TH',{day:'2-digit',month:'short',year:'numeric'})} ${o.date.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'})}</span>
+        <span class="holo-order-qty">${o.qty} ใบ</span>
+        <span class="holo-order-total">\u{0E3F}${o.total.toLocaleString()}</span>
+      </div>
+    </div>
+    <div class="holo-order-detail" id="odet-modal-${o.orderId}">
+      <div class="holo-order-detail-inner">
+        ${o.tickets.map(t => `<div class="holo-order-ticket"><span class="holo-order-ticket-num">${t.num}</span><span class="holo-order-ticket-price">\u{0E3F}${t.price}</span></div>`).join('')}
+        <div style="display:flex;justify-content:space-between;padding-top:6px;margin-top:4px;border-top:1px solid rgba(0,0,0,.06);font-size:.73rem;font-weight:700">
+          <span style="color:var(--text2)">รวม ${o.qty} ใบ</span>
+          <span style="color:#dc2626;font-family:'JetBrains Mono',monospace">\u{0E3F}${o.total.toLocaleString()}</span>
+        </div>
+      </div>
+    </div>`).join('');
+  overlay.innerHTML = `<div class="orders-modal">
+    <div class="orders-modal-header">
+      <h3>\u{1F6D2} รายการคำสั่งซื้อทั้งหมดในงวด</h3>
+      <button class="orders-modal-close" onclick="closeOrdersModal()">\u2715 ปิด</button>
+    </div>
+    <div style="padding:8px 20px;display:flex;justify-content:space-between;font-size:.72rem;color:var(--text2);border-bottom:1px solid rgba(0,0,0,.06)">
+      <span>${orders.length} รายการ \u{2022} ${totalQty} ใบ</span>
+      <span style="color:#dc2626;font-family:'JetBrains Mono',monospace;font-weight:700">\u{0E3F}${totalPrice.toLocaleString()}</span>
+    </div>
+    <div class="orders-modal-body">${ordersListHtml}</div>
+  </div>`;
+  overlay.classList.add('show');
+}
+function closeOrdersModal() {
+  const overlay = document.getElementById('ordersModalOverlay');
+  if (overlay) overlay.classList.remove('show');
+}
+
+async function captureHoloDash() {
+  const el = document.querySelector('.holo-dash');
+  const canvas = await html2canvas(el, {
+    backgroundColor: '#ffffff',
+    scale: 2,
+    useCORS: true,
+    logging: false
+  });
+  return canvas;
+}
+
+async function copyHoloDashImage() {
+  try {
+    toast('กำลัง capture...', 'success');
+    const canvas = await captureHoloDash();
+    canvas.toBlob(async (blob) => {
+      try {
+        await navigator.clipboard.write([
+          new ClipboardItem({ 'image/png': blob })
+        ]);
+        toast('Copy ภาพสำเร็จ! วางได้เลย', 'success');
+      } catch (e) {
+        // Fallback: open in new tab
+        const url = canvas.toDataURL('image/png');
+        window.open(url, '_blank');
+        toast('เปิดภาพในแท็บใหม่ - กด Ctrl+C เพื่อ copy', 'success');
+      }
+    }, 'image/png');
+  } catch (e) {
+    toast('Copy ไม่สำเร็จ: ' + e.message, 'error');
+  }
+}
+
+async function saveHoloDashImage() {
+  try {
+    toast('กำลัง capture...', 'success');
+    const canvas = await captureHoloDash();
+    const link = document.createElement('a');
+    const custName = document.querySelector('.holo-cust-name')?.textContent || 'customer';
+    link.download = `LotteryPlus_${custName.replace(/\s+/g,'_')}_${new Date().toISOString().slice(0,10)}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    toast('Save ภาพสำเร็จ!', 'success');
+  } catch (e) {
+    toast('Save ไม่สำเร็จ: ' + e.message, 'error');
+  }
 }
 
 function showSearchDetail(el) {
@@ -1333,7 +1727,25 @@ function filterCatList() {
 }
 
 function getActiveTeam() {
+  if (currentUser.team === 'Specialist') {
+    const sel = document.getElementById('specialistTeamSelect');
+    return sel ? sel.value : ENTRY_TEAMS[0];
+  }
   return currentUser.team;
+}
+
+function onSpecialistTeamChange() {
+  const sel = document.getElementById('specialistTeamSelect');
+  const team = sel.value;
+  const color = TEAM_COLORS[team] || '#14b8a6';
+  sel.style.color = color;
+  sel.style.borderColor = color + '44';
+  const inner = document.getElementById('entryFormInner');
+  if (!inner) return;
+  let html = buildTeamFields(team);
+  html += `<div class="submit-area"><button class="btn btn-red" onclick="submitEntry()">บันทึก</button><button class="btn btn-ghost" onclick="clearForm()">ล้าง</button></div>`;
+  inner.innerHTML = html;
+  initAutocomplete();
 }
 
 function submitEntry() {
@@ -1393,19 +1805,19 @@ function renderProdPanel() {
 
   el.innerHTML = `
     <div class="prod-chip">
-      <span class="prod-chip-val" style="color:#f87171">${myEntries.length}</span>
+      <span class="prod-chip-val" style="color:#dc2626">${myEntries.length}</span>
       <span class="prod-chip-label">วันนี้ ${dateStr}</span>
     </div>
     <div class="prod-chip">
-      <span class="prod-chip-val" style="color:#22d3ee">${myPeriod}</span>
+      <span class="prod-chip-val" style="color:#dc2626">${myPeriod}</span>
       <span class="prod-chip-label">ทั้งงวด</span>
     </div>
     <div class="prod-chip">
-      <span class="prod-chip-val" style="color:#4ade80">#${myRank || '-'}<span style="font-size:.65rem;font-weight:500;color:var(--text2)">/${totalAgents}</span></span>
+      <span class="prod-chip-val" style="color:#16a34a">#${myRank || '-'}<span style="font-size:.65rem;font-weight:500;color:var(--text2)">/${totalAgents}</span></span>
       <span class="prod-chip-label">Ranking</span>
     </div>
     <div class="prod-chip">
-      <span class="prod-chip-val" style="color:#c084fc">${teamAvg}</span>
+      <span class="prod-chip-val" style="color:#7c3aed">${teamAvg}</span>
       <span class="prod-chip-label">เฉลี่ย/คน</span>
     </div>`;
 }
@@ -1440,7 +1852,7 @@ function renderTodayHistory() {
     if (hasRoom) t += `<td style="font-size:.68rem">${e.roomName || '-'}</td>`;
     if (hasSM) t += `<td style="font-size:.68rem">${e.smType || '-'}</td>`;
     if (hasOrder) t += `<td style="font-size:.68rem">${e.orderId || '-'}</td>`;
-    const cat1Color = e.cat1 === 'Info' ? '#f87171' : e.cat1 === 'Problem' ? '#fbbf24' : '#22d3ee';
+    const cat1Color = e.cat1 === 'Info' ? '#dc2626' : e.cat1 === 'Problem' ? '#d97706' : '#dc2626';
     t += `<td style="font-size:.63rem;color:${cat1Color};font-weight:600">${e.cat1 || '-'}</td>`;
     t += `<td style="font-size:.63rem;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.cat2 || '-'}</td>`;
     t += `<td style="font-size:.63rem;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.cat3 || '-'}</td>`;
@@ -1543,8 +1955,8 @@ function renderProdChart(entries, agents) {
       responsive: true, maintainAspectRatio: false,
       plugins: { legend: { display: false } },
       scales: {
-        x: { ticks: { color: '#94a3b8', font: { size: 11 } }, grid: { color: 'rgba(148,163,184,.08)' } },
-        y: { ticks: { color: '#94a3b8', font: { family: 'JetBrains Mono', size: 11 } }, grid: { color: 'rgba(148,163,184,.08)' }, beginAtZero: true }
+        x: { ticks: { color: '#64748b', font: { size: 11 } }, grid: { color: 'rgba(0,0,0,.06)' } },
+        y: { ticks: { color: '#64748b', font: { family: 'JetBrains Mono', size: 11 } }, grid: { color: 'rgba(0,0,0,.06)' }, beginAtZero: true }
       }
     }
   });
@@ -1580,7 +1992,7 @@ function renderIntervalTable(entries, startD, endD, agentF) {
     const totals = agents.map(a => dayEntries.filter(e => e.agent === a).length);
     t += `<tr style="font-weight:700;background:var(--bg2)"><td>รวม</td>`;
     totals.forEach(v => t += `<td style="color:var(--cyan)">${v}</td>`);
-    t += `<td style="color:#f87171">${totals.reduce((a, b) => a + b, 0)}</td></tr>`;
+    t += `<td style="color:#dc2626">${totals.reduce((a, b) => a + b, 0)}</td></tr>`;
     t += `</tbody></table>`;
     document.getElementById('intervalTable').innerHTML = t;
   } else {
@@ -1651,7 +2063,7 @@ function renderAdmin() {
       <td><span class="badge ${u.role === 'admin' ? 'badge-red' : 'badge-cyan'}">${u.role}</span></td>
       <td class="admin-actions">
         <button class="btn btn-ghost btn-sm" onclick="editUser('${u.id}')">แก้ไข</button>
-        ${u.id !== 'u1' ? `<button class="btn btn-ghost btn-sm" style="color:#f87171;border-color:rgba(220,38,38,.3)" onclick="deleteUser('${u.id}')">ลบ</button>` : ''}
+        ${u.id !== 'u1' ? `<button class="btn btn-ghost btn-sm" style="color:#dc2626;border-color:rgba(220,38,38,.2)" onclick="deleteUser('${u.id}')">ลบ</button>` : ''}
       </td></tr>`;
   });
   html += `</tbody></table></div></div>`;
