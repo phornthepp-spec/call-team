@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CP Management</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+Thai:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ============ LOGIN PAGE ============ -->
+<div id="loginPage">
+<div class="login-box">
+  <div class="login-logo">
+    <h1>CP Management</h1>
+    <p>Commission Points Management System</p>
+  </div>
+  <div class="login-tabs">
+    <div class="login-tab active" onclick="switchLoginTab('login')">เข้าสู่ระบบ</div>
+    <div class="login-tab" onclick="switchLoginTab('register')">ลงทะเบียน</div>
+  </div>
+  <div id="loginFields">
+    <div class="form-group"><label>ชื่อผู้ใช้</label><input id="loginUser" placeholder="username" autocomplete="username"></div>
+    <div class="form-group"><label>รหัสผ่าน</label><input id="loginPass" type="password" placeholder="password" autocomplete="current-password"></div>
+    <button class="btn btn-primary" onclick="doLogin()" id="btnLogin">เข้าสู่ระบบ</button>
+    <div style="text-align:center;margin-top:12px"><a href="#" onclick="showForgotPassword();return false" style="font-size:.75rem;color:var(--text3)">ลืมรหัสผ่าน? ติดต่อแอดมิน</a></div>
+  </div>
+  <div id="registerFields" class="register-fields">
+    <div class="form-group"><label>ชื่อผู้ใช้</label><input id="regUser" placeholder="username"></div>
+    <div class="form-group"><label>รหัสผ่าน</label><input id="regPass" type="password" placeholder="password" oninput="checkRegPassMatch()"></div>
+    <div class="form-group"><label>ยืนยันรหัสผ่าน</label><input id="regPassConfirm" type="password" placeholder="กรอกรหัสผ่านอีกครั้ง" oninput="checkRegPassMatch()"><div id="regPassMismatch" style="display:none;color:var(--red);font-size:.72rem;margin-top:4px;font-weight:600">รหัสผ่านไม่ตรงกัน</div></div>
+    <div class="form-group"><label>ชื่อตัวละคร</label><input id="regName" placeholder="ชื่อตัวละครในเกม"></div>
+    <div class="form-group"><label>อาชีพ</label><select id="regClass"><option value="">-- เลือกอาชีพ --</option><option value="One-handed Sword">One-handed Sword</option><option value="Twin Sword">Twin Sword</option><option value="Staff">Staff</option><option value="Wand">Wand</option><option value="Orb">Orb</option><option value="Two-handed Sword">Two-handed Sword</option><option value="Spear">Spear</option><option value="Bow">Bow</option><option value="Dagger">Dagger</option><option value="Rapier">Rapier</option><option value="Cannon">Cannon</option></select></div>
+    <div class="form-group"><label>CP ปัจจุบัน</label><input id="regCP" inputmode="numeric" placeholder="0" oninput="formatNumberInput(this)"></div>
+    <button class="btn btn-purple" onclick="doRegister()">ลงทะเบียน</button>
+  </div>
+  <input type="hidden" id="demoToggle">
+</div>
+</div>
+
+<!-- ============ APP SHELL ============ -->
+<div id="app">
+<div class="hamburger" onclick="toggleSidebar()"><span></span><span></span><span></span></div>
+<div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header"><h2>CP Management</h2><p>Commission Points System</p></div>
+  <div class="sidebar-user" onclick="showProfileModal()" style="cursor:pointer" title="แก้ไขโปรไฟล์">
+    <div class="sidebar-avatar" id="userAvatar">S</div>
+    <div><div class="sidebar-uname" id="userName">User</div><div class="sidebar-urole" id="userRole">member</div></div>
+  </div>
+  <nav class="nav-items" id="navItems"></nav>
+  <div class="sidebar-footer">
+    <button class="btn btn-ghost btn-sm" onclick="showChangePasswordModal()" style="width:100%;justify-content:center;margin-bottom:6px">เปลี่ยนรหัสผ่าน</button>
+    <button class="btn btn-danger btn-sm" onclick="doLogout()" style="width:100%;justify-content:center">ออกจากระบบ</button>
+  </div>
+</aside>
+
+<main class="main-content">
+<!-- Dashboard Page -->
+<div class="page" id="pageDashboard">
+  <div class="page-header"><h2>Dashboard</h2><p>ภาพรวมระบบ CP Management</p></div>
+  <div class="kpi-grid" id="dashKPI"></div>
+  <div class="grid-2">
+    <div class="card"><div class="card-title"><span class="ct-icon">🏆</span>Top Performers</div><div class="rank-list" id="dashTopList"></div></div>
+    <div class="card"><div class="card-title"><span class="ct-icon">📋</span>การแจกรางวัลล่าสุด</div><div id="dashRecentDist"></div></div>
+  </div>
+</div>
+
+<!-- Members Page -->
+<div class="page" id="pageMembers">
+  <div class="page-header flex justify-between items-center">
+    <div><h2>สมาชิก</h2><p>จัดการข้อมูล CP สมาชิก</p></div>
+    <button class="btn btn-primary" onclick="showMemberModal()" id="btnAddMember">+ เพิ่มสมาชิก</button>
+  </div>
+  <div class="card member-tier-card"><div class="card-title"><span class="ct-icon">📊</span>การกระจาย Tier</div><div class="chart-box"><canvas id="chartTier"></canvas></div><div id="chartTierLegend" style="display:flex;flex-wrap:wrap;justify-content:center;padding:8px 0 4px;gap:4px"></div></div>
+  <div class="toolbar">
+    <input type="text" id="memberSearch" placeholder="ค้นหาชื่อสมาชิก..." oninput="renderMembers()">
+    <select id="memberTierFilter" onchange="renderMembers()"><option value="all">ทุก Tier</option></select>
+    <button class="btn btn-ghost btn-sm" onclick="showBatchUpdateModal()">Batch Update CP</button>
+  </div>
+  <div class="table-wrap"><table>
+    <thead><tr><th>ชื่อ</th><th>CP</th><th>Tier</th><th>%</th><th>สถานะ</th><th>จัดการ</th></tr></thead>
+    <tbody id="membersTable"></tbody>
+  </table></div>
+</div>
+
+<!-- Rewards Page -->
+<div class="page" id="pageRewards">
+  <div class="page-header"><h2>แจกรางวัล</h2><p>คำนวณและแจกรางวัลตาม CP</p></div>
+  <div class="card">
+    <div class="card-title"><span class="ct-icon">🎯</span>คำนวณรางวัล</div>
+    <div class="flex gap-md items-center" style="flex-wrap:wrap">
+      <div style="flex:1;min-width:200px"><label>จำนวนเงินรางวัลรวม (บาท)</label><input id="totalPrize" inputmode="numeric" placeholder="10,000" oninput="formatNumberInput(this)"></div>
+      <button class="btn btn-primary" onclick="calculateRewards()" style="margin-top:18px">คำนวณ</button>
+    </div>
+  </div>
+  <div id="rewardPreviewSection" class="hidden">
+    <div class="card mt-md">
+      <div class="card-title flex justify-between"><span><span class="ct-icon">📋</span>ผลการคำนวณ</span>
+        <div class="flex gap-sm">
+          <button class="btn btn-success btn-sm" onclick="confirmCurrentDistribution()" id="btnConfirmDist">ยืนยัน</button>
+          <button class="btn btn-ghost btn-sm" onclick="exportRewardCSV()">Export CSV</button>
+        </div>
+      </div>
+      <div class="reward-summary" id="rewardSummary"></div>
+      <div class="table-wrap reward-preview"><table>
+        <thead><tr><th>#</th><th>ชื่อ</th><th>CP</th><th>Tier</th><th>%</th><th>จำนวนเงิน (บาท)</th></tr></thead>
+        <tbody id="rewardTable"></tbody>
+      </table></div>
+    </div>
+  </div>
+  <div class="card mt-md">
+    <div class="card-title"><span class="ct-icon">📜</span>ประวัติการแจก</div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>วันที่</th><th>เงินรวม</th><th>แจกโดย</th><th>สถานะ</th><th>จัดการ</th></tr></thead>
+      <tbody id="distHistoryTable"></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- Admin Page (SuperAdmin) -->
+<div class="page" id="pageAdmin">
+  <div class="page-header"><h2>จัดการระบบ</h2><p>SuperAdmin Panel</p></div>
+  <div class="tabs" id="adminTabs">
+    <div class="tab active" onclick="switchAdminTab('users')">ผู้ใช้งาน</div>
+    <div class="tab" onclick="switchAdminTab('pending')">รอนุมัติ <span id="pendingBadge" class="badge badge-red" style="margin-left:4px">0</span></div>
+    <div class="tab" onclick="switchAdminTab('resetpw')">รีเซ็ตรหัสผ่าน <span id="resetPwBadge" class="badge badge-yellow" style="margin-left:4px">0</span></div>
+    <div class="tab" onclick="switchAdminTab('notifications')">แจ้งเตือน <span id="notifBadge" class="badge badge-cyan" style="margin-left:4px">0</span></div>
+    <div class="tab" onclick="switchAdminTab('activity')">Activity Logs</div>
+    <div class="tab" onclick="switchAdminTab('loginlogs')">Login Logs</div>
+  </div>
+  <div class="tab-content active" id="tabUsers">
+    <div class="toolbar">
+      <input type="text" id="userSearch" placeholder="ค้นหาผู้ใช้..." oninput="renderUsers()">
+      <button class="btn btn-primary btn-sm" onclick="showUserModal()">+ เพิ่มผู้ใช้</button>
+    </div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Username</th><th>ชื่อ</th><th>อาชีพ</th><th>Role</th><th>สถานะ</th><th>จัดการ</th></tr></thead>
+      <tbody id="usersTable"></tbody>
+    </table></div>
+  </div>
+  <div class="tab-content" id="tabPending">
+    <div class="table-wrap"><table>
+      <thead><tr><th>Username</th><th>ชื่อ</th><th>จัดการ</th></tr></thead>
+      <tbody id="pendingTable"></tbody>
+    </table></div>
+  </div>
+  <div class="tab-content" id="tabResetpw">
+    <div class="table-wrap"><table>
+      <thead><tr><th>วันที่</th><th>Username</th><th>เหตุผล</th><th>สถานะ</th><th>จัดการ</th></tr></thead>
+      <tbody id="resetPwTable"></tbody>
+    </table></div>
+  </div>
+  <div class="tab-content" id="tabNotifications">
+    <div id="notificationList" style="max-height:500px;overflow-y:auto"></div>
+  </div>
+  <div class="tab-content" id="tabActivity">
+    <div id="activityLogList" style="max-height:500px;overflow-y:auto"></div>
+  </div>
+  <div class="tab-content" id="tabLoginlogs">
+    <div id="loginLogList" style="max-height:500px;overflow-y:auto"></div>
+  </div>
+</div>
+
+<!-- Settings Page -->
+<div class="page" id="pageSettings">
+  <div class="page-header flex justify-between items-center">
+    <div><h2>ตั้งค่า CP Tiers</h2><p>จัดการช่วง CP และเปอร์เซ็นต์รางวัล</p></div>
+    <button class="btn btn-primary" onclick="showTierModal()" id="btnAddTier">+ เพิ่ม Tier</button>
+  </div>
+  <div class="card"><div class="card-title"><span class="ct-icon">📊</span>ช่วง CP (Visual)</div><div id="tierVisual" class="tier-range"></div></div>
+  <div class="card mt-md">
+    <div class="table-wrap"><table>
+      <thead><tr><th>Tier</th><th>Min CP</th><th>Max CP</th><th>Reward %</th><th>สถานะ</th><th>จัดการ</th></tr></thead>
+      <tbody id="tiersTable"></tbody>
+    </table></div>
+  </div>
+</div>
+</main>
+</div>
+
+<!-- ============ MODALS ============ -->
+<!-- Member Modal -->
+<div class="modal-overlay" id="memberModal"><div class="modal">
+  <h3 id="memberModalTitle">เพิ่มสมาชิก</h3>
+  <input type="hidden" id="editMemberId">
+  <div class="form-group"><label>ชื่อ</label><input id="memberName"></div>
+  <div class="form-group"><label>CP Value</label><input id="memberCP" inputmode="numeric" placeholder="0" oninput="formatNumberInput(this)"></div>
+  <div class="form-group"><label>สถานะ</label><select id="memberStatus"><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
+  <div class="modal-actions">
+    <button class="btn btn-ghost" onclick="hideModal('memberModal')">ยกเลิก</button>
+    <button class="btn btn-primary" onclick="saveMember()">บันทึก</button>
+  </div>
+</div></div>
+
+<!-- Tier Modal -->
+<div class="modal-overlay" id="tierModal"><div class="modal">
+  <h3 id="tierModalTitle">เพิ่ม CP Tier</h3>
+  <input type="hidden" id="editTierId">
+  <div class="form-group"><label>ชื่อ Tier</label><input id="tierName" placeholder="Bronze, Silver, Gold..."></div>
+  <div class="grid-2">
+    <div class="form-group"><label>Min CP</label><input type="number" id="tierMinCP" step="0.01"></div>
+    <div class="form-group"><label>Max CP</label><input type="number" id="tierMaxCP" step="0.01"></div>
+  </div>
+  <div class="form-group"><label>Reward %</label><input type="number" id="tierRewardPct" step="0.01"></div>
+  <div class="modal-actions">
+    <button class="btn btn-ghost" onclick="hideModal('tierModal')">ยกเลิก</button>
+    <button class="btn btn-primary" onclick="saveTier()">บันทึก</button>
+  </div>
+</div></div>
+
+<!-- User Modal -->
+<div class="modal-overlay" id="userModal"><div class="modal">
+  <h3 id="userModalTitle">เพิ่มผู้ใช้</h3>
+  <input type="hidden" id="editUserUsername">
+  <div class="form-group"><label>Username</label><input id="mUserName"></div>
+  <div class="form-group"><label>รหัสผ่าน</label><input id="mUserPass" type="password"></div>
+  <div class="form-group"><label>ชื่อตัวละคร</label><input id="mUserDisplay" placeholder="ชื่อตัวละครในเกม"></div>
+  <div class="form-group"><label>อาชีพ</label><select id="mUserClass"><option value="">-- เลือกอาชีพ --</option><option value="One-handed Sword">One-handed Sword</option><option value="Twin Sword">Twin Sword</option><option value="Staff">Staff</option><option value="Wand">Wand</option><option value="Orb">Orb</option><option value="Two-handed Sword">Two-handed Sword</option><option value="Spear">Spear</option><option value="Bow">Bow</option><option value="Dagger">Dagger</option><option value="Rapier">Rapier</option><option value="Cannon">Cannon</option></select></div>
+  <div class="form-group"><label>Role</label><select id="mUserRole"><option value="member">Member</option><option value="admin">Admin</option><option value="superadmin">SuperAdmin</option></select></div>
+  <div class="form-group"><label>สถานะ</label><select id="mUserStatus"><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
+  <div class="modal-actions">
+    <button class="btn btn-ghost" onclick="hideModal('userModal')">ยกเลิก</button>
+    <button class="btn btn-primary" onclick="saveUser()">บันทึก</button>
+  </div>
+</div></div>
+
+<!-- Batch Update Modal -->
+<div class="modal-overlay" id="batchModal"><div class="modal modal-lg">
+  <h3>Batch Update CP</h3>
+  <p style="font-size:.78rem;color:var(--text3);margin-bottom:16px">แก้ไข CP ของสมาชิกหลายคนพร้อมกัน</p>
+  <div class="table-wrap" style="max-height:400px;overflow-y:auto"><table>
+    <thead><tr><th>ชื่อ</th><th>CP ปัจจุบัน</th><th>CP ใหม่</th></tr></thead>
+    <tbody id="batchTable"></tbody>
+  </table></div>
+  <div class="modal-actions">
+    <button class="btn btn-ghost" onclick="hideModal('batchModal')">ยกเลิก</button>
+    <button class="btn btn-primary" onclick="saveBatchUpdate()">อัพเดททั้งหมด</button>
+  </div>
+</div></div>
+
+<!-- Change Password Modal -->
+<div class="modal-overlay" id="passwordModal"><div class="modal">
+  <h3>เปลี่ยนรหัสผ่าน</h3>
+  <div class="form-group"><label>รหัสผ่านเดิม</label><input id="oldPass" type="password"></div>
+  <div class="form-group"><label>รหัสผ่านใหม่</label><input id="newPass" type="password"></div>
+  <div class="form-group"><label>ยืนยันรหัสผ่านใหม่</label><input id="confirmPass" type="password"></div>
+  <div class="modal-actions">
+    <button class="btn btn-ghost" onclick="hideModal('passwordModal')">ยกเลิก</button>
+    <button class="btn btn-primary" onclick="doChangePassword()">เปลี่ยน</button>
+  </div>
+</div></div>
+
+<!-- Distribution Detail Modal -->
+<div class="modal-overlay" id="distDetailModal"><div class="modal modal-lg">
+  <h3 id="distDetailTitle">รายละเอียดการแจกรางวัล</h3>
+  <div id="distDetailTotal" style="font-size:1.1rem;margin-bottom:14px"></div>
+  <div class="table-wrap" style="max-height:400px;overflow-y:auto"><table>
+    <thead><tr><th>#</th><th>ชื่อ</th><th>CP</th><th>Tier</th><th>%</th><th>จำนวนเงิน</th></tr></thead>
+    <tbody id="distDetailTable"></tbody>
+  </table></div>
+  <div class="modal-actions"><button class="btn btn-ghost" onclick="hideModal('distDetailModal')">ปิด</button></div>
+</div></div>
+
+<!-- Forgot Password Modal -->
+<div class="modal-overlay" id="forgotModal"><div class="modal">
+  <h3>ลืมรหัสผ่าน</h3>
+  <p style="font-size:.78rem;color:var(--text3);margin-bottom:16px">กรอกชื่อผู้ใช้เพื่อส่งคำขอรีเซ็ตรหัสผ่านไปยังแอดมิน</p>
+  <div class="form-group"><label>ชื่อผู้ใช้</label><input id="forgotUser" placeholder="username ของคุณ"></div>
+  <div class="form-group"><label>เหตุผล (ถ้ามี)</label><textarea id="forgotReason" rows="2" placeholder="อธิบายเพิ่มเติม..."></textarea></div>
+  <div class="modal-actions">
+    <button class="btn btn-ghost" onclick="hideModal('forgotModal')">ยกเลิก</button>
+    <button class="btn btn-primary" onclick="submitForgotPassword()">ส่งคำขอ</button>
+  </div>
+</div></div>
+
+<!-- Profile Modal -->
+<div class="modal-overlay" id="profileModal"><div class="modal">
+  <h3>แก้ไขโปรไฟล์</h3>
+  <div class="profile-preview" id="profilePreview">?</div>
+  <div class="profile-upload-area">
+    <label>📷 เลือกรูปโปรไฟล์<input type="file" accept="image/*" onchange="handleProfileImage(this)"></label>
+    <div style="font-size:.65rem;color:var(--text3);margin-top:6px">รูปจะถูก resize เป็น 128x128px อัตโนมัติ</div>
+  </div>
+  <div class="modal-actions">
+    <button class="btn btn-ghost" onclick="hideModal('profileModal')">ยกเลิก</button>
+    <button class="btn btn-primary" onclick="saveProfile()">บันทึก</button>
+  </div>
+</div></div>
+
+<script src="js/app.js"></script>
+</body>
+</html>
