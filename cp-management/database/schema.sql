@@ -9,10 +9,11 @@ CREATE TABLE Users (
     username        VARCHAR(100) PRIMARY KEY,    -- ชื่อผู้ใช้ (unique)
     password        VARCHAR(100) NOT NULL,       -- รหัสผ่าน (plain text)
     displayName     VARCHAR(200) NOT NULL,       -- ชื่อแสดง / ชื่อตัวละคร
-    role            VARCHAR(20)  NOT NULL DEFAULT 'member',  -- superadmin | admin | member
+    role            VARCHAR(20)  NOT NULL DEFAULT 'member',  -- Super Admin | admin | member
     status          VARCHAR(20)  NOT NULL DEFAULT 'pending', -- active | inactive | pending
     profileImage    TEXT,                        -- Base64 encoded profile image (128x128 JPEG)
-    weaponClass     VARCHAR(50)                  -- อาชีพ (One-handed Sword, Twin Sword, Staff, Wand, Orb, Two-handed Sword, Spear, Bow, Dagger, Rapier, Cannon)
+    weaponClass     VARCHAR(50),                 -- อาชีพ (One-handed Sword, Twin Sword, Staff, Wand, Orb, Two-handed Sword, Spear, Bow, Dagger, Rapier, Cannon)
+    forceChangePassword BOOLEAN DEFAULT FALSE     -- บังคับเปลี่ยนรหัสผ่านหลัง reset
 );
 
 -- 2. Members - ข้อมูลสมาชิก CP
