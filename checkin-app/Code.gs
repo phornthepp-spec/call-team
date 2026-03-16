@@ -49,6 +49,9 @@ function doPost(e) {
       case 'cancelRight':
         result = cancelRight_(body.rowNum);
         break;
+      case 'addAttendee':
+        result = addAttendee_(body);
+        break;
       default:
         result = { success: false, error: 'Unknown action: ' + action };
     }
@@ -159,6 +162,62 @@ function cancelRight_(rowNum) {
   sheet.getRange(rowNum, 9).setValue('เปลี่ยนใจไม่มา');  // I: สถานะสิทธิ์
   SpreadsheetApp.flush();
   return { success: true };
+}
+
+// ============ Add Attendee ============
+
+function addAttendee_(body) {
+  var name = (body.name || '').trim();
+  if (!name) throw new Error('กรุณาระบุชื่อ');
+
+  var phone = (body.phone || '').trim();
+  var memberId = (body.memberId || '').trim();
+  var type = (body.type || 'ผู้สมัคร').trim();
+  var applicantRowNum = body.applicantRowNum || 0;
+
+  var sheet = getSheet_();
+  var lastRow = sheet.getLastRow();
+
+  // Find max order for auto-increment
+  var allOrders = lastRow >= 2 ? sheet.getRange(2, 1, lastRow - 1, 1).getValues() : [];
+  var maxOrder = 0;
+  for (var i = 0; i < allOrders.length; i++) {
+    var val = Number(allOrders[i][0]);
+    if (!isNaN(val) && val > maxOrder) maxOrder = val;
+  }
+  var newOrder = maxOrder + 1;
+
+  var rowData = [newOrder, memberId, 'Walk-in', name, phone, type];
+
+  if (type === 'ผู้ติดตาม' && applicantRowNum > 0) {
+    var insertAfter = applicantRowNum;
+    var data = sheet.getRange(2, 1, lastRow - 1, 6).getValues();
+    for (var r = applicantRowNum - 1; r < data.length; r++) {
+      var actualRow = r + 2;
+      if (actualRow <= applicantRowNum) continue;
+      var rowType = String(data[r][5]).trim();
+      if (rowType === 'ผู้ติดตาม') {
+        insertAfter = actualRow;
+      } else {
+        break;
+      }
+    }
+    sheet.insertRowAfter(insertAfter);
+    var newRow = insertAfter + 1;
+    sheet.getRange(newRow, 1, 1, 6).clearDataValidations();
+    for (var c = 0; c < rowData.length; c++) {
+      sheet.getRange(newRow, c + 1).setValue(rowData[c]);
+    }
+  } else {
+    var newRow = lastRow + 1;
+    sheet.getRange(newRow, 1, 1, 6).clearDataValidations();
+    for (var c = 0; c < rowData.length; c++) {
+      sheet.getRange(newRow, c + 1).setValue(rowData[c]);
+    }
+  }
+
+  SpreadsheetApp.flush();
+  return { success: true, order: newOrder };
 }
 
 // ============ Setup ============

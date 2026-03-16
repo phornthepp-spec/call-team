@@ -633,6 +633,78 @@
   .btn-primary { background: var(--red); color: white; }
   .btn-secondary { background: var(--gray-100); color: var(--gray-600); }
 
+  /* ─── Add Member Button ─── */
+  .btn-add-member {
+    position: absolute;
+    top: 12px;
+    left: 80px;
+    background: rgba(255,255,255,0.2);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 8px;
+    padding: 5px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    z-index: 150;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .btn-add-member:active { opacity: 0.7; }
+
+  /* ─── Add Member Modal ─── */
+  .add-form-group {
+    margin-bottom: 14px;
+  }
+  .add-form-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--gray-600);
+    margin-bottom: 4px;
+  }
+  .add-form-group input,
+  .add-form-group select {
+    width: 100%;
+    height: 38px;
+    border: 2px solid var(--gray-200);
+    border-radius: 10px;
+    padding: 0 12px;
+    font-size: 14px;
+    outline: none;
+    background: var(--white);
+  }
+  .add-form-group input:focus,
+  .add-form-group select:focus { border-color: var(--red); }
+  .mode-toggle {
+    display: flex;
+    gap: 0;
+    border: 2px solid var(--gray-200);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 14px;
+  }
+  .mode-toggle label {
+    flex: 1;
+    text-align: center;
+    padding: 9px 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--gray-500);
+    background: var(--white);
+    transition: all .15s;
+    user-select: none;
+  }
+  .mode-toggle input { display: none; }
+  .mode-toggle input:checked + label {
+    background: var(--red);
+    color: white;
+  }
+  .applicant-select-group { display: none; }
+  .applicant-select-group.show { display: block; }
+
   /* Mobile responsive tabs */
   @media (max-width: 480px) {
     .toolbar { flex-wrap: wrap; }
@@ -641,6 +713,145 @@
     .brand-name { font-size: 20px; letter-spacing: 2px; }
     .stat-card { padding: 6px 14px; min-width: 80px; }
     .stat-num { font-size: 22px; }
+  }
+
+  /* ─── Map View ─── */
+  .map-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 16px 8px 80px;
+  }
+  .map-screen {
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    color: rgba(255,255,255,0.9);
+    text-align: center;
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+  .map-row {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    margin-bottom: 10px;
+  }
+  .map-side {
+    display: flex;
+    gap: 6px;
+    flex: 1;
+  }
+  .map-side.left { justify-content: flex-end; }
+  .map-side.right { justify-content: flex-start; }
+  .map-aisle {
+    width: 20px;
+    flex-shrink: 0;
+    position: relative;
+  }
+  .map-aisle::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0; bottom: 0;
+    width: 1px;
+    background: var(--gray-200);
+    transform: translateX(-50%);
+  }
+  .map-table {
+    width: 52px;
+    min-height: 58px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: 2px solid var(--gray-200);
+    background: var(--white);
+    transition: all .15s;
+    gap: 1px;
+    user-select: none;
+  }
+  .map-table:active { transform: scale(0.92); }
+  .map-table.has-people {
+    border-color: var(--green);
+    background: var(--green-light);
+  }
+  .map-table-num {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--gray-400);
+    line-height: 1.2;
+  }
+  .map-table.has-people .map-table-num { color: var(--green-dark); }
+  .map-table-count {
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--gray-300);
+    line-height: 1;
+  }
+  .map-table.has-people .map-table-count { color: var(--green); }
+  .map-table-label {
+    font-size: 9px;
+    color: var(--gray-400);
+    line-height: 1;
+  }
+  .map-table.has-people .map-table-label { color: var(--green-dark); }
+  .map-summary {
+    text-align: center;
+    margin-top: 20px;
+    padding: 14px;
+    background: var(--white);
+    border-radius: 12px;
+    border: 1px solid var(--gray-200);
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+  }
+  .map-summary-item { text-align: center; }
+  .map-summary-num {
+    font-size: 24px;
+    font-weight: 900;
+    color: var(--green);
+  }
+  .map-summary-num.gray { color: var(--gray-400); }
+  .map-summary-label {
+    font-size: 11px;
+    color: var(--gray-500);
+    font-weight: 600;
+  }
+  .td-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .td-table th {
+    background: var(--gray-100);
+    padding: 8px 10px;
+    text-align: left;
+    font-weight: 700;
+    font-size: 11px;
+    color: var(--gray-600);
+  }
+  .td-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--gray-100);
+  }
+  .td-empty {
+    text-align: center;
+    color: var(--gray-400);
+    padding: 30px 16px;
+    font-size: 14px;
+  }
+  @media (max-width: 480px) {
+    .map-table { width: 46px; min-height: 52px; }
+    .map-table-count { font-size: 17px; }
+    .map-aisle { width: 14px; }
+    .map-side { gap: 4px; }
+    .map-row { margin-bottom: 8px; }
   }
 </style>
 </head>
@@ -651,6 +862,7 @@
   <div class="header-zone">
     <div class="header">
       <button class="btn-summary" onclick="showSummary()">&#x1F4CB; สรุป</button>
+      <button class="btn-add-member" onclick="showAddMember()">+ เพิ่มคน</button>
       <div class="live-indicator"><span class="live-dot"></span><span id="statusText">เชื่อมต่อ...</span></div>
       <div class="brand-name">LOTTERY PLUS</div>
       <div class="brand-sub">EVENT CHECK-IN SYSTEM</div>
@@ -682,6 +894,7 @@
         <div class="tab active" data-filter="all">ทั้งหมด</div>
         <div class="tab" data-filter="pending">ยังไม่มา</div>
         <div class="tab" data-filter="checked">มาแล้ว</div>
+        <div class="tab" data-filter="map">แผนผัง</div>
       </div>
     </div>
   </div>
@@ -709,10 +922,52 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="tableDetailOverlay" onclick="if(event.target===this)closeTableDetail()">
+  <div class="modal">
+    <div class="modal-header"><h3 id="tdTitle">โต๊ะ</h3><button class="modal-close" onclick="closeTableDetail()">&times;</button></div>
+    <div class="modal-body" id="tdBody"></div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeTableDetail()">ปิด</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="addMemberOverlay" onclick="if(event.target===this)closeAddMember()">
+  <div class="modal">
+    <div class="modal-header"><h3>เพิ่มสมาชิก</h3><button class="modal-close" onclick="closeAddMember()">&times;</button></div>
+    <div class="modal-body">
+      <div class="mode-toggle">
+        <input type="radio" name="addMode" id="modeApplicant" value="applicant" checked onchange="toggleAddMode()">
+        <label for="modeApplicant">ผู้สมัครใหม่</label>
+        <input type="radio" name="addMode" id="modeFollower" value="follower" onchange="toggleAddMode()">
+        <label for="modeFollower">ผู้ติดตาม</label>
+      </div>
+      <div class="add-form-group applicant-select-group" id="applicantSelectGroup">
+        <label>เลือกผู้สมัครที่ต้องการเพิ่มผู้ติดตาม *</label>
+        <select id="addApplicantSelect"><option value="">-- เลือกผู้สมัคร --</option></select>
+      </div>
+      <div class="add-form-group">
+        <label>ชื่อ-นามสกุล *</label>
+        <input type="text" id="addName" placeholder="กรอกชื่อ-นามสกุล">
+      </div>
+      <div class="add-form-group">
+        <label>เบอร์โทร</label>
+        <input type="tel" id="addPhone" placeholder="กรอกเบอร์โทร">
+      </div>
+      <div class="add-form-group">
+        <label>รหัสสมาชิก</label>
+        <input type="text" id="addMemberId" placeholder="กรอกรหัสสมาชิก (ถ้ามี)">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeAddMember()">ยกเลิก</button>
+      <button class="btn btn-primary" id="addMemberSubmitBtn" onclick="submitAddMember()">เพิ่มสมาชิก</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
-const API_URL = 'https://script.google.com/macros/s/AKfycbwAO3MgGXR0MN70BhgrnynRbGA6r5y8wZKu5RGlDJmE7NOnQFCvKRBvq1GkPRq_IJjn3A/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbxKMautlHUnmBA9pIH1OdKILeA8OwLEWpyi_8_W3kCqYuFy4dVUYQ_djnBBfUGwgg1tVA/exec';
 
 let attendees = [];
 let currentFilter = 'all';
@@ -747,6 +1002,7 @@ searchInput.addEventListener('input', () => {
 function clearSearch() { searchInput.value=''; searchQuery=''; searchClear.classList.remove('show'); renderCards(); }
 
 function isUserEditing() {
+  if ($('addMemberOverlay').classList.contains('show')) return true;
   const active = document.activeElement;
   if (!active) return false;
   return active.closest && active.closest('.table-wrap, .mid-form, .mid-input');
@@ -845,13 +1101,6 @@ function confirmTable(rowNum) {
   const input=$('ti'+rowNum);
   const v = input ? input.value.trim() : '';
   if(!v){toast('กรุณาใส่เลขโต๊ะ',true);return;}
-  // Check duplicate table number
-  const dup = attendees.find(a => a.rowNum !== rowNum && a.tableNo && a.tableNo.trim() === v);
-  if(dup){
-    toast('โต๊ะ '+v+' ถูกใช้แล้วโดย '+dup.name, true);
-    if(input){ input.style.borderColor='#DC2626'; input.focus(); }
-    return;
-  }
   const p=attendees.find(a=>a.rowNum===rowNum);
   if(p)p.tableNo=v;
   toast('โต๊ะ '+v+' บันทึกแล้ว'); renderCards(); resetAutoRefresh();
@@ -929,6 +1178,7 @@ function matchesSearch(a) {
 
 // ── Render ──
 function renderCards() {
+  if (currentFilter === 'map') { renderMap(); return; }
   // Filter out เปลี่ยนใจไม่มา (Column I / shirtSize field)
   const active = attendees.filter(a => {
     const status = (a.shirtSize||'').trim();
@@ -1107,6 +1357,169 @@ function showSummary(){
 }
 function closeModal(){$('modalOverlay').classList.remove('show');}
 function copySummary(){$('summaryText').select();document.execCommand('copy');toast('Copy แล้ว!');}
+
+// ── Map View ──
+function renderMap() {
+  const layout = [
+    { left: [1,2,3], right: [4,5,6] },
+    { left: [7,8,9,10], right: [11,12,13,14] },
+    { left: [15,16,17,18,19], right: [20,21,22,23,24] },
+  ];
+
+  const active = attendees.filter(a => (a.shirtSize||'').trim() !== 'เปลี่ยนใจไม่มา' && a.checkinStatus === 'เช็คอินแล้ว');
+  const tableCounts = {};
+  for (const a of active) {
+    const tbl = (a.tableNo || '').trim();
+    if (!tbl) continue;
+    const nums = tbl.split('-').map(s => s.trim()).filter(s => s);
+    for (const n of nums) {
+      tableCounts[n] = (tableCounts[n] || 0) + 1;
+    }
+  }
+
+  const seated = active.filter(a => (a.tableNo||'').trim()).length;
+  const noTable = active.length - seated;
+
+  let h = '<div class="map-container">';
+  h += '<div class="map-screen">SCREEN / หน้าจอ</div>';
+
+  for (const row of layout) {
+    h += '<div class="map-row">';
+    h += '<div class="map-side left">';
+    for (const t of row.left) {
+      const count = tableCounts[String(t)] || 0;
+      const cls = count > 0 ? ' has-people' : '';
+      h += '<div class="map-table'+cls+'" onclick="showTableDetail('+t+')">'
+        + '<div class="map-table-num">T'+t+'</div>'
+        + '<div class="map-table-count">'+count+'</div>'
+        + '<div class="map-table-label">คน</div>'
+        + '</div>';
+    }
+    h += '</div>';
+    h += '<div class="map-aisle"></div>';
+    h += '<div class="map-side right">';
+    for (const t of row.right) {
+      const count = tableCounts[String(t)] || 0;
+      const cls = count > 0 ? ' has-people' : '';
+      h += '<div class="map-table'+cls+'" onclick="showTableDetail('+t+')">'
+        + '<div class="map-table-num">T'+t+'</div>'
+        + '<div class="map-table-count">'+count+'</div>'
+        + '<div class="map-table-label">คน</div>'
+        + '</div>';
+    }
+    h += '</div>';
+    h += '</div>';
+  }
+
+  h += '<div class="map-summary">'
+    + '<div class="map-summary-item"><div class="map-summary-num">'+seated+'</div><div class="map-summary-label">มีโต๊ะแล้ว</div></div>'
+    + '<div class="map-summary-item"><div class="map-summary-num gray">'+noTable+'</div><div class="map-summary-label">ยังไม่มีโต๊ะ</div></div>'
+    + '</div>';
+
+  h += '</div>';
+  contentEl.innerHTML = h;
+}
+
+function showTableDetail(tableNum) {
+  const members = attendees.filter(a => {
+    if ((a.shirtSize||'').trim() === 'เปลี่ยนใจไม่มา') return false;
+    if (a.checkinStatus !== 'เช็คอินแล้ว') return false;
+    const tbl = (a.tableNo || '').trim();
+    if (!tbl) return false;
+    return tbl.split('-').map(s => s.trim()).includes(String(tableNum));
+  });
+
+  $('tdTitle').textContent = 'โต๊ะ ' + tableNum + ' (' + members.length + ' คน)';
+
+  let h;
+  if (!members.length) {
+    h = '<div class="td-empty">ไม่มีผู้เข้าร่วมในโต๊ะนี้</div>';
+  } else {
+    h = '<table class="td-table"><thead><tr><th>#</th><th>รหัสสมาชิก</th><th>ชื่อ-นามสกุล</th><th>ประเภท</th></tr></thead><tbody>';
+    members.forEach((a, i) => {
+      const mid = (a.memberId||'').trim();
+      const tp = (a.type||'').trim() === 'ผู้สมัคร'
+        ? '<span class="type-badge applicant-badge">ผู้สมัคร</span>'
+        : '<span class="type-badge follower-badge">ผู้ติดตาม</span>';
+      h += '<tr><td>'+(i+1)+'</td><td>'+(mid ? '<span class="member-id">'+escHtml(mid)+'</span>' : '-')+'</td><td style="font-weight:600">'+escHtml(a.name)+'</td><td>'+tp+'</td></tr>';
+    });
+    h += '</tbody></table>';
+  }
+
+  $('tdBody').innerHTML = h;
+  $('tableDetailOverlay').classList.add('show');
+}
+
+function closeTableDetail() {
+  $('tableDetailOverlay').classList.remove('show');
+}
+
+// ── Add Member ──
+function showAddMember() {
+  // Reset form
+  $('addName').value = '';
+  $('addPhone').value = '';
+  $('addMemberId').value = '';
+  $('modeApplicant').checked = true;
+  $('addMemberSubmitBtn').disabled = false;
+  toggleAddMode();
+
+  // Populate applicant dropdown
+  const sel = $('addApplicantSelect');
+  sel.innerHTML = '<option value="">-- เลือกผู้สมัคร --</option>';
+  const active = attendees.filter(a => (a.shirtSize||'').trim() !== 'เปลี่ยนใจไม่มา');
+  active.filter(a => (a.type||'').trim() === 'ผู้สมัคร').forEach(a => {
+    const opt = document.createElement('option');
+    opt.value = a.rowNum;
+    opt.textContent = '#' + a.order + ' ' + a.name;
+    sel.appendChild(opt);
+  });
+
+  $('addMemberOverlay').classList.add('show');
+}
+
+function closeAddMember() {
+  $('addMemberOverlay').classList.remove('show');
+}
+
+function toggleAddMode() {
+  const isFollower = $('modeFollower').checked;
+  $('applicantSelectGroup').classList.toggle('show', isFollower);
+}
+
+async function submitAddMember() {
+  const name = $('addName').value.trim();
+  if (!name) { toast('กรุณากรอกชื่อ-นามสกุล', true); return; }
+
+  const isFollower = $('modeFollower').checked;
+  const applicantRowNum = isFollower ? parseInt($('addApplicantSelect').value) : 0;
+  if (isFollower && !applicantRowNum) { toast('กรุณาเลือกผู้สมัคร', true); return; }
+
+  const phone = $('addPhone').value.trim();
+  const memberId = $('addMemberId').value.trim();
+  const type = isFollower ? 'ผู้ติดตาม' : 'ผู้สมัคร';
+
+  $('addMemberSubmitBtn').disabled = true;
+  $('addMemberSubmitBtn').textContent = 'กำลังเพิ่ม...';
+
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ action: 'addAttendee', name, phone, memberId, type, applicantRowNum })
+    });
+    const json = await res.json();
+    if (!json.success) throw new Error(json.error || 'API error');
+    toast('เพิ่ม ' + name + ' สำเร็จ (ลำดับ #' + json.order + ')');
+    closeAddMember();
+    await loadData();
+  } catch (err) {
+    toast('เพิ่มไม่สำเร็จ: ' + err.message, true);
+  } finally {
+    $('addMemberSubmitBtn').disabled = false;
+    $('addMemberSubmitBtn').textContent = 'เพิ่มสมาชิก';
+  }
+}
 
 // ── Pull to Refresh ──
 (function(){
