@@ -1,0 +1,1581 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>LOTTERY PLUS - Event Check-in</title>
+<style>
+  :root {
+    --red: #E32321;
+    --red-dark: #C41E1A;
+    --red-deep: #A01812;
+    --white: #FFFFFF;
+    --off-white: #FAFAFA;
+    --gray-100: #F2F2F2;
+    --gray-200: #E5E5E5;
+    --gray-300: #D4D4D4;
+    --gray-400: #A3A3A3;
+    --gray-500: #737373;
+    --gray-600: #525252;
+    --gray-800: #262626;
+    --green: #16A34A;
+    --green-light: #DCFCE7;
+    --green-dark: #15803D;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { height:100%; overflow:hidden; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    background: var(--white);
+    color: var(--gray-800);
+  }
+
+  /* ─── App Shell ─── */
+  .app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
+  }
+
+  /* ─── Fixed Header Zone ─── */
+  .header-zone {
+    flex-shrink: 0;
+    z-index: 100;
+  }
+
+  /* ─── Header ─── */
+  .header {
+    background: var(--red);
+    color: var(--white);
+    padding: 16px 20px 18px;
+    text-align: center;
+    position: relative;
+  }
+  .live-indicator {
+    position: absolute;
+    right: 14px;
+    top: 14px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+    opacity: 0.85;
+    font-weight: 500;
+  }
+  .live-dot {
+    width: 7px;
+    height: 7px;
+    background: #4ADE80;
+    border-radius: 50%;
+    animation: pulse 1.5s ease-in-out infinite;
+    box-shadow: 0 0 6px rgba(74,222,128,0.5);
+  }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.8)} }
+
+  .brand-name {
+    font-size: 24px;
+    font-weight: 900;
+    letter-spacing: 3px;
+    line-height: 1.2;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.15);
+  }
+  .brand-sub {
+    font-size: 11px;
+    font-weight: 500;
+    opacity: 0.8;
+    letter-spacing: 2px;
+    margin-top: 2px;
+  }
+
+  /* Stats Cards */
+  .stats-bar {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 14px;
+  }
+  .stat-card {
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 8px 20px;
+    text-align: center;
+    min-width: 100px;
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+  .stat-card.green {
+    background: rgba(255,255,255,0.95);
+    border-color: rgba(255,255,255,0.5);
+    color: var(--green);
+  }
+  .stat-card.remain {
+    background: rgba(255,255,255,0.2);
+    border-color: rgba(255,255,255,0.15);
+    color: var(--white);
+  }
+  .stat-card.total {
+    background: rgba(0,0,0,0.15);
+    border-color: rgba(0,0,0,0.1);
+    color: var(--white);
+  }
+  .stat-num {
+    font-size: 26px;
+    font-weight: 900;
+    line-height: 1.1;
+  }
+  .stat-label {
+    font-size: 11px;
+    font-weight: 600;
+    opacity: 0.9;
+    margin-top: 2px;
+  }
+
+  /* ─── Toolbar ─── */
+  .toolbar {
+    background: var(--white);
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .search-box {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    background: var(--gray-100);
+    border-radius: 10px;
+    padding: 0 12px;
+    border: 2px solid transparent;
+    transition: border-color .2s;
+  }
+  .search-box:focus-within { border-color: var(--red); }
+  .search-box svg { flex-shrink:0; color:var(--gray-400); width:16px; height:16px; }
+  .search-box input {
+    flex: 1;
+    border: none;
+    outline: none;
+    padding: 9px 8px;
+    font-size: 14px;
+    background: transparent;
+    color: var(--gray-800);
+  }
+  .search-box input::placeholder { color: var(--gray-400); }
+  .search-clear {
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: var(--gray-400);
+    cursor: pointer;
+    display: none;
+    padding: 2px;
+    line-height: 1;
+  }
+  .search-clear.show { display: block; }
+  .tabs { display:flex; gap:6px; flex-shrink:0; }
+  .tab {
+    padding: 7px 14px;
+    border-radius: 20px;
+    border: 1.5px solid var(--gray-200);
+    background: var(--white);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gray-500);
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+    transition: all .2s;
+  }
+  .tab:hover { border-color: var(--gray-300); color: var(--gray-600); }
+  .tab.active {
+    background: var(--red);
+    color: var(--white);
+    border-color: var(--red);
+  }
+
+  /* ─── Error ─── */
+  .error-banner {
+    background: #FEF2F2;
+    color: #DC2626;
+    padding: 8px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    display: none;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid #FECACA;
+  }
+  .error-banner.show { display: flex; }
+  .error-banner button {
+    margin-left: auto;
+    background: #DC2626;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 4px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* ─── Pull to Refresh ─── */
+  .ptr-indicator {
+    text-align: center;
+    height: 0;
+    overflow: hidden;
+    transition: height .25s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--off-white);
+    color: var(--gray-400);
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .ptr-indicator .ptr-spinner {
+    width: 22px;
+    height: 22px;
+    border: 2.5px solid var(--gray-200);
+    border-top-color: var(--red);
+    border-radius: 50%;
+    margin-right: 8px;
+    display: none;
+  }
+  .ptr-indicator.refreshing .ptr-spinner {
+    display: inline-block;
+    animation: spin .7s linear infinite;
+  }
+  .ptr-indicator .ptr-arrow {
+    margin-right: 8px;
+    transition: transform .2s;
+    font-size: 16px;
+  }
+  .ptr-indicator.ready .ptr-arrow { transform: rotate(180deg); }
+  .ptr-indicator.refreshing .ptr-arrow { display: none; }
+
+  /* ─── Scrollable Content ─── */
+  .content-scroll {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    background: var(--off-white);
+  }
+
+  /* ─── Name List (single column, centered) ─── */
+  .name-list {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 8px 12px 80px;
+  }
+
+  /* Group */
+  .group {
+    background: var(--white);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 8px;
+    border: 1px solid var(--gray-200);
+  }
+  .group.all-checked {
+    background: var(--green-light);
+    border-color: #BBF7D0;
+  }
+
+  /* Row */
+  .row {
+    display: flex;
+    align-items: center;
+    padding: 10px 14px;
+    gap: 10px;
+    border-bottom: 1px solid var(--gray-100);
+    min-height: 52px;
+    transition: background .15s;
+  }
+  .row:last-child { border-bottom: none; }
+  .row:active { background: var(--gray-100); }
+  .row.checked { background: var(--green-light); }
+  .row.applicant { font-weight: 600; }
+  .row.applicant:not(.checked) { background: #FFF5F5; }
+  .row.follower { font-weight: 600; padding-left: 38px; }
+  .row.follower:not(.checked) { background: #F5F3FF; }
+  .row.follower.checked { background: #F0FDF4; }
+
+  /* Checkbox */
+  .chk-wrap { flex-shrink: 0; }
+  .chk {
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+    border: 2.5px solid var(--gray-300);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background: var(--white);
+    transition: all .15s;
+  }
+  .chk:active { transform: scale(0.85); }
+  .chk.on {
+    background: var(--green);
+    border-color: var(--green);
+    box-shadow: 0 1px 4px rgba(22,163,74,0.3);
+  }
+  .chk svg { display: none; }
+  .chk.on svg { display: block; }
+
+  /* Name */
+  .name-area { flex: 1; min-width: 0; overflow: hidden; }
+  .person-name {
+    font-size: 15px;
+    line-height: 1.4;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--gray-800);
+  }
+  .person-meta {
+    font-size: 11px;
+    color: var(--gray-400);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 1px;
+  }
+  .badge {
+    display: inline-block;
+    font-size: 9px;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-weight: 700;
+    vertical-align: middle;
+    margin-left: 6px;
+  }
+  .badge.returning { background: #FEF3C7; color: #D97706; }
+  .badge.first-time { background: #DBEAFE; color: #2563EB; }
+
+  /* Type badge */
+  .type-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 6px;
+    vertical-align: middle;
+    margin-right: 6px;
+    letter-spacing: 0.3px;
+  }
+  .type-badge.applicant-badge {
+    background: var(--red);
+    color: white;
+  }
+  .type-badge.follower-badge {
+    background: #6366F1;
+    color: white;
+  }
+  .check-time {
+    font-size: 11px;
+    color: var(--green-dark);
+    font-weight: 600;
+    margin-left: 4px;
+  }
+
+  /* Member ID */
+  .member-id {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 800;
+    color: #2563EB;
+    background: #EFF6FF;
+    padding: 1px 8px;
+    border-radius: 6px;
+    margin-left: 6px;
+    vertical-align: middle;
+    letter-spacing: 0.5px;
+  }
+  .no-id-warn {
+    display: inline-flex;
+    align-items: center;
+    background: #FEF3C7;
+    color: #D97706;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 8px;
+    border-radius: 6px;
+    margin-left: 6px;
+    vertical-align: middle;
+    cursor: pointer;
+  }
+  .mid-form {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+  .mid-input {
+    width: 100px;
+    height: 26px;
+    border: 2px solid #D97706;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 0 6px;
+    outline: none;
+    background: #FFFBEB;
+  }
+  .mid-input:focus { border-color: var(--red); }
+  .mid-btn {
+    height: 26px;
+    padding: 0 10px;
+    border: none;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .mid-btn.ok { background: var(--green); color: white; }
+  .mid-btn.cancel { background: var(--gray-200); color: var(--gray-600); }
+
+  /* Table Input (applicant only) */
+  .table-wrap { flex-shrink:0; display:flex; align-items:center; gap:3px; }
+  .table-input {
+    width: 60px;
+    height: 28px;
+    text-align: center;
+    border: 2px solid var(--gray-300);
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    outline: none;
+    background: var(--white);
+  }
+  .table-input:focus { border-color: var(--red); }
+  .row.checked .table-input { border-color: var(--green); }
+  .table-display {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--green-dark);
+    min-width: 28px;
+    text-align: center;
+    cursor: pointer;
+    padding: 3px 8px;
+    border-radius: 8px;
+    background: var(--green-light);
+    transition: background .15s;
+  }
+  .table-display:hover { background: #BBF7D0; }
+  .tbl-btn {
+    height: 26px;
+    padding: 0 8px;
+    border: none;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .tbl-btn.ok { background: var(--green); color: white; }
+  .tbl-btn.del { background: var(--red); color: white; }
+  .tbl-btn.cancel { background: var(--gray-200); color: var(--gray-600); }
+
+  /* Loading / Empty */
+  .empty, .loading-overlay {
+    text-align: center;
+    padding: 60px 16px;
+    color: var(--gray-400);
+  }
+  .empty p { font-size: 14px; }
+  .spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--gray-200);
+    border-top-color: var(--red);
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+    margin: 0 auto 12px;
+  }
+  @keyframes spin { to { transform: rotate(360deg) } }
+
+  /* Swipe row */
+  .row-swipe {
+    position: relative;
+    overflow: hidden;
+  }
+  .row-swipe .row {
+    position: relative;
+    z-index: 1;
+    transition: transform .25s ease;
+  }
+  .row-swipe .swipe-bg {
+    position: absolute;
+    top: 0; right: 0; bottom: 0;
+    width: 120px;
+    background: #DC2626;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
+    z-index: 0;
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--gray-800);
+    color: white;
+    padding: 10px 22px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    z-index: 500;
+    transition: transform .3s ease;
+    pointer-events: none;
+    white-space: nowrap;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.warn { background: #DC2626; }
+
+  /* Summary button in header */
+  .btn-summary {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: rgba(255,255,255,0.2);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 8px;
+    padding: 5px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    z-index: 150;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .btn-summary:active { opacity: 0.7; }
+
+  /* Modal */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+    z-index: 300;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: white;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+  .modal-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .modal-header h3 { font-size: 15px; font-weight: 700; }
+  .modal-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--gray-400);
+    line-height: 1;
+  }
+  .modal-body { padding: 14px 18px; overflow-y: auto; flex: 1; }
+  .modal-body textarea {
+    width: 100%;
+    height: 200px;
+    border: 2px solid var(--gray-200);
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 12px;
+    font-family: monospace;
+    resize: vertical;
+    outline: none;
+  }
+  .modal-body textarea:focus { border-color: var(--red); }
+  .modal-info { font-size: 12px; color: var(--gray-500); margin-bottom: 10px; }
+  .modal-footer {
+    padding: 12px 18px;
+    border-top: 1px solid var(--gray-200);
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+  .btn {
+    padding: 9px 22px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: opacity .15s;
+  }
+  .btn:active { opacity: 0.8; }
+  .btn-primary { background: var(--red); color: white; }
+  .btn-secondary { background: var(--gray-100); color: var(--gray-600); }
+
+  /* ─── Add Member Button ─── */
+  .btn-add-member {
+    position: absolute;
+    top: 12px;
+    left: 80px;
+    background: rgba(255,255,255,0.2);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 8px;
+    padding: 5px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    z-index: 150;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .btn-add-member:active { opacity: 0.7; }
+
+  /* ─── Add Member Modal ─── */
+  .add-form-group {
+    margin-bottom: 14px;
+  }
+  .add-form-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--gray-600);
+    margin-bottom: 4px;
+  }
+  .add-form-group input,
+  .add-form-group select {
+    width: 100%;
+    height: 38px;
+    border: 2px solid var(--gray-200);
+    border-radius: 10px;
+    padding: 0 12px;
+    font-size: 14px;
+    outline: none;
+    background: var(--white);
+  }
+  .add-form-group input:focus,
+  .add-form-group select:focus { border-color: var(--red); }
+  .mode-toggle {
+    display: flex;
+    gap: 0;
+    border: 2px solid var(--gray-200);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 14px;
+  }
+  .mode-toggle label {
+    flex: 1;
+    text-align: center;
+    padding: 9px 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--gray-500);
+    background: var(--white);
+    transition: all .15s;
+    user-select: none;
+  }
+  .mode-toggle input { display: none; }
+  .mode-toggle input:checked + label {
+    background: var(--red);
+    color: white;
+  }
+  .applicant-select-group { display: none; }
+  .applicant-select-group.show { display: block; }
+
+  /* Mobile responsive tabs */
+  @media (max-width: 480px) {
+    .toolbar { flex-wrap: wrap; }
+    .search-box { flex: 1 1 100%; order: 1; }
+    .tabs { order: 2; width: 100%; justify-content: center; margin-top: 4px; }
+    .brand-name { font-size: 20px; letter-spacing: 2px; }
+    .stat-card { padding: 6px 14px; min-width: 80px; }
+    .stat-num { font-size: 22px; }
+  }
+
+  /* ─── Map View ─── */
+  .map-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 16px 8px 80px;
+  }
+  .map-screen {
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    color: rgba(255,255,255,0.9);
+    text-align: center;
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+  .map-row {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    margin-bottom: 10px;
+  }
+  .map-side {
+    display: flex;
+    gap: 6px;
+    flex: 1;
+  }
+  .map-side.left { justify-content: flex-end; }
+  .map-side.right { justify-content: flex-start; }
+  .map-aisle {
+    width: 20px;
+    flex-shrink: 0;
+    position: relative;
+  }
+  .map-aisle::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0; bottom: 0;
+    width: 1px;
+    background: var(--gray-200);
+    transform: translateX(-50%);
+  }
+  .map-table {
+    width: 52px;
+    min-height: 58px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: 2px solid var(--gray-200);
+    background: var(--white);
+    transition: all .15s;
+    gap: 1px;
+    user-select: none;
+  }
+  .map-table:active { transform: scale(0.92); }
+  .map-table.has-people {
+    border-color: var(--green);
+    background: var(--green-light);
+  }
+  .map-table-num {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--gray-400);
+    line-height: 1.2;
+  }
+  .map-table.has-people .map-table-num { color: var(--green-dark); }
+  .map-table-count {
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--gray-300);
+    line-height: 1;
+  }
+  .map-table.has-people .map-table-count { color: var(--green); }
+  .map-table-label {
+    font-size: 9px;
+    color: var(--gray-400);
+    line-height: 1;
+  }
+  .map-table.has-people .map-table-label { color: var(--green-dark); }
+  .map-summary {
+    text-align: center;
+    margin-top: 20px;
+    padding: 14px;
+    background: var(--white);
+    border-radius: 12px;
+    border: 1px solid var(--gray-200);
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+  }
+  .map-summary-item { text-align: center; }
+  .map-summary-num {
+    font-size: 24px;
+    font-weight: 900;
+    color: var(--green);
+  }
+  .map-summary-num.gray { color: var(--gray-400); }
+  .map-summary-label {
+    font-size: 11px;
+    color: var(--gray-500);
+    font-weight: 600;
+  }
+  .td-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .td-table th {
+    background: var(--gray-100);
+    padding: 8px 10px;
+    text-align: left;
+    font-weight: 700;
+    font-size: 11px;
+    color: var(--gray-600);
+  }
+  .td-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--gray-100);
+  }
+  .td-empty {
+    text-align: center;
+    color: var(--gray-400);
+    padding: 30px 16px;
+    font-size: 14px;
+  }
+  @media (max-width: 480px) {
+    .map-table { width: 46px; min-height: 52px; }
+    .map-table-count { font-size: 17px; }
+    .map-aisle { width: 14px; }
+    .map-side { gap: 4px; }
+    .map-row { margin-bottom: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- Fixed Header Zone -->
+  <div class="header-zone">
+    <div class="header">
+      <button class="btn-summary" onclick="showSummary()">&#x1F4CB; สรุป</button>
+      <button class="btn-add-member" onclick="showAddMember()">+ เพิ่มคน</button>
+      <div class="live-indicator"><span class="live-dot"></span><span id="statusText">เชื่อมต่อ...</span></div>
+      <div class="brand-name">LOTTERY PLUS</div>
+      <div class="brand-sub">EVENT CHECK-IN SYSTEM</div>
+      <div class="stats-bar">
+        <div class="stat-card green">
+          <div class="stat-num" id="statChecked">-</div>
+          <div class="stat-label">มาแล้ว</div>
+        </div>
+        <div class="stat-card remain">
+          <div class="stat-num" id="statRemain">-</div>
+          <div class="stat-label">ยังไม่มา</div>
+        </div>
+        <div class="stat-card total">
+          <div class="stat-num" id="statTotal">-</div>
+          <div class="stat-label">ทั้งหมด</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="error-banner" id="errorBanner"><span id="errorText"></span><button onclick="loadData()">ลองใหม่</button></div>
+
+    <div class="toolbar">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="searchInput" placeholder="ค้นหาชื่อ, เบอร์, รหัส...">
+        <button class="search-clear" id="searchClear" onclick="clearSearch()">&times;</button>
+      </div>
+      <div class="tabs">
+        <div class="tab active" data-filter="all">ทั้งหมด</div>
+        <div class="tab" data-filter="pending">ยังไม่มา</div>
+        <div class="tab" data-filter="checked">มาแล้ว</div>
+        <div class="tab" data-filter="map">แผนผัง</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scrollable Content -->
+  <div class="content-scroll" id="contentScroll">
+    <div class="ptr-indicator" id="ptrIndicator">
+      <span class="ptr-arrow">↓</span>
+      <span class="ptr-spinner"></span>
+      <span class="ptr-text">ดึงลงเพื่อรีเฟรช</span>
+    </div>
+    <div id="content">
+      <div class="name-list">
+        <div class="loading-overlay"><div class="spinner"></div><p>กำลังโหลดข้อมูล...</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-header"><h3>สรุปรหัสสมาชิก (ผู้เข้าร่วม)</h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
+    <div class="modal-body"><div class="modal-info" id="modalInfo"></div><textarea id="summaryText" readonly></textarea></div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">ปิด</button><button class="btn btn-primary" onclick="copySummary()">Copy</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="tableDetailOverlay" onclick="if(event.target===this)closeTableDetail()">
+  <div class="modal">
+    <div class="modal-header"><h3 id="tdTitle">โต๊ะ</h3><button class="modal-close" onclick="closeTableDetail()">&times;</button></div>
+    <div class="modal-body" id="tdBody"></div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeTableDetail()">ปิด</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="addMemberOverlay" onclick="if(event.target===this)closeAddMember()">
+  <div class="modal">
+    <div class="modal-header"><h3>เพิ่มสมาชิก</h3><button class="modal-close" onclick="closeAddMember()">&times;</button></div>
+    <div class="modal-body">
+      <div class="mode-toggle">
+        <input type="radio" name="addMode" id="modeApplicant" value="applicant" checked onchange="toggleAddMode()">
+        <label for="modeApplicant">ผู้สมัครใหม่</label>
+        <input type="radio" name="addMode" id="modeFollower" value="follower" onchange="toggleAddMode()">
+        <label for="modeFollower">ผู้ติดตาม</label>
+      </div>
+      <div class="add-form-group applicant-select-group" id="applicantSelectGroup">
+        <label>เลือกผู้สมัครที่ต้องการเพิ่มผู้ติดตาม *</label>
+        <select id="addApplicantSelect"><option value="">-- เลือกผู้สมัคร --</option></select>
+      </div>
+      <div class="add-form-group">
+        <label>ชื่อ-นามสกุล *</label>
+        <input type="text" id="addName" placeholder="กรอกชื่อ-นามสกุล">
+      </div>
+      <div class="add-form-group">
+        <label>เบอร์โทร</label>
+        <input type="tel" id="addPhone" placeholder="กรอกเบอร์โทร">
+      </div>
+      <div class="add-form-group">
+        <label>รหัสสมาชิก</label>
+        <input type="text" id="addMemberId" placeholder="กรอกรหัสสมาชิก (ถ้ามี)">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeAddMember()">ยกเลิก</button>
+      <button class="btn btn-primary" id="addMemberSubmitBtn" onclick="submitAddMember()">เพิ่มสมาชิก</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API_URL = 'https://script.google.com/macros/s/AKfycbzGqOqJ_NyRU5NlFM_EbbNClm4XhQP0CuWylnauReWZkcFuQjCu5RJKZyFUO_pQCyd4KQ/exec';
+
+let attendees = [];
+let currentFilter = 'all';
+let searchQuery = '';
+let refreshTimer = null;
+let isLoading = false;
+let pendingRequests = 0;
+
+const $ = id => document.getElementById(id);
+const contentEl = $('content');
+const searchInput = $('searchInput');
+const searchClear = $('searchClear');
+const toastEl = $('toast');
+
+document.addEventListener('DOMContentLoaded', () => { loadData(); startAutoRefresh(); });
+
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    currentFilter = tab.dataset.filter;
+    renderCards();
+  });
+});
+
+searchInput.addEventListener('input', () => {
+  searchQuery = searchInput.value.trim().toLowerCase();
+  searchClear.classList.toggle('show', searchQuery.length > 0);
+  renderCards();
+});
+
+function clearSearch() { searchInput.value=''; searchQuery=''; searchClear.classList.remove('show'); renderCards(); }
+
+function isUserEditing() {
+  if ($('addMemberOverlay').classList.contains('show')) return true;
+  const active = document.activeElement;
+  if (!active) return false;
+  return active.closest && active.closest('.table-wrap, .mid-form, .mid-input');
+}
+
+function startAutoRefresh() {
+  if (refreshTimer) clearInterval(refreshTimer);
+  refreshTimer = setInterval(() => {
+    if (!isLoading && pendingRequests === 0 && !isUserEditing()) loadData(true);
+  }, 5000);
+}
+
+function resetAutoRefresh() {
+  startAutoRefresh();
+}
+
+function groupAttendees(list) {
+  const groups = []; let cur = null;
+  for (const a of list) {
+    if (a.type === 'ผู้สมัคร') { cur = { applicant:a, followers:[] }; groups.push(cur); }
+    else if (a.type === 'ผู้ติดตาม') { if (cur) cur.followers.push(a); else groups.push({applicant:null,followers:[a]}); }
+    else { cur = {applicant:a,followers:[]}; groups.push(cur); }
+  }
+  return groups;
+}
+
+// ── Load ──
+async function loadData(silent) {
+  if (isLoading) return;
+  isLoading = true;
+  if (!silent) contentEl.innerHTML = '<div class="name-list"><div class="loading-overlay"><div class="spinner"></div><p>กำลังโหลดข้อมูล...</p></div></div>';
+  try {
+    const res = await fetch(API_URL + '?action=getAttendees');
+    const json = await res.json();
+    if (!json.success) throw new Error(json.error || 'API error');
+    // Auto-detect old Code.gs column mapping and remap if needed
+    // Old: type=ColD(name), name=ColE(phone), schedule=ColF(type)
+    // New: name=ColD, phone=ColE, type=ColF
+    const raw = json.data;
+    const needsRemap = raw.length > 0 &&
+      !['ผู้สมัคร','ผู้ติดตาม'].includes(String(raw[0].type || '').trim());
+    if (needsRemap) {
+      attendees = raw.map(a => ({
+        ...a,
+        name: String(a.type || ''),
+        phone: String(a.name || ''),
+        type: String(a.schedule || ''),
+      }));
+    } else {
+      attendees = raw;
+    }
+    $('errorBanner').classList.remove('show');
+    $('statusText').textContent = 'เชื่อมต่อแล้ว';
+    updateStats();
+    if (!isUserEditing()) renderCards();
+  } catch (err) {
+    if (!silent) { $('errorText').textContent = 'โหลดไม่ได้: '+err.message; $('errorBanner').classList.add('show'); }
+    $('statusText').textContent = 'ขาดการเชื่อมต่อ';
+  } finally { isLoading = false; }
+}
+
+// ── Check In ──
+function toggleCheckIn(rowNum) {
+  const p = attendees.find(a => a.rowNum === rowNum);
+  if (!p) return;
+  const wasChecked = p.checkinStatus === 'เช็คอินแล้ว';
+  const prev = { s:p.checkinStatus, t:p.checkinTime };
+
+  if (wasChecked) {
+    p.checkinStatus = ''; p.checkinTime = '';
+    toast('ยกเลิก: ' + p.name);
+  } else {
+    p.checkinStatus = 'เช็คอินแล้ว';
+    p.checkinTime = new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    toast('เช็คอิน: ' + p.name);
+    if (!p.memberId.trim()) setTimeout(() => toast('ยังไม่มีรหัสสมาชิก: '+p.name, true), 800);
+  }
+  updateStats();
+  renderCards();
+  resetAutoRefresh();
+
+  const action = wasChecked ? 'undoCheckIn' : 'checkIn';
+  pendingRequests++;
+  fetch(API_URL, { method:'POST', headers:{'Content-Type':'text/plain'}, body:JSON.stringify({action,rowNum,tableNo:p.tableNo||''}) })
+    .then(r=>r.json()).then(j=>{ if(!j.success)throw new Error(j.error); if(!wasChecked&&j.time)p.checkinTime=j.time; })
+    .catch(err=>{ p.checkinStatus=prev.s; p.checkinTime=prev.t; updateStats(); renderCards(); toast('ผิดพลาด: '+err.message); })
+    .finally(()=>{ pendingRequests--; });
+}
+
+// ── Table ──
+function showTblBtns(rowNum) {
+  const ok=$('tbok'+rowNum), no=$('tbno'+rowNum);
+  if(ok)ok.style.display=''; if(no)no.style.display='';
+}
+function confirmTable(rowNum) {
+  const input=$('ti'+rowNum);
+  const v = input ? input.value.trim() : '';
+  if(!v){toast('กรุณาใส่เลขโต๊ะ',true);return;}
+  const p=attendees.find(a=>a.rowNum===rowNum);
+  if(p)p.tableNo=v;
+  toast('โต๊ะ '+v+' บันทึกแล้ว'); renderCards(); resetAutoRefresh();
+  pendingRequests++;
+  fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'setTableNo',rowNum,tableNo:v})})
+    .then(r=>r.json()).then(j=>{if(!j.success)throw new Error(j.error);})
+    .catch(()=>{if(p)p.tableNo='';renderCards();toast('บันทึกโต๊ะไม่สำเร็จ',true);})
+    .finally(()=>{ pendingRequests--; });
+}
+function cancelTable(rowNum) {
+  const ok=$('tbok'+rowNum),no=$('tbno'+rowNum),inp=$('ti'+rowNum);
+  if(ok)ok.style.display='none';if(no)no.style.display='none';if(inp){inp.value='';inp.blur();}
+}
+function clearTable(rowNum) {
+  const p=attendees.find(a=>a.rowNum===rowNum);
+  if(p)p.tableNo='';
+  toast('ลบเลขโต๊ะแล้ว'); renderCards(); resetAutoRefresh();
+  pendingRequests++;
+  fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'setTableNo',rowNum,tableNo:''})})
+    .then(r=>r.json()).then(j=>{if(!j.success)throw new Error(j.error);})
+    .catch(()=>{if(p)p.tableNo='';renderCards();toast('ลบโต๊ะไม่สำเร็จ',true);})
+    .finally(()=>{ pendingRequests--; });
+}
+function editTable(rowNum) {
+  const p=attendees.find(a=>a.rowNum===rowNum), tw=$('tw'+rowNum);
+  if(!tw)return;
+  tw.innerHTML='<input class="table-input" id="ti'+rowNum+'" value="'+(p?p.tableNo:'')+'">'
+    +'<button class="tbl-btn ok" onclick="confirmTable('+rowNum+')">OK</button>'
+    +'<button class="tbl-btn del" onclick="clearTable('+rowNum+')">ลบ</button>'
+    +'<button class="tbl-btn cancel" onclick="cancelTable('+rowNum+');renderCards()">X</button>';
+  const inp=$('ti'+rowNum); if(inp){inp.focus();inp.select();}
+}
+
+// ── MemberId ──
+function showMidForm(rowNum) {
+  const w=document.querySelector('[data-row="'+rowNum+'"] .no-id-warn');
+  const f=$('midForm'+rowNum), i=$('midVal'+rowNum);
+  if(w)w.style.display='none'; if(f)f.style.display='inline-flex'; if(i)i.focus();
+}
+function cancelMid(rowNum) {
+  const w=document.querySelector('[data-row="'+rowNum+'"] .no-id-warn');
+  const f=$('midForm'+rowNum);
+  if(w)w.style.display=''; if(f)f.style.display='none';
+}
+function confirmMid(rowNum) {
+  const inp=$('midVal'+rowNum), v=inp?inp.value.trim():'';
+  if(!v){toast('กรุณากรอกรหัสสมาชิก',true);return;}
+  const p=attendees.find(a=>a.rowNum===rowNum);
+  if(p)p.memberId=v;
+  toast('บันทึกรหัส '+v); renderCards(); resetAutoRefresh();
+  pendingRequests++;
+  fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'setMemberId',rowNum,memberId:v})})
+    .then(r=>r.json()).then(j=>{if(!j.success)throw new Error(j.error);})
+    .catch(()=>{if(p)p.memberId='';renderCards();toast('บันทึกรหัสไม่สำเร็จ',true);})
+    .finally(()=>{ pendingRequests--; });
+}
+
+// ── Stats ──
+function updateStats() {
+  const active = attendees.filter(a => (a.shirtSize||'').trim() !== 'เปลี่ยนใจไม่มา');
+  const c = active.filter(a=>a.checkinStatus==='เช็คอินแล้ว').length;
+  $('statChecked').textContent=c; $('statRemain').textContent=active.length-c;
+  $('statTotal').textContent=active.length;
+}
+
+function matchesFilter(a) {
+  if(currentFilter==='checked')return a.checkinStatus==='เช็คอินแล้ว';
+  if(currentFilter==='pending')return a.checkinStatus!=='เช็คอินแล้ว';
+  return true;
+}
+function matchesSearch(a) {
+  if(!searchQuery)return true;
+  return a.name.toLowerCase().includes(searchQuery)||a.phone.includes(searchQuery)||a.memberId.toLowerCase().includes(searchQuery)||String(a.order).includes(searchQuery);
+}
+
+// ── Render ──
+function renderCards() {
+  if (currentFilter === 'map') { renderMap(); return; }
+  // Filter out เปลี่ยนใจไม่มา (Column I / shirtSize field)
+  const active = attendees.filter(a => {
+    const status = (a.shirtSize||'').trim();
+    return status !== 'เปลี่ยนใจไม่มา';
+  });
+  const vis = active.filter(a => matchesFilter(a) && matchesSearch(a));
+  if(!vis.length){ contentEl.innerHTML='<div class="name-list"><div class="empty"><p>'+(searchQuery?'ไม่พบ "'+escHtml(searchQuery)+'"':'ไม่มีข้อมูล')+'</p></div></div>'; return; }
+
+  // Group applicant + their followers into one card
+  let h='<div class="name-list">';
+  let groupHtml = '';
+  let inGroup = false;
+  for(const a of vis) {
+    const isApp = (a.type||'').trim() === 'ผู้สมัคร';
+    if(isApp) {
+      // Close previous group if open
+      if(inGroup) { h += groupHtml + '</div>'; }
+      groupHtml = '<div class="group">' + renderRow(a);
+      inGroup = true;
+    } else {
+      // Follower
+      if(!inGroup) {
+        // Orphan follower — wrap in own group
+        h += '<div class="group">' + renderRow(a) + '</div>';
+      } else {
+        groupHtml += renderRow(a);
+      }
+    }
+  }
+  if(inGroup) { h += groupHtml + '</div>'; }
+  h+='</div>';
+  contentEl.innerHTML=h;
+}
+
+function renderRow(a) {
+  const ck = a.checkinStatus==='เช็คอินแล้ว';
+  const isApp = (a.type||'').trim()==='ผู้สมัคร';
+  const isRet = a.visited&&a.visited!==''&&a.visited!=='ไม่เคย'&&a.visited!=='ยังไม่เคย'&&a.visited!=='ไม่เคยมา';
+  const cls = isApp?'applicant':'follower';
+
+  const typeBadge = isApp
+    ? '<span class="type-badge applicant-badge">ผู้สมัคร</span>'
+    : '<span class="type-badge follower-badge">ผู้ติดตาม</span>';
+
+  const timeS = ck?'<span class="check-time">✓ '+escHtml(a.checkinTime)+'</span>':'';
+
+  // Meta line: #order · phone · memberId · visitBadge
+  let metaParts=['#'+a.order];
+  const ph = a.phone ? a.phone.replace(/\t/g,'').trim() : '';
+  if(ph) metaParts.push(ph);
+  let metaHtml = escHtml(metaParts.join(' · '));
+
+  const hasMid = a.memberId ? a.memberId.trim() : '';
+  if(hasMid){
+    metaHtml+=' <span class="member-id">'+escHtml(a.memberId)+'</span>';
+  } else if(ck){
+    metaHtml+=' <span class="no-id-warn" onclick="event.stopPropagation();showMidForm('+a.rowNum+')">! ไม่มีรหัส</span>'
+      +'<span class="mid-form" id="midForm'+a.rowNum+'" style="display:none">'
+        +'<input class="mid-input" id="midVal'+a.rowNum+'" placeholder="กรอกรหัส...">'
+        +'<button class="mid-btn ok" onclick="confirmMid('+a.rowNum+')">ยืนยัน</button>'
+        +'<button class="mid-btn cancel" onclick="cancelMid('+a.rowNum+')">ยกเลิก</button>'
+      +'</span>';
+  }
+
+  const visitB = isRet?'<span class="badge returning">★ เคยมา</span>':'<span class="badge first-time">✦ ใหม่</span>';
+  metaHtml += ' ' + visitB;
+
+  // Table number: only for ผู้สมัคร
+  let tblH='';
+  if(isApp){
+    const tblVal = a.tableNo ? a.tableNo.trim() : '';
+    if(tblVal){
+      tblH='<div class="table-wrap" id="tw'+a.rowNum+'"><span class="table-display" onclick="editTable('+a.rowNum+')">โต๊ะ '+escHtml(tblVal)+'</span></div>';
+    } else {
+      tblH='<div class="table-wrap" id="tw'+a.rowNum+'"><input class="table-input" id="ti'+a.rowNum+'" placeholder="โต๊ะ" onfocus="showTblBtns('+a.rowNum+')">'
+        +'<button class="tbl-btn ok" id="tbok'+a.rowNum+'" style="display:none" onclick="confirmTable('+a.rowNum+')">OK</button>'
+        +'<button class="tbl-btn cancel" id="tbno'+a.rowNum+'" style="display:none" onclick="cancelTable('+a.rowNum+')">X</button></div>';
+    }
+  }
+
+  return '<div class="row-swipe" data-row="'+a.rowNum+'">'
+    +'<div class="swipe-bg" onclick="confirmCancel('+a.rowNum+')">เปลี่ยนใจไม่มา</div>'
+    +'<div class="row '+cls+(ck?' checked':'')+'">'
+      +'<div class="chk-wrap"><div class="chk'+(ck?' on':'')+'" onclick="toggleCheckIn('+a.rowNum+')">'
+        +'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'
+      +'</div></div>'
+      +'<div class="name-area">'
+        +'<div class="person-name">'+typeBadge+escHtml(a.name)+timeS+'</div>'
+        +'<div class="person-meta">'+metaHtml+'</div>'
+      +'</div>'
+      +tblH
+    +'</div>'
+  +'</div>';
+}
+
+// ── Swipe to cancel ──
+let swipeStartX = 0;
+let swipeEl = null;
+document.addEventListener('touchstart', e => {
+  const wrap = e.target.closest('.row-swipe');
+  if(!wrap) return;
+  swipeStartX = e.touches[0].clientX;
+  swipeEl = wrap.querySelector('.row');
+}, {passive:true});
+document.addEventListener('touchmove', e => {
+  if(!swipeEl) return;
+  const dx = e.touches[0].clientX - swipeStartX;
+  if(dx < 0) swipeEl.style.transform = 'translateX('+Math.max(dx,-120)+'px)';
+  else swipeEl.style.transform = '';
+}, {passive:true});
+document.addEventListener('touchend', () => {
+  if(swipeEl){
+    const cur = parseFloat(swipeEl.style.transform.replace(/[^-\d.]/g,''))||0;
+    if(cur < -60) swipeEl.style.transform='translateX(-120px)';
+    else swipeEl.style.transform='';
+    swipeEl=null;
+  }
+});
+
+function confirmCancel(rowNum) {
+  const p = attendees.find(a=>a.rowNum===rowNum);
+  if(!p) return;
+  if(!confirm('ยืนยันเปลี่ยนใจไม่มาของ '+p.name+' ?')) {
+    // Reset swipe
+    const wrap = document.querySelector('.row-swipe[data-row="'+rowNum+'"] .row');
+    if(wrap) wrap.style.transform='';
+    return;
+  }
+  p.shirtSize = 'เปลี่ยนใจไม่มา';
+  toast('เปลี่ยนใจไม่มา: '+p.name);
+  updateStats(); renderCards(); resetAutoRefresh();
+  pendingRequests++;
+  fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'cancelRight',rowNum})})
+    .then(r=>r.json()).then(j=>{if(!j.success)throw new Error(j.error);})
+    .catch(()=>{p.shirtSize='ยืนยันสิทธิ์';updateStats();renderCards();toast('ยกเลิกไม่สำเร็จ',true);})
+    .finally(()=>{pendingRequests--;});
+}
+
+function escHtml(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+
+function toast(msg,isWarn){
+  toastEl.textContent=msg; toastEl.classList.toggle('warn',!!isWarn); toastEl.classList.add('show');
+  setTimeout(()=>{toastEl.classList.remove('show');toastEl.classList.remove('warn');},2500);
+}
+
+function showSummary(){
+  const ci=attendees.filter(a=>a.checkinStatus==='เช็คอินแล้ว');
+  const ciApp=ci.filter(a=>(a.type||'').trim()==='ผู้สมัคร');
+  const ciFol=ci.filter(a=>(a.type||'').trim()==='ผู้ติดตาม');
+  const wId=ci.filter(a=>a.memberId && a.memberId.trim());
+  const noId=ci.filter(a=>!a.memberId || !a.memberId.trim());
+
+  let t='=== สรุปผู้เข้าร่วมงาน ===\n';
+  t+='เช็คอินทั้งหมด: '+ci.length+' คน\n';
+  t+='  ผู้สมัคร: '+ciApp.length+' คน\n';
+  t+='  ผู้ติดตาม: '+ciFol.length+' คน\n';
+  t+='มีรหัสสมาชิก: '+wId.length+' / ไม่มีรหัส: '+noId.length+'\n';
+  t+='================================\n\n';
+  if(wId.length){
+    t+='--- มีรหัสสมาชิก ('+wId.length+' คน) ---\n';
+    wId.forEach(a=>{
+      const tp=(a.type||'').trim()==='ผู้สมัคร'?'[สมัคร]':'[ติดตาม]';
+      t+=a.memberId+'\t'+a.name+'\t'+tp+'\n';
+    });
+  }
+  if(noId.length){
+    t+='\n--- ยังไม่มีรหัส ('+noId.length+' คน) ---\n';
+    noId.forEach(a=>{
+      const tp=(a.type||'').trim()==='ผู้สมัคร'?'[สมัคร]':'[ติดตาม]';
+      t+=a.name+'\t'+tp+'\n';
+    });
+  }
+
+  $('modalInfo').textContent='เช็คอินแล้ว '+ci.length+' คน (ผู้สมัคร '+ciApp.length+', ผู้ติดตาม '+ciFol.length+')';
+  $('summaryText').value=t; $('modalOverlay').classList.add('show');
+}
+function closeModal(){$('modalOverlay').classList.remove('show');}
+function copySummary(){$('summaryText').select();document.execCommand('copy');toast('Copy แล้ว!');}
+
+// ── Map View ──
+function renderMap() {
+  const layout = [
+    { left: [1,2,3], right: [4,5,6] },
+    { left: [7,8,9,10], right: [11,12,13,14] },
+    { left: [15,16,17,18,19], right: [20,21,22,23,24] },
+  ];
+
+  const active = attendees.filter(a => (a.shirtSize||'').trim() !== 'เปลี่ยนใจไม่มา' && a.checkinStatus === 'เช็คอินแล้ว');
+  const tableCounts = {};
+  for (const a of active) {
+    const tbl = (a.tableNo || '').trim();
+    if (!tbl) continue;
+    const nums = tbl.split('-').map(s => s.trim()).filter(s => s);
+    for (const n of nums) {
+      tableCounts[n] = (tableCounts[n] || 0) + 1;
+    }
+  }
+
+  const seated = active.filter(a => (a.tableNo||'').trim()).length;
+  const noTable = active.length - seated;
+
+  let h = '<div class="map-container">';
+  h += '<div class="map-screen">SCREEN / หน้าจอ</div>';
+
+  for (const row of layout) {
+    h += '<div class="map-row">';
+    h += '<div class="map-side left">';
+    for (const t of row.left) {
+      const count = tableCounts[String(t)] || 0;
+      const cls = count > 0 ? ' has-people' : '';
+      h += '<div class="map-table'+cls+'" onclick="showTableDetail('+t+')">'
+        + '<div class="map-table-num">T'+t+'</div>'
+        + '<div class="map-table-count">'+count+'</div>'
+        + '<div class="map-table-label">คน</div>'
+        + '</div>';
+    }
+    h += '</div>';
+    h += '<div class="map-aisle"></div>';
+    h += '<div class="map-side right">';
+    for (const t of row.right) {
+      const count = tableCounts[String(t)] || 0;
+      const cls = count > 0 ? ' has-people' : '';
+      h += '<div class="map-table'+cls+'" onclick="showTableDetail('+t+')">'
+        + '<div class="map-table-num">T'+t+'</div>'
+        + '<div class="map-table-count">'+count+'</div>'
+        + '<div class="map-table-label">คน</div>'
+        + '</div>';
+    }
+    h += '</div>';
+    h += '</div>';
+  }
+
+  h += '<div class="map-summary">'
+    + '<div class="map-summary-item"><div class="map-summary-num">'+seated+'</div><div class="map-summary-label">มีโต๊ะแล้ว</div></div>'
+    + '<div class="map-summary-item"><div class="map-summary-num gray">'+noTable+'</div><div class="map-summary-label">ยังไม่มีโต๊ะ</div></div>'
+    + '</div>';
+
+  h += '</div>';
+  contentEl.innerHTML = h;
+}
+
+function showTableDetail(tableNum) {
+  const members = attendees.filter(a => {
+    if ((a.shirtSize||'').trim() === 'เปลี่ยนใจไม่มา') return false;
+    if (a.checkinStatus !== 'เช็คอินแล้ว') return false;
+    const tbl = (a.tableNo || '').trim();
+    if (!tbl) return false;
+    return tbl.split('-').map(s => s.trim()).includes(String(tableNum));
+  });
+
+  $('tdTitle').textContent = 'โต๊ะ ' + tableNum + ' (' + members.length + ' คน)';
+
+  let h;
+  if (!members.length) {
+    h = '<div class="td-empty">ไม่มีผู้เข้าร่วมในโต๊ะนี้</div>';
+  } else {
+    h = '<table class="td-table"><thead><tr><th>#</th><th>รหัสสมาชิก</th><th>ชื่อ-นามสกุล</th><th>ประเภท</th></tr></thead><tbody>';
+    members.forEach((a, i) => {
+      const mid = (a.memberId||'').trim();
+      const tp = (a.type||'').trim() === 'ผู้สมัคร'
+        ? '<span class="type-badge applicant-badge">ผู้สมัคร</span>'
+        : '<span class="type-badge follower-badge">ผู้ติดตาม</span>';
+      h += '<tr><td>'+(i+1)+'</td><td>'+(mid ? '<span class="member-id">'+escHtml(mid)+'</span>' : '-')+'</td><td style="font-weight:600">'+escHtml(a.name)+'</td><td>'+tp+'</td></tr>';
+    });
+    h += '</tbody></table>';
+  }
+
+  $('tdBody').innerHTML = h;
+  $('tableDetailOverlay').classList.add('show');
+}
+
+function closeTableDetail() {
+  $('tableDetailOverlay').classList.remove('show');
+}
+
+// ── Add Member ──
+function showAddMember() {
+  // Reset form
+  $('addName').value = '';
+  $('addPhone').value = '';
+  $('addMemberId').value = '';
+  $('modeApplicant').checked = true;
+  $('addMemberSubmitBtn').disabled = false;
+  toggleAddMode();
+
+  // Populate applicant dropdown
+  const sel = $('addApplicantSelect');
+  sel.innerHTML = '<option value="">-- เลือกผู้สมัคร --</option>';
+  const active = attendees.filter(a => (a.shirtSize||'').trim() !== 'เปลี่ยนใจไม่มา');
+  active.filter(a => (a.type||'').trim() === 'ผู้สมัคร').forEach(a => {
+    const opt = document.createElement('option');
+    opt.value = a.rowNum;
+    opt.textContent = '#' + a.order + ' ' + a.name;
+    sel.appendChild(opt);
+  });
+
+  $('addMemberOverlay').classList.add('show');
+}
+
+function closeAddMember() {
+  $('addMemberOverlay').classList.remove('show');
+}
+
+function toggleAddMode() {
+  const isFollower = $('modeFollower').checked;
+  $('applicantSelectGroup').classList.toggle('show', isFollower);
+}
+
+async function submitAddMember() {
+  const name = $('addName').value.trim();
+  if (!name) { toast('กรุณากรอกชื่อ-นามสกุล', true); return; }
+
+  const isFollower = $('modeFollower').checked;
+  const applicantRowNum = isFollower ? parseInt($('addApplicantSelect').value) : 0;
+  if (isFollower && !applicantRowNum) { toast('กรุณาเลือกผู้สมัคร', true); return; }
+
+  const phone = $('addPhone').value.trim();
+  const memberId = $('addMemberId').value.trim();
+  const type = isFollower ? 'ผู้ติดตาม' : 'ผู้สมัคร';
+
+  $('addMemberSubmitBtn').disabled = true;
+  $('addMemberSubmitBtn').textContent = 'กำลังเพิ่ม...';
+
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ action: 'addAttendee', name, phone, memberId, type, applicantRowNum })
+    });
+    const json = await res.json();
+    if (!json.success) throw new Error(json.error || 'API error');
+    toast('เพิ่ม ' + name + ' สำเร็จ (ลำดับ #' + json.order + ')');
+    closeAddMember();
+    await loadData();
+  } catch (err) {
+    toast('เพิ่มไม่สำเร็จ: ' + err.message, true);
+  } finally {
+    $('addMemberSubmitBtn').disabled = false;
+    $('addMemberSubmitBtn').textContent = 'เพิ่มสมาชิก';
+  }
+}
+
+// ── Pull to Refresh ──
+(function(){
+  const scroller = $('contentScroll');
+  const indicator = $('ptrIndicator');
+  const ptrText = indicator.querySelector('.ptr-text');
+  const THRESHOLD = 70;
+  let ptrStartY = 0;
+  let ptrPulling = false;
+  let ptrRefreshing = false;
+
+  scroller.addEventListener('touchstart', function(e) {
+    if (ptrRefreshing) return;
+    if (scroller.scrollTop <= 0) {
+      ptrStartY = e.touches[0].clientY;
+      ptrPulling = true;
+    }
+  }, {passive:true});
+
+  scroller.addEventListener('touchmove', function(e) {
+    if (!ptrPulling || ptrRefreshing) return;
+    const dy = e.touches[0].clientY - ptrStartY;
+    if (dy > 0 && scroller.scrollTop <= 0) {
+      const dist = Math.min(dy * 0.5, 120);
+      indicator.style.height = dist + 'px';
+      indicator.classList.toggle('ready', dist >= THRESHOLD);
+      ptrText.textContent = dist >= THRESHOLD ? 'ปล่อยเพื่อรีเฟรช' : 'ดึงลงเพื่อรีเฟรช';
+    } else {
+      indicator.style.height = '0px';
+      indicator.classList.remove('ready');
+    }
+  }, {passive:true});
+
+  scroller.addEventListener('touchend', async function() {
+    if (!ptrPulling || ptrRefreshing) return;
+    ptrPulling = false;
+    const h = parseFloat(indicator.style.height) || 0;
+    if (h >= THRESHOLD) {
+      ptrRefreshing = true;
+      indicator.classList.remove('ready');
+      indicator.classList.add('refreshing');
+      indicator.style.height = '50px';
+      ptrText.textContent = 'กำลังรีเฟรช...';
+      await loadData(true);
+      indicator.classList.remove('refreshing');
+      indicator.style.height = '0px';
+      ptrText.textContent = 'ดึงลงเพื่อรีเฟรช';
+      ptrRefreshing = false;
+      toast('รีเฟรชแล้ว');
+      resetAutoRefresh();
+    } else {
+      indicator.style.height = '0px';
+      indicator.classList.remove('ready');
+    }
+  });
+})();
+</script>
+</body>
+</html>
