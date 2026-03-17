@@ -1,0 +1,2245 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lottery Plus - CRM Performance</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#ffffff;--bg2:#f1f5f9;--card:#ffffff;--red:#dc2626;--cyan:#dc2626;--text:#1e293b;--text2:#64748b;--green:#16a34a;--warn:#d97706;--border:rgba(0,0,0,.08);--glass:rgba(255,255,255,.85);--sidebar:320px;--radius:12px}
+html{font-size:14px}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+input,select,button,textarea{font-family:inherit;font-size:.875rem}
+.mono{font-family:'JetBrains Mono',monospace}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:#f1f5f9}
+::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}
+.glass{background:var(--glass);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.btn{padding:8px 20px;border:none;border-radius:8px;cursor:pointer;font-weight:600;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.btn-red{background:linear-gradient(135deg,#dc2626,#ea580c);color:#fff}
+.btn-red:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(220,38,38,.4)}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--red);color:var(--red)}
+.btn-sm{padding:5px 12px;font-size:.75rem}
+.btn-cyan{background:var(--cyan);color:#fff}
+.btn-green{background:var(--green);color:#fff}
+.input{width:100%;padding:10px 14px;background:#f8fafc;border:1px solid var(--border);border-radius:8px;color:var(--text);outline:none;transition:border-color .2s}
+.input:focus{border-color:var(--red)}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.7rem;font-weight:600;letter-spacing:.3px}
+.badge-red{background:rgba(220,38,38,.1);color:#dc2626;border:1px solid rgba(220,38,38,.2)}
+.badge-cyan{background:rgba(220,38,38,.1);color:#dc2626;border:1px solid rgba(220,38,38,.2)}
+.badge-green{background:rgba(22,163,74,.1);color:#16a34a;border:1px solid rgba(22,163,74,.2)}
+.badge-warn{background:rgba(217,119,6,.1);color:#d97706;border:1px solid rgba(217,119,6,.2)}
+label{font-size:.8rem;color:var(--text2);margin-bottom:4px;display:block;font-weight:500}
+.form-group{margin-bottom:14px}
+.checkbox-label{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.85rem;color:var(--text)}
+.checkbox-label input[type="checkbox"]{accent-color:var(--red);width:16px;height:16px}
+.fade-in{animation:fadeIn .4s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes gradShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+
+/* Login Page */
+#loginPage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:1000;background:linear-gradient(135deg,#fef2f2,#ffffff,#fff1f2)}
+.login-bg{position:absolute;inset:0;overflow:hidden}
+.login-bg::before{content:'';position:absolute;width:500px;height:500px;background:radial-gradient(circle,rgba(220,38,38,.06),transparent 70%);top:20%;left:10%;animation:float 8s ease-in-out infinite}
+.login-bg::after{content:'';position:absolute;width:400px;height:400px;background:radial-gradient(circle,rgba(220,38,38,.04),transparent 70%);bottom:10%;right:10%;animation:float 6s ease-in-out infinite reverse}
+.grid-lines{position:absolute;inset:0;background-image:linear-gradient(rgba(0,0,0,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,.02) 1px,transparent 1px);background-size:60px 60px}
+.login-card{position:relative;width:380px;max-width:90vw;padding:40px;text-align:center}
+.login-logo{font-size:1.8rem;font-weight:800;background:linear-gradient(135deg,#dc2626,#ea580c,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:2px;margin-bottom:6px}
+.login-sub{color:var(--text2);font-size:.75rem;margin-bottom:30px;letter-spacing:1px}
+.login-card .form-group{text-align:left}
+.login-card .btn-red{width:100%;justify-content:center;padding:12px;font-size:.95rem;margin-top:8px}
+.forgot-link{color:var(--text2);font-size:.75rem;margin-top:14px;cursor:pointer;transition:color .2s}
+.forgot-link:hover{color:var(--red)}
+
+/* App Layout */
+#app{display:none;min-height:100vh}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100;transition:transform .3s, border-right-color .3s;box-shadow:2px 0 8px rgba(0,0,0,.04)}
+.sidebar-logo{padding:24px 20px;border-bottom:1px solid var(--border)}
+.sidebar-logo h1{font-size:1.2rem;font-weight:800;background:linear-gradient(135deg,#dc2626,#ea580c,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:1.5px}
+.sidebar-logo p{font-size:.65rem;color:var(--text2);margin-top:2px;letter-spacing:.5px}
+.nav-items{flex:1;padding:16px 0}
+.nav-item{display:flex;align-items:center;gap:12px;padding:12px 20px;color:var(--text2);cursor:pointer;transition:all .2s;border-left:3px solid transparent;font-size:.85rem;font-weight:500}
+.nav-item:hover{color:var(--text);background:rgba(0,0,0,.03)}
+.nav-item.active{color:var(--text);border-left-color:var(--red);background:rgba(220,38,38,.05)}
+.nav-item span:first-child{font-size:1.1rem;width:24px;text-align:center}
+.sidebar-footer{padding:16px 20px;border-top:1px solid var(--border)}
+.user-info{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.user-avatar{width:36px;height:36px;background:linear-gradient(135deg,var(--red),#ea580c);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.75rem;color:#fff}
+.user-name{font-size:.8rem;font-weight:600}
+.user-team{font-size:.65rem;color:var(--text2)}
+.logout-btn{width:100%;padding:8px;background:rgba(220,38,38,.06);border:1px solid rgba(220,38,38,.15);color:#dc2626;border-radius:8px;cursor:pointer;font-size:.75rem;font-weight:600;transition:all .2s}
+.logout-btn:hover{background:rgba(220,38,38,.2)}
+.main{margin-left:var(--sidebar);min-height:100vh;padding:24px 28px}
+.page{display:none}
+.page.active{display:block}
+.page-title{font-size:1.4rem;font-weight:700;margin-bottom:6px}
+.page-sub{color:var(--text2);font-size:.8rem;margin-bottom:24px}
+.hamburger{display:none;position:fixed;top:16px;left:16px;z-index:200;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;cursor:pointer;color:var(--text);font-size:1.2rem}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:90}
+
+/* Data Entry */
+.team-header{display:flex;align-items:center;gap:14px;margin-bottom:20px;flex-wrap:wrap}
+.entry-layout{display:grid;grid-template-columns:420px 1fr;gap:28px;align-items:start}
+@media(max-width:1024px){.entry-layout{grid-template-columns:1fr}}
+.entry-form{max-width:420px}
+.entry-form .glass{padding:24px}
+.right-col{display:flex;flex-direction:column;gap:14px;margin-left:auto;max-width:420px;width:100%}
+.right-col .prod-mini{justify-content:flex-end}
+.prod-mini{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.prod-chip{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 14px;border-radius:12px;background:#ffffff;border:1px solid rgba(0,0,0,.08);position:relative;overflow:hidden;min-width:70px;transition:all .25s;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.prod-chip:hover{border-color:rgba(0,0,0,.15);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.prod-chip::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:2px 2px 0 0}
+.prod-chip:nth-child(1)::before{background:linear-gradient(90deg,#dc2626,#ef4444)}
+.prod-chip:nth-child(2)::before{background:linear-gradient(90deg,#dc2626,#f87171)}
+.prod-chip:nth-child(3)::before{background:linear-gradient(90deg,#16a34a,#22c55e)}
+.prod-chip:nth-child(4)::before{background:linear-gradient(90deg,#a855f7,#ec4899)}
+.prod-chip-val{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:1.1rem;line-height:1}
+.prod-chip-label{font-size:.58rem;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;font-weight:500}
+.autocomplete-wrap{position:relative}
+.autocomplete-list{position:absolute;top:100%;left:0;right:0;max-height:200px;overflow-y:auto;background:var(--bg2);border:1px solid var(--border);border-radius:8px;z-index:50;display:none}
+.autocomplete-list.show{display:block}
+.ac-item{padding:8px 14px;cursor:pointer;font-size:.8rem;display:flex;gap:8px;transition:background .15s}
+.ac-item:hover,.ac-item.selected{background:rgba(220,38,38,.06)}
+.ac-item .ac-cat1{color:var(--cyan);min-width:60px;font-weight:600}
+.ac-item .ac-cat2{color:var(--text)}
+.ac-item .ac-cat3{color:var(--text2);font-size:.75rem}
+.submit-area{display:flex;gap:10px;margin-top:20px}
+.wf-box{margin-top:16px;display:none}
+.wf-box.show{display:block}
+.wf-card{padding:16px 18px;border:1px solid rgba(220,38,38,.15);border-radius:10px;background:rgba(220,38,38,.03);position:relative}
+.wf-title{font-size:.72rem;font-weight:700;color:#dc2626;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.wf-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(220,38,38,.25),transparent)}
+.wf-content{font-size:.8rem;color:var(--text);line-height:1.7;white-space:pre-wrap;word-break:break-word}
+.global-search{margin-bottom:20px;position:relative;max-width:420px}
+.global-search input{width:100%;padding:12px 16px 12px 40px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:.85rem;outline:none;transition:all .25s}
+.global-search input:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(220,38,38,.08)}
+.global-search input::placeholder{color:var(--text2)}
+.global-search .search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text2);font-size:.9rem;pointer-events:none}
+.search-results{position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border:1px solid var(--border);border-radius:12px;max-height:320px;overflow-y:auto;z-index:60;display:none;box-shadow:0 8px 30px rgba(0,0,0,.12)}
+.search-results.show{display:block}
+.search-result-item{padding:12px 18px;cursor:pointer;transition:background .15s;border-bottom:1px solid var(--border);display:flex;gap:12px;align-items:center}
+.search-result-item:last-child{border-bottom:none}
+.search-result-item:hover{background:rgba(220,38,38,.04)}
+.sr-info{flex:1;min-width:0}
+.sr-primary{font-size:.85rem;font-weight:500;color:var(--text)}
+.sr-secondary{font-size:.7rem;color:var(--text2);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sr-badge{font-size:.65rem;padding:3px 8px;border-radius:8px;font-weight:600;white-space:nowrap}
+.cat-browse-btn{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--cyan);cursor:pointer;font-size:1rem;padding:4px;transition:color .2s}
+.cat-browse-btn:hover{color:var(--text)}
+.cat-input-wrap{position:relative}
+.cat-input-wrap .input{padding-right:32px}
+.cat-modal-body{max-height:60vh;overflow-y:auto}
+.cat-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:16px}
+.cat-tab{padding:10px 20px;cursor:pointer;font-size:.85rem;font-weight:500;color:var(--text2);border-bottom:2px solid transparent;transition:all .2s}
+.cat-tab:hover{color:var(--text)}
+.cat-tab.active{color:var(--red);border-bottom-color:var(--red)}
+.cat-search-box{margin-bottom:16px}
+.cat-row{display:grid;grid-template-columns:80px 1fr 1fr;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;font-size:.85rem;align-items:center}
+.cat-row:hover{background:rgba(220,38,38,.04)}
+.cat-row-header{font-size:.7rem;color:var(--text2);text-transform:uppercase;letter-spacing:.3px;font-weight:600;cursor:default;background:var(--bg2);position:sticky;top:0;z-index:1}
+.cat-row-header:hover{background:var(--bg2)}
+.cat-badge-info{background:rgba(220,38,38,.1);color:#dc2626;padding:3px 10px;border-radius:12px;font-size:.7rem;font-weight:600;text-align:center}
+.cat-badge-problem{background:rgba(217,119,6,.1);color:#d97706;padding:3px 10px;border-radius:12px;font-size:.7rem;font-weight:600;text-align:center}
+.cat-badge-request{background:rgba(220,38,38,.1);color:#dc2626;padding:3px 10px;border-radius:12px;font-size:.7rem;font-weight:600;text-align:center}
+
+/* Dashboard */
+.filters-bar{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;align-items:flex-end}
+.filter-group{display:flex;flex-direction:column;gap:4px}
+.filter-group select,.filter-group input{padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--text);outline:none;font-size:.8rem}
+.summary-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:24px}
+.summary-card{padding:20px}
+.summary-card .sc-label{font-size:.7rem;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.summary-card .sc-value{font-size:1.8rem;font-weight:700;font-family:'JetBrains Mono',monospace}
+.summary-card .sc-sub{font-size:.7rem;color:var(--text2);margin-top:4px}
+.sc-red .sc-value{color:#dc2626}
+.sc-cyan .sc-value{color:#dc2626}
+.sc-green .sc-value{color:#16a34a}
+.sc-warn .sc-value{color:#d97706}
+.chart-section{margin-bottom:24px}
+.chart-container{padding:20px;max-height:360px}
+.chart-container canvas{max-height:300px}
+.section-title{font-size:1rem;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.section-title span{color:var(--red)}
+.data-table{width:100%;border-collapse:collapse;font-size:.78rem}
+.data-table th{background:var(--bg2);color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.3px;padding:10px 12px;text-align:left;position:sticky;top:0;font-size:.7rem}
+.data-table td{padding:8px 12px;border-bottom:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:.75rem}
+.data-table tr:hover td{background:rgba(220,38,38,.03)}
+.pct-up{color:var(--green)}
+.pct-down{color:#dc2626}
+.table-wrap{overflow-x:auto;max-height:500px;overflow-y:auto}
+.table-wrap .glass{padding:0;overflow:hidden}
+
+/* Admin */
+.admin-section{margin-bottom:24px}
+.admin-table{width:100%;border-collapse:collapse;font-size:.8rem}
+.admin-table th{background:var(--bg2);color:var(--text2);font-weight:600;padding:10px 14px;text-align:left;font-size:.7rem;text-transform:uppercase;letter-spacing:.3px}
+.admin-table td{padding:10px 14px;border-bottom:1px solid var(--border)}
+.admin-actions{display:flex;gap:6px}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);backdrop-filter:blur(4px);z-index:500;display:none;align-items:center;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal{width:420px;max-width:92vw;padding:28px;animation:fadeIn .3s ease}
+.modal h3{font-size:1.1rem;margin-bottom:16px}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+
+/* Toast */
+.toast-container{position:fixed;top:20px;right:20px;z-index:600;display:flex;flex-direction:column;gap:8px}
+.toast{padding:12px 20px;border-radius:10px;font-size:.8rem;font-weight:500;animation:fadeIn .3s ease;display:flex;align-items:center;gap:8px;max-width:340px}
+.toast-success{background:#f0fdf4;border:1px solid rgba(22,163,74,.25);color:#16a34a;box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.toast-error{background:#fef2f2;border:1px solid rgba(220,38,38,.25);color:#dc2626;box-shadow:0 4px 12px rgba(0,0,0,.1)}
+
+/* Customer Profile - Inside Sidebar */
+@keyframes cpPopIn{0%{transform:translateY(30px) scale(.9);opacity:0}50%{transform:translateY(-5px) scale(1.02);opacity:1}100%{transform:translateY(0) scale(1);opacity:1}}
+@keyframes cpPopOut{0%{transform:translateY(0) scale(1);opacity:1}100%{transform:translateY(30px) scale(.9);opacity:0}}
+@keyframes neonPulse{0%,100%{box-shadow:2px 0 8px rgba(0,0,0,.04)}50%{box-shadow:2px 0 12px rgba(0,0,0,.06)}}
+@keyframes glowLine{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes avatarGlow{0%,100%{box-shadow:0 2px 8px rgba(220,38,38,.15)}50%{box-shadow:0 2px 12px rgba(220,38,38,.25)}}
+.cp-panel{position:absolute;left:0;right:0;bottom:0;z-index:10;display:flex;flex-direction:column;background:#fff;border-top:1px solid rgba(220,38,38,.15);border-radius:12px 12px 0 0;transform:translateY(30px) scale(.9);opacity:0;pointer-events:none;overflow:hidden;box-shadow:0 -4px 20px rgba(0,0,0,.08)}
+.cp-panel.show{transform:translateY(0) scale(1);opacity:1;pointer-events:auto;animation:cpPopIn .45s cubic-bezier(.34,1.56,.64,1) forwards}
+.cp-panel.closing{animation:cpPopOut .25s ease forwards;pointer-events:none}
+.cp-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#dc2626,#ef4444,#dc2626,transparent);background-size:200% 100%;animation:glowLine 3s linear infinite;z-index:3}
+.cp-panel::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(220,38,38,.2),transparent);z-index:3}
+.sidebar.cp-active{border-right-color:rgba(220,38,38,.15)}
+.cp-header{background:linear-gradient(135deg,rgba(220,38,38,.04),rgba(220,38,38,.02));padding:20px 18px;display:flex;gap:14px;align-items:center;border-bottom:1px solid rgba(220,38,38,.1);position:relative;overflow:hidden}
+.cp-header::before{content:'';position:absolute;top:-50px;right:-50px;width:120px;height:120px;background:radial-gradient(circle,rgba(220,38,38,.06),transparent 70%);border-radius:50%}
+.cp-avatar{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:800;color:#fff;flex-shrink:0;border:2px solid rgba(220,38,38,.3);animation:avatarGlow 3s ease-in-out infinite}
+.cp-info{flex:1;min-width:0;position:relative;z-index:1}
+.cp-name{font-size:.95rem;font-weight:700;color:#f1f5f9}
+.cp-meta{display:flex;flex-direction:column;gap:4px;margin-top:6px}
+.cp-meta-item{font-size:.7rem;color:var(--text2);display:flex;align-items:center;gap:4px}
+.cp-meta-item .cp-icon{font-size:.75rem}
+.cp-body{flex:1;overflow-y:auto;padding:14px 16px}
+.cp-stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:14px}
+.cp-stat{background:#f8fafc;border:1px solid rgba(0,0,0,.06);border-radius:8px;padding:10px 6px;text-align:center;transition:all .25s}
+.cp-stat:hover{border-color:rgba(220,38,38,.2);box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.cp-stat-val{font-size:1rem;font-weight:700;font-family:'JetBrains Mono',monospace;line-height:1.2}
+.cp-stat-val.neon{color:#dc2626}
+.cp-stat-val.cyan{color:#dc2626}
+.cp-stat-val.gold{color:#d97706}
+.cp-stat-label{font-size:.55rem;color:var(--text2);margin-top:3px;text-transform:uppercase;letter-spacing:.3px}
+.cp-orders-title{font-size:.7rem;font-weight:600;color:#dc2626;text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.cp-orders-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(220,38,38,.2),transparent)}
+.cp-order-row{display:grid;grid-template-columns:82px 1fr 50px 62px;gap:4px;padding:7px 8px;border-bottom:1px solid var(--border);font-size:.7rem;align-items:center;transition:background .15s}
+.cp-order-row:hover{background:rgba(220,38,38,.03)}
+.cp-order-row:last-child{border-bottom:none}
+.cp-order-row.header{font-size:.6rem;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.2px;background:rgba(220,38,38,.03);border-radius:6px;margin-bottom:3px;border-bottom:none}
+.cp-order-id{font-family:'JetBrains Mono',monospace;color:#dc2626;font-size:.65rem}
+.cp-order-date{color:var(--text2);font-size:.65rem}
+.cp-order-qty{font-family:'JetBrains Mono',monospace;text-align:center;font-size:.68rem}
+.cp-order-amt{font-family:'JetBrains Mono',monospace;text-align:right;font-weight:600;color:#dc2626;font-size:.68rem}
+mark{background:rgba(220,38,38,.12);color:#dc2626;border-radius:2px;padding:0 2px;font-weight:600}
+.cp-close{position:absolute;top:12px;right:12px;background:rgba(220,38,38,.06);border:1px solid rgba(220,38,38,.15);border-radius:6px;color:#dc2626;cursor:pointer;font-size:.95rem;padding:4px 10px;transition:all .2s;z-index:4}
+.cp-close:hover{background:rgba(220,38,38,.1);border-color:rgba(220,38,38,.3)}
+.cp-footer{padding:10px 16px;border-top:1px solid rgba(0,0,0,.06);background:rgba(0,0,0,.02);display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.cp-footer-stat{font-size:.65rem;color:var(--text2);display:flex;align-items:center;gap:3px}
+.cp-footer-stat b{color:#dc2626;font-family:'JetBrains Mono',monospace}
+.cp-nickname{font-size:.72rem;color:var(--text2);font-weight:400}
+.cp-segment-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.58rem;font-weight:600;letter-spacing:.3px}
+.cp-engage-list{margin-bottom:12px}
+.cp-engage-item{display:flex;justify-content:space-between;align-items:center;padding:5px 8px;border-bottom:1px solid var(--border);font-size:.72rem}
+.cp-engage-item:last-child{border-bottom:none}
+.cp-engage-label{color:var(--text2)}
+.cp-engage-val{font-family:'JetBrains Mono',monospace;color:var(--text);font-weight:500;font-size:.68rem}
+.cp-engage-val.danger{color:#dc2626}
+.cp-engage-val.warn{color:#d97706}
+.cp-lastdigit{background:rgba(220,38,38,.08);color:#dc2626;padding:2px 8px;border-radius:6px;font-weight:700;font-size:.75rem;letter-spacing:1px}
+.cp-gender-icon{font-size:.7rem}
+
+/* Customer Dashboard */
+@keyframes dataLoad{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+
+.holo-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);backdrop-filter:blur(6px);z-index:700;display:none;align-items:center;justify-content:center;padding:16px}
+.holo-overlay.show{display:flex}
+.holo-dash{width:96vw;max-width:1440px;height:92vh;max-height:920px;background:#f8fafc;border:1px solid rgba(0,0,0,.1);border-radius:16px;position:relative;overflow:hidden;display:flex;flex-direction:column;animation:fadeIn .5s ease;box-shadow:0 20px 60px rgba(0,0,0,.15)}
+.holo-dash::before{content:none}
+.holo-dash::after{content:none}
+.holo-grid-bg{display:none}
+.holo-corner{display:none}
+.holo-corner::before,.holo-corner::after{display:none}
+.holo-corner-tl,.holo-corner-tr,.holo-corner-bl,.holo-corner-br{display:none}
+.holo-header{padding:14px 24px;border-bottom:1px solid rgba(0,0,0,.08);display:flex;align-items:center;justify-content:space-between;position:relative;z-index:5;flex-shrink:0;background:linear-gradient(135deg,#dc2626,#b91c1c)}
+.holo-title{display:flex;align-items:center;gap:16px}
+.holo-title h2{font-size:1.2rem;font-weight:800;letter-spacing:3px;color:#fff}
+.holo-title .holo-sub{font-size:.7rem;color:rgba(255,255,255,.7);letter-spacing:2px;text-transform:uppercase}
+.holo-close{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:8px;cursor:pointer;font-size:1.05rem;padding:8px 16px;transition:all .2s;z-index:6}
+.holo-close:hover{background:rgba(255,255,255,.25)}
+.holo-body{flex:1;display:grid;grid-template-columns:260px auto 1fr;gap:16px;padding:16px 24px;overflow-y:auto;position:relative;z-index:5}
+.holo-section{background:#ffffff;border:1px solid rgba(0,0,0,.08);border-radius:12px;padding:20px;position:relative;overflow:hidden;transition:border-color .3s;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.holo-section:hover{border-color:rgba(0,0,0,.15)}
+.holo-section::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:2px 2px 0 0}
+.sec-profile::before{background:linear-gradient(90deg,#dc2626,#ef4444)}
+.sec-reward::before{background:linear-gradient(90deg,#dc2626,#f97316)}
+.sec-reward{width:fit-content;min-width:420px}
+.sec-top::before{background:linear-gradient(90deg,#ef4444,#ec4899)}
+.sec-purchase::before{background:linear-gradient(90deg,#dc2626,#b91c1c)}
+.holo-purchase-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+.holo-order-row{padding:10px 12px;border-bottom:1px solid rgba(0,0,0,.06);cursor:pointer;transition:background .2s,border-color .2s;border-radius:6px;margin-bottom:4px;background:rgba(0,0,0,.02)}
+.holo-order-row:hover{background:rgba(220,38,38,.04);border-color:rgba(220,38,38,.15)}
+.holo-order-row.active{background:rgba(220,38,38,.04);border-color:rgba(220,38,38,.1)}
+.holo-order-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.holo-order-id{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:#dc2626;font-weight:600}
+.holo-order-date{font-size:.68rem;color:var(--text2)}
+.holo-order-summary{display:flex;justify-content:space-between;align-items:center;margin-top:5px;font-size:.75rem}
+.holo-order-qty{color:var(--text2)}
+.holo-order-total{font-family:'JetBrains Mono',monospace;font-weight:700;color:#dc2626}
+.holo-order-detail{max-height:0;overflow:hidden;transition:max-height .35s ease,padding .35s ease;padding:0 8px}
+.holo-order-detail.open{max-height:400px;padding:8px}
+.holo-order-detail-inner{background:#f8fafc;border:1px solid rgba(0,0,0,.06);border-radius:6px;padding:8px 10px}
+.holo-order-ticket{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid rgba(148,163,184,.04);font-size:.73rem}
+.holo-order-ticket:last-child{border-bottom:none}
+.holo-order-ticket-num{font-family:'JetBrains Mono',monospace;color:#d97706;font-weight:600;letter-spacing:1px}
+.holo-order-ticket-price{font-family:'JetBrains Mono',monospace;color:var(--text2);font-size:.7rem}
+.holo-order-expand-icon{font-size:.7rem;color:var(--text2);transition:transform .3s}
+.holo-order-row.active .holo-order-expand-icon{transform:rotate(180deg);color:#dc2626}
+.btn-view-orders{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:rgba(220,38,38,.06);border:1px solid rgba(220,38,38,.15);color:#dc2626;border-radius:8px;cursor:pointer;font-size:.72rem;font-weight:600;transition:all .2s;letter-spacing:.3px}
+.btn-view-orders:hover{background:rgba(220,38,38,.1)}
+.orders-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);backdrop-filter:blur(4px);z-index:800;display:none;align-items:center;justify-content:center;padding:20px}
+.orders-modal-overlay.show{display:flex}
+.orders-modal{width:580px;max-width:95vw;max-height:80vh;background:#ffffff;border:1px solid rgba(0,0,0,.1);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;animation:fadeIn .3s ease;box-shadow:0 20px 60px rgba(0,0,0,.15)}
+.orders-modal-header{padding:16px 20px;border-bottom:1px solid rgba(0,0,0,.08);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.orders-modal-header h3{font-size:.9rem;font-weight:700;color:#dc2626;letter-spacing:1px;display:flex;align-items:center;gap:8px}
+.orders-modal-body{flex:1;overflow-y:auto;padding:12px 16px}
+.orders-modal-close{background:rgba(220,38,38,.06);border:1px solid rgba(220,38,38,.15);color:#dc2626;border-radius:6px;cursor:pointer;font-size:.85rem;padding:6px 12px;transition:all .2s}
+.orders-modal-close:hover{background:rgba(220,38,38,.1)}
+.holo-sec-title{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:16px;display:flex;align-items:center;gap:8px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.holo-sec-title .sec-icon{font-size:1.1rem}
+.sec-profile .holo-sec-title{color:#dc2626}
+.sec-reward .holo-sec-title{color:#dc2626}
+.sec-top .holo-sec-title{color:#dc2626}
+.sec-purchase .holo-sec-title{color:#dc2626}
+.holo-avatar-wrap{display:flex;flex-direction:column;align-items:center;margin-bottom:14px}
+.holo-avatar-big{width:84px;height:84px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem;font-weight:800;color:#fff;border:2px solid rgba(220,38,38,.25);box-shadow:0 4px 16px rgba(0,0,0,.1);margin-bottom:10px}
+.holo-cust-name{font-size:1.1rem;font-weight:700;text-align:center}
+.holo-cust-nick{font-size:.82rem;color:var(--text2);text-align:center;margin-top:3px}
+.holo-segment{display:inline-block;padding:5px 14px;border-radius:20px;font-size:.7rem;font-weight:600;letter-spacing:.3px;margin-top:8px}
+.holo-profile-list{display:flex;flex-direction:column}
+.holo-profile-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(148,163,184,.05);font-size:.82rem}
+.holo-profile-row:last-child{border-bottom:none}
+.holo-plabel{color:var(--text2);font-size:.78rem}
+.holo-pval{font-family:'JetBrains Mono',monospace;color:var(--text);font-weight:500;font-size:.8rem}
+.holo-fav-nums{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;justify-content:center}
+.holo-fav-num{font-family:'JetBrains Mono',monospace;font-size:1.1rem;font-weight:800;color:#dc2626;background:rgba(220,38,38,.06);border:1.5px solid rgba(220,38,38,.2);padding:6px 12px;border-radius:8px;letter-spacing:1px;min-width:38px;text-align:center}
+.holo-reward-hero{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.holo-rh-card{background:rgba(220,38,38,.03);border:1px solid rgba(220,38,38,.1);border-radius:8px;padding:8px 6px;text-align:center}
+.holo-rh-val{font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:800;color:#dc2626}
+.holo-rh-label{font-size:.6rem;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-top:3px}
+.holo-reward-list{display:flex;flex-direction:column}
+.holo-reward-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(148,163,184,.05);font-size:.82rem;align-items:center}
+.holo-reward-row:last-child{border-bottom:none}
+.holo-rlabel{color:var(--text2);font-size:.78rem}
+.holo-rval{font-family:'JetBrains Mono',monospace;font-weight:600;font-size:.85rem}
+.holo-rval.glow-cyan{color:#dc2626}
+.holo-rval.glow-green{color:#16a34a}
+.holo-rval.glow-gold{color:#d97706}
+.holo-chart-block{margin-bottom:16px}
+.holo-chart-head{font-size:.75rem;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.holo-chart-head b{font-family:'JetBrains Mono',monospace;font-size:.9rem}
+.holo-chart-head .top-num{color:#dc2626}
+.holo-chart-head .top-count{color:var(--text);font-size:.8rem}
+.holo-bar-chart{display:flex;flex-direction:column;gap:6px}
+.holo-bar-row{display:flex;align-items:center;gap:8px;font-size:.8rem}
+.holo-bar-label{width:36px;font-family:'JetBrains Mono',monospace;color:var(--text2);text-align:right;font-size:.78rem;flex-shrink:0}
+.holo-bar-track{flex:1;height:20px;background:#f1f5f9;border-radius:3px;overflow:hidden}
+.holo-bar-fill{height:100%;border-radius:3px;animation:dataLoad .8s ease forwards}
+.bar-red{background:linear-gradient(90deg,#b91c1c,#dc2626,#ef4444)}
+.bar-cyan{background:linear-gradient(90deg,#dc2626,#ef4444,#f87171)}
+.holo-bar-val{font-family:'JetBrains Mono',monospace;color:var(--text2);font-size:.72rem;width:40px;flex-shrink:0}
+.holo-purchase-item{padding:12px 0;border-bottom:1px solid rgba(0,0,0,.06)}
+.holo-purchase-item:last-child{border-bottom:none}
+.holo-purchase-label{font-size:.7rem;color:var(--text2);text-transform:uppercase;letter-spacing:.3px;margin-bottom:5px}
+.holo-purchase-val{font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:600;color:#dc2626}
+.holo-purchase-val.dim{color:var(--text)}
+.holo-purchase-val.warn{color:#d97706}
+.holo-purchase-val.danger{color:#dc2626}
+@media(max-width:1100px){.holo-body{grid-template-columns:1fr 1fr}}
+@media(max-width:700px){.holo-body{grid-template-columns:1fr;padding:10px}.holo-purchase-grid{grid-template-columns:1fr}}
+
+/* Responsive */
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0;padding:16px}
+  .hamburger{display:block}
+  .overlay.show{display:block}
+  .summary-cards{grid-template-columns:1fr 1fr}
+  .filters-bar{flex-direction:column}
+  .login-card{padding:28px 20px}
+}
+@media(max-width:480px){
+  .summary-cards{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div id="loginPage">
+  <div class="login-bg"><div class="grid-lines"></div></div>
+  <div class="login-card glass">
+    <div class="login-logo">LOTTERY PLUS</div>
+    <div class="login-sub">CRM PERFORMANCE SYSTEM</div>
+    <div class="form-group">
+      <label>Username</label>
+      <input type="text" class="input" id="loginUser" placeholder="ชื่อผู้ใช้">
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" class="input" id="loginPass" placeholder="รหัสผ่าน">
+    </div>
+    <button class="btn btn-red" onclick="doLogin()">เข้าสู่ระบบ</button>
+    <div style="display:flex;justify-content:space-between;margin-top:14px">
+      <div class="forgot-link" onclick="showModal('forgotModal')">ลืมรหัสผ่าน?</div>
+      <div class="forgot-link" onclick="showRegister()" style="color:var(--red)">สมัครสมาชิก</div>
+    </div>
+  </div>
+
+  <!-- Register Card -->
+  <div class="login-card glass" id="registerCard" style="display:none">
+    <div class="login-logo">LOTTERY PLUS</div>
+    <div class="login-sub">สมัครสมาชิกใหม่</div>
+    <div class="form-group">
+      <label>Username</label>
+      <input type="text" class="input" id="regUser" placeholder="ชื่อผู้ใช้งาน">
+    </div>
+    <div class="form-group">
+      <label>รหัสผ่าน</label>
+      <input type="password" class="input" id="regPass" placeholder="ตั้งรหัสผ่าน">
+    </div>
+    <div class="form-group">
+      <label>ยืนยันรหัสผ่าน</label>
+      <input type="password" class="input" id="regPassConfirm" placeholder="กรอกรหัสผ่านอีกครั้ง">
+    </div>
+    <div class="form-group">
+      <label>ชื่อ-นามสกุล</label>
+      <input type="text" class="input" id="regName" placeholder="ชื่อที่ใช้แสดงในระบบ">
+    </div>
+    <div class="form-group">
+      <label>ทีม</label>
+      <select class="input" id="regTeam">
+        <option value="">-- เลือกทีม --</option>
+        <option value="Phone Call">Phone Call</option>
+        <option value="Line OA">Line OA</option>
+        <option value="Line OPC">Line OPC</option>
+        <option value="Social Media">Social Media</option>
+        <option value="Approve">Approve</option>
+        <option value="Team Leader">Team Leader</option>
+        <option value="Specialist">Specialist</option>
+        <option value="Manager">Manager</option>
+      </select>
+    </div>
+    <button class="btn btn-red" onclick="doRegister()">สมัครสมาชิก</button>
+    <div class="forgot-link" onclick="showLoginCard()" style="margin-top:14px">กลับไปหน้าเข้าสู่ระบบ</div>
+  </div>
+</div>
+
+<div id="app">
+  <div class="hamburger" onclick="toggleSidebar()">&#9776;</div>
+  <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <h1>LOTTERY PLUS</h1>
+      <p>CRM Performance</p>
+    </div>
+    <nav class="nav-items" id="navItems"></nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="userAvatar"></div>
+        <div><div class="user-name" id="userName"></div><div class="user-team" id="userTeam"></div></div>
+      </div>
+      <button class="logout-btn" onclick="doLogout()">ออกจากระบบ</button>
+    </div>
+    <div class="cp-panel" id="cpPanel"></div>
+  </aside>
+  <main class="main">
+    <div class="page" id="pageEntry"></div>
+    <div class="page" id="pageDashboard"></div>
+    <div class="page" id="pageAdmin"></div>
+  </main>
+</div>
+
+<div class="modal-overlay" id="forgotModal">
+  <div class="modal glass">
+    <h3>ลืมรหัสผ่าน</h3>
+    <div class="form-group"><label>Username ของคุณ</label><input type="text" class="input" id="forgotUser" placeholder="กรอก username"></div>
+    <p style="font-size:.75rem;color:var(--text2)">ระบบจะแจ้ง Admin ให้ตั้งรหัสผ่านใหม่</p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="hideModal('forgotModal')">ยกเลิก</button>
+      <button class="btn btn-red" onclick="submitForgot()">ส่งคำขอ</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="userModal">
+  <div class="modal glass">
+    <h3 id="userModalTitle">เพิ่มผู้ใช้</h3>
+    <div class="form-group"><label>Username</label><input type="text" class="input" id="umUser"></div>
+    <div class="form-group"><label>รหัสผ่าน</label><input type="password" class="input" id="umPass"></div>
+    <div class="form-group"><label>ชื่อแสดง</label><input type="text" class="input" id="umName"></div>
+    <div class="form-group"><label>ทีม</label>
+      <select class="input" id="umTeam"><option value="Phone Call">Phone Call</option><option value="Line OA">Line OA</option><option value="Line OPC">Line OPC</option><option value="Social Media">Social Media</option><option value="Approve">Approve</option><option value="Team Leader">Team Leader</option><option value="Specialist">Specialist</option><option value="Manager">Manager</option></select>
+    </div>
+    <div class="form-group"><label>Role</label>
+      <select class="input" id="umRole"><option value="agent">Agent</option><option value="admin">Admin</option></select>
+    </div>
+    <input type="hidden" id="umEditId">
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="hideModal('userModal')">ยกเลิก</button>
+      <button class="btn btn-red" onclick="saveUser()">บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="catBrowserModal">
+  <div class="modal glass" style="width:700px;max-width:95vw;max-height:85vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <h3 style="margin:0">Category Revised</h3>
+      <button class="btn btn-ghost btn-sm" onclick="hideModal('catBrowserModal')" style="font-size:1.1rem;padding:4px 10px">&times;</button>
+    </div>
+    <div class="cat-tabs" id="catTabs">
+      <div class="cat-tab active" onclick="filterCatTab('All')">All</div>
+      <div class="cat-tab" onclick="filterCatTab('Info')">Info</div>
+      <div class="cat-tab" onclick="filterCatTab('Problem')">Problem</div>
+      <div class="cat-tab" onclick="filterCatTab('Request')">Request</div>
+    </div>
+    <div class="cat-search-box">
+      <input type="text" class="input" id="catSearchInput" placeholder="&#128269; Search..." oninput="filterCatList()">
+    </div>
+    <div class="cat-modal-body">
+      <div class="cat-row cat-row-header"><span>CATEGORY 1</span><span>CATEGORY 2</span><span>CATEGORY 3</span></div>
+      <div id="catListBody"></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="regLogModal">
+  <div class="modal glass" style="width:600px">
+    <h3>ประวัติการสมัครสมาชิก</h3>
+    <div style="overflow-x:auto;max-height:400px;overflow-y:auto" id="regLogTable"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="hideModal('regLogModal')">ปิด</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toasts"></div>
+
+<!-- Sci-Fi Customer Dashboard Modal -->
+<div class="holo-overlay" id="holoDash" onclick="if(event.target===this)closeHoloDash()">
+  <div class="holo-dash">
+    <div class="holo-grid-bg"></div>
+    <div class="holo-corner holo-corner-tl"></div>
+    <div class="holo-corner holo-corner-tr"></div>
+    <div class="holo-corner holo-corner-bl"></div>
+    <div class="holo-corner holo-corner-br"></div>
+    <div class="holo-header">
+      <div class="holo-title">
+        <div><h2>LOTTERY PLUS</h2><div class="holo-sub">Customer Intelligence System</div></div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn btn-sm" onclick="copyHoloDashImage()" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:.75rem;transition:all .2s" onmouseover="this.style.background='rgba(255,255,255,.25)'" onmouseout="this.style.background='rgba(255,255,255,.15)'">&#128203; Copy ภาพ</button>
+        <button class="btn btn-sm" onclick="saveHoloDashImage()" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:.75rem;transition:all .2s" onmouseover="this.style.background='rgba(255,255,255,.25)'" onmouseout="this.style.background='rgba(255,255,255,.15)'">&#128190; Save ภาพ</button>
+        <button class="holo-close" onclick="closeHoloDash()">&times; CLOSE</button>
+      </div>
+    </div>
+    <div class="holo-body" id="holoBody"></div>
+  </div>
+</div>
+
+<script>
+const CONFIG = { APPS_SCRIPT_URL: '', DEMO_MODE: true };
+
+const TEAMS = ['Phone Call','Line OA','Line OPC','Social Media','Approve','Team Leader','Specialist','Manager'];
+const TEAM_COLORS = {'Phone Call':'#3b82f6','Line OA':'#22c55e','Line OPC':'#f59e0b','Social Media':'#a855f7','Approve':'#ec4899','Team Leader':'#f97316','Specialist':'#14b8a6','Manager':'#e11d48'};
+
+const CATEGORIES = [
+  ['Info','การส่งของขวัญ','วิธีการรับ/ส่งของขวัญ'],
+  ['Info','ข้อกฎหมาย อายุต่ำกว่า 20 ปี','สอบถามข้อมูลและเงื่อนไข'],
+  ['Info','คูปอง','วิธีการใช้คูปอง'],
+  ['Info','แคมเปญทางการตลาด','สอบถามรายละเอียด'],
+  ['Info','แคมเปญทางการตลาด','ติดตามการประกาศผล/แจกของรางวัล'],
+  ['Info','แคมเปญ CRM','สอบถามรายละเอียด'],
+  ['Info','แคมเปญ CRM','ติดตามการประกาศผล/แจกของรางวัล'],
+  ['Info','นกช็อป','สอบถามข้อมูล'],
+  ['Info','นกช็อป','ติดตามการส่งของ'],
+  ['Info','นกพอยท์','สอบถามข้อมูล'],
+  ['Info','นกพอยท์','วิธีการแลกพอยท์'],
+  ['Info','นกแคช','สอบถามข้อมูล'],
+  ['Info','นกแคช','วิธีการใช้นกแคช'],
+  ['Info','แนะนำเพื่อน','วิธีการกรอกรหัสแนะนำเพื่อน'],
+  ['Info','แนะนำเพื่อน','วิธีการยืนยันตัวตน'],
+  ['Info','แนะนำเพื่อน','เงื่อนไขการใช้และถอนค่าแนะนำ'],
+  ['Info','แนะนำเพื่อน','ขั้นตอนการแนะนำเพื่อน'],
+  ['Info','บัญชีสมาชิก','ขั้นตอนการสมัครสมาชิก'],
+  ['Info','บัญชีสมาชิก','สอบถามเลขสมาชิก'],
+  ['Info','บัญชีสมาชิก','รายละเอียดเงื่อนไขการสมัครสมาชิก'],
+  ['Info','บัญชีสมาชิก','ลูกค้าเปลี่ยนไลน์ใหม่'],
+  ['Info','บัญชีสมาชิก','ไม่มีบัญชีธนาคารประเทศไทย'],
+  ['Info','บัญชีสมาชิก','ไม่มีเบอร์โทรศัพท์ประเทศไทย'],
+  ['Info','บัญชีสมาชิก','อยู่ต่างประเทศซื้อลอตเตอรี่ได้หรือไม่'],
+  ['Info','บัญชีสมาชิก','ชาวต่างชาติซื้อลอตเตอรี่ได้หรือไม่'],
+  ['Info','บัญชีสมาชิก','ขั้นตอนการลบบัญชีสมาชิก'],
+  ['Info','บัญชีสมาชิก','ขั้นตอนการล็อคอินเข้าสู่ระบบ'],
+  ['Info','จิ๊ดริดหยิบโชค','รายละเอียดจิ๊ดริดหยิบโชค'],
+  ['Info','จิ๊ดริดหยิบโชค','สอบถามจิ๊ดริดหยิบโชค 3 ใบ'],
+  ['Info','จิ๊ดริดหยิบโชค','สอบถามจิ๊ดริดหยิบโชค 5 ใบ'],
+  ['Info','จิ๊ดริดหยิบโชค','สอบถามจิ๊ดริดหยิบโชค 10 ใบ'],
+  ['Info','มิจฉาชีพ','สอบถามข้อมูลมิจฉาชีพ'],
+  ['Info','รับเงินรางวัล','วิธีการรับเงินรางวัล'],
+  ['Info','รับเงินรางวัล','สอบถามผลรางวัล'],
+  ['Info','วิธีการแนบสลิป','แนบสลิปหน้าแดง'],
+  ['Info','วิธีการแนบสลิป','แนบสลิปหน้าเหลือง'],
+  ['Info','วิธีการสั่งซื้อ/ ชำระเงิน','สอบถามข้อมูลและรายละเอียดคำสั่งซื้อ'],
+  ['Info','วิธีการสั่งซื้อ/ ชำระเงิน','วิธีการสั่งซื้อลอตเตอรี่'],
+  ['Info','วิธีการสั่งซื้อ/ ชำระเงิน','วิธีการสั่งซื้อจิ๊ดริดหยิบโชค'],
+  ['Info','วิธีการสั่งซื้อ/ ชำระเงิน','ไม่มีแอปพลิเคชันธนาคาร'],
+  ['Info','วิธีการสั่งซื้อ/ ชำระเงิน','วิธีการขอสลิปย้อนหลังจากธนาคาร'],
+  ['Info','สอบถามข้อมูลทั่วไป','Greeting'],
+  ['Info','สอบถามข้อมูลทั่วไป','อวยพร'],
+  ['Info','สอบถามข้อมูลทั่วไป','การแบ่งจำหน่ายเลขชุด'],
+  ['Info','สอบถามข้อมูลทั่วไป','ขอดูลอตเตอรี่ใบจริง'],
+  ['Info','สอบถามข้อมูลทั่วไป','วิธีการจัดส่งลอตเตอรี่ใบจริง'],
+  ['Info','สอบถามข้อมูลทั่วไป','ข้อมูลห้อง VIP/ห้องทำนายฝัน'],
+  ['Info','สอบถามข้อมูลทั่วไป','ตรวจสอบประวัติการซื้องวดเก่า'],
+  ['Info','สอบถามข้อมูลทั่วไป','รายละเอียดการซื้อลอตเตอรี่/การเช่าตู้เซฟ'],
+  ['Info','สอบถามข้อมูลทั่วไป','เลขเด็ด'],
+  ['Info','สอบถามข้อมูลทั่วไป','เลขในระบบ'],
+  ['Info','สอบถามข้อมูลทั่วไป','วันเปิดจำหน่าย'],
+  ['Info','สอบถามข้อมูลทั่วไป','วันปิดจำหน่าย'],
+  ['Info','สอบถามข้อมูลทั่วไป','เอาลอตเตอรี่จากที่อื่นมาขึ้นเงินรางวัล'],
+  ['Info','สอบถามข้อมูลทั่วไป','กิจกรรม - Open Chat'],
+  ['Info','สอบถามข้อมูลทั่วไป','กิจกรรม - หน้าเพจ'],
+  ['Info','สอบถามข้อมูลทั่วไป','การจองลอตเตอรี่'],
+  ['Info','สอบถามข้อมูลทั่วไป','ข้อมูลคอนเทนต์ต่างๆ'],
+  ['Info','สอบถามข้อมูลทั่วไป','ซื้อลอตเตอรี่ 80 บาท ด้วยตนเอง'],
+  ['Info','สอบถามข้อมูลทั่วไป','ประเภทสลาก'],
+  ['Info','สอบถามข้อมูลทั่วไป','ราคาลอตเตอรี่'],
+  ['Info','สอบถามข้อมูลทั่วไป','วันประกาศผลรางวัล'],
+  ['Info','สอบถามข้อมูลทั่วไป','เวลาลอตเตอรี่เข้าระบบ'],
+  ['Info','สอบถามข้อมูลทั่วไป','อัตราการจ่ายเงินรางวัล'],
+  ['Info','สอบถามข้อมูลทั่วไป','เพิ่มเว็บไซต์บนโฮมเพจ'],
+  ['Info','สอบถามข้อมูลทั่วไป','ตรวจสอบประวัติการถูกรางวัลย้อนหลัง'],
+  ['Info','สอบถามข้อมูลทั่วไป','สอบถามเลขใบเดี่ยว'],
+  ['Info','สอบถามข้อมูลทั่วไป','อื่นๆ'],
+  ['Info','QR Payment','ADAPTIS'],
+  ['Info','QR Payment','PAYGENIX'],
+  ['Info','QR Payment','EPOS'],
+  ['Info','Facebook','พูดคุยทั่วไป'],
+  ['Info','Facebook','ปักหมุดคอมเมนต์'],
+  ['Info','Facebook','โพสต์คอนเทนต์ในกลุ่ม'],
+  ['Info','Line OPC','พูดคุยทั่วไป'],
+  ['Info','Line OPC','เคลมเลขเด็ด'],
+  ['Info','Line OPC','โพสต์คอนเทนต์ในกลุ่ม'],
+  ['Info','Line OPC','เชิญเข้ากลุ่ม VIP'],
+  ['Info','กิจกรรมหน้าเพจ','สอบถาม/ยืนยันตัวตน'],
+  ['Info','Null','Null'],
+  ['Problem','การส่งของขวัญ','ส่งของขวัญผิด'],
+  ['Problem','การส่งของขวัญ','ปัญหาอื่นๆ'],
+  ['Problem','ข้อกฎหมาย อายุต่ำกว่า 20 ปี','ยกเลิกคำสั่งซื้อ คืนเงิน และแบน'],
+  ['Problem','ข้อกฎหมาย อายุต่ำกว่า 20 ปี','แบน (ยังไม่มีคำสั่งซื้อ)'],
+  ['Problem','ข้อกฎหมาย อายุต่ำกว่า 20 ปี','ยกเลิกคำสั่งซื้อ ใช้บัญชีอายุต่ำกว่า 20 ปี'],
+  ['Problem','คำสั่งซื้อไม่สำเร็จ','ไม่แนบสลิปภายในเวลาที่กำหนด'],
+  ['Problem','คำสั่งซื้อไม่สำเร็จ','โอนเงินแล้วไม่มีสลิป'],
+  ['Problem','คำสั่งซื้อไม่สำเร็จ','โอนเงินไม่ครบ/โอนขาด'],
+  ['Problem','คำสั่งซื้อไม่สำเร็จ','โอนแล้วสลิปไม่สมบูรณ์'],
+  ['Problem','คำสั่งซื้อไม่สำเร็จ','เลือกคำสั่งซื้อเกิน'],
+  ['Problem','คำสั่งซื้อไม่สำเร็จ','แนบสลิปผิด/แนบรูปภาพอื่นที่ไม่ใช่สลิป'],
+  ['Problem','คำสั่งซื้อไม่สำเร็จ','สแกน QR Code คำสั่งซื้อถูกยกเลิก (Call Back ล่าช้า)'],
+  ['Problem','คำสั่งซื้อไม่สำเร็จ','แนบสลิปแล้ว รูปไม่ขึ้นในระบบ'],
+  ['Problem','คำสั่งซื้อไม่สำเร็จ','รอหลักฐานยืนยัน ลูกค้าต่างประเทศ'],
+  ['Problem','คำสั่งซื้อไม่สำเร็จ','รอตรวจสอบยอด ลูกค้าต่างประเทศ'],
+  ['Problem','คำสั่งซื้อไม่สำเร็จ','อนุมัติคำสั่งซื้อต่างประเทศ'],
+  ['Problem','คำสั่งซื้อไม่สำเร็จ','ยกเลิกคำสั่งซื้อ (ยังไม่ได้โอนชำระ)'],
+  ['Problem','คำสั่งซื้อไม่สำเร็จ','สแกน QR Code ซ้ำ'],
+  ['Problem','คำสั่งซื้อไม่สำเร็จ','สแกน QR Code ไม่สำเร็จ เปลี่ยนช่องทางการชำระเงิน'],
+  ['Problem','คำสั่งซื้อไม่สำเร็จ','สแกน Bad Slip'],
+  ['Problem','คำสั่งซื้อสำเร็จ','โอนซ้ำ'],
+  ['Problem','คำสั่งซื้อสำเร็จ','โอนเงินเกิน'],
+  ['Problem','นกช็อป','บนระบบไม่มีของพรีเมี่ยมที่ต้องการ'],
+  ['Problem','นกช็อป','ของพรีเมี่ยมไม่ตรงกับที่แลก'],
+  ['Problem','นกช็อป','ตัดพอยท์ไม่ได้'],
+  ['Problem','นกช็อป','ตัดพอยท์ไม่ถูกต้อง'],
+  ['Problem','นกช็อป','ปัญหาอื่นๆ'],
+  ['Problem','นกพอยท์','ได้พอยท์ไม่ครบ'],
+  ['Problem','นกพอยท์','ซื้อแล้วแต่ไม่ได้พอยท์'],
+  ['Problem','นกแคช','ปัญหาการใช้งาน'],
+  ['Problem','แนะนำเพื่อน','ลูกค้าแนะนำเพื่อนไม่สำเร็จ'],
+  ['Problem','แนะนำเพื่อน','ปัญหาระบบแนะนำเพื่อน'],
+  ['Problem','แนะนำเพื่อน','ยืนยันตัวตนไม่สำเร็จ'],
+  ['Problem','บรอดแคสต์','ร้องเรียนบรอดแคสต์เยอะเกินไป'],
+  ['Problem','บรอดแคสต์','ข้อมูลบรอดแคสต์กิจกรรม / คอนเทนต์ผิด'],
+  ['Problem','บรอดแคสต์','ข้อมูลบรอดแคสต์ลอตเตอรี่ผิด'],
+  ['Problem','บัญชีสมาชิก','เข้าระบบไม่ได้ ให้กรอก Email'],
+  ['Problem','ปัญหาการสั่งซื้อ','แนบสลิปไม่ได้ (ลูกค้าดำเนินการด้วยตนเอง)'],
+  ['Problem','ปัญหาการสั่งซื้อ','แนบสลิปไม่ได้ (แอดมินดำเนินการให้)'],
+  ['Problem','ปัญหาการสั่งซื้อ','ชำระเงินด้วยนกแคชไม่เป็น (แอดมินดำเนินการให้)'],
+  ['Problem','ปัญหาการสั่งซื้อ','สั่งซื้อผ่าน Rich Menu ไม่ได้'],
+  ['Problem','ปัญหาการใช้งาน','หน้าจอค้าง/หน้าจอขาว'],
+  ['Problem','ปัญหาการใช้งาน','ปัญหาอื่นๆ'],
+  ['Problem','ปัญหาเครือข่ายอินเตอร์เน็ต','3BB - Wifi'],
+  ['Problem','ปัญหาเครือข่ายอินเตอร์เน็ต','AIS'],
+  ['Problem','ปัญหาเครือข่ายอินเตอร์เน็ต','AIS Fibre'],
+  ['Problem','ปัญหาเครือข่ายอินเตอร์เน็ต','DTAC'],
+  ['Problem','ปัญหาเครือข่ายอินเตอร์เน็ต','DTAC - Wifi'],
+  ['Problem','ปัญหาเครือข่ายอินเตอร์เน็ต','My CAT'],
+  ['Problem','ปัญหาเครือข่ายอินเตอร์เน็ต','NT - Wifi'],
+  ['Problem','ปัญหาเครือข่ายอินเตอร์เน็ต','TOT - Wifi'],
+  ['Problem','ปัญหาเครือข่ายอินเตอร์เน็ต','TRUE - Wifi'],
+  ['Problem','ปัญหาเครือข่ายอินเตอร์เน็ต','TRUE'],
+  ['Problem','ปัญหาแคมเปญ CRM','ไม่ตรงตามเงื่อนไขกิจกรรม'],
+  ['Problem','ปัญหาแคมเปญ CRM','เกิดข้อผิดพลาดจากระบบ'],
+  ['Problem','ปัญหาแคมเปญ CRM','ปฏิบัติตามเงื่อนไขแต่ไม่มีรางวัล'],
+  ['Problem','ปัญหาแคมเปญทางการตลาด','ไม่ตรงตามเงื่อนไขกิจกรรม'],
+  ['Problem','ปัญหาแคมเปญทางการตลาด','เกิดข้อผิดพลาดจากระบบ'],
+  ['Problem','ปัญหาแคมเปญทางการตลาด','ปฏิบัติตามเงื่อนไขแต่ไม่มีรางวัล'],
+  ['Problem','จิ๊ดริดหยิบโชค','จิ๊ดริดหยิบโชค 3 ใบ ไม่ตรงเงื่อนไข'],
+  ['Problem','จิ๊ดริดหยิบโชค','จิ๊ดริดหยิบโชค 5 ใบ ไม่ตรงเงื่อนไข'],
+  ['Problem','จิ๊ดริดหยิบโชค','จิ๊ดริดหยิบโชค 10 ใบ ไม่ตรงเงื่อนไข'],
+  ['Problem','จิ๊ดริดหยิบโชค','ตัวเลขลอตเตอรี่ไม่ชัด/ขาดหาย'],
+  ['Problem','จิ๊ดริดหยิบโชค','ลอตเตอรี่ผิดงวด'],
+  ['Problem','จิ๊ดริดหยิบโชค','ปัญหาอื่นๆ'],
+  ['Problem','ปัญหาธนาคาร','สลิปไม่แสดง QR code'],
+  ['Problem','ปัญหาธนาคาร','มีรายการโอนออก แต่ไม่มีสลิป'],
+  ['Problem','ปัญหาธนาคาร','สลิปหลุดคิว'],
+  ['Problem','ปัญหาธนาคาร','ระบบธนาคารมีปัญหา'],
+  ['Problem','ปัญหาระบบ','ระบบไม่อ่าน QR Code - ทุกธนาคาร'],
+  ['Problem','ปัญหาระบบ','ระบบไม่อ่าน QR Code - SCB'],
+  ['Problem','ปัญหาระบบ','ระบบไม่อ่าน QR Code - UOB'],
+  ['Problem','ปัญหาระบบ','ระบบไม่อ่าน QR Code - Wi Wallet'],
+  ['Problem','ปัญหาระบบ','ระบบไม่อ่าน QR Code - กรุงเทพ'],
+  ['Problem','ปัญหาระบบ','ระบบไม่อ่าน QR Code - กรุงไทย'],
+  ['Problem','ปัญหาระบบ','ระบบไม่อ่าน QR Code - กรุงศรีอยุธยา'],
+  ['Problem','ปัญหาระบบ','ระบบไม่อ่าน QR Code - กสิกรไทย'],
+  ['Problem','ปัญหาระบบ','ระบบไม่อ่าน QR Code - เกียรตินาคิน'],
+  ['Problem','ปัญหาระบบ','ระบบไม่อ่าน QR Code - ซีไอเอ็มบี'],
+  ['Problem','ปัญหาระบบ','ระบบไม่อ่าน QR Code - ทหารไทยธนชาต'],
+  ['Problem','ปัญหาระบบ','ระบบไม่อ่าน QR Code - ทิสโก้'],
+  ['Problem','ปัญหาระบบ','ระบบไม่อ่าน QR Code - ไทยเครดิต'],
+  ['Problem','ปัญหาระบบ','ระบบไม่อ่าน QR Code - ธ.ก.ส'],
+  ['Problem','ปัญหาระบบ','ระบบไม่อ่าน QR Code - แลนด์แอนด์เฮ้าส์'],
+  ['Problem','ปัญหาระบบ','ระบบไม่อ่าน QR Code - ออมสิน'],
+  ['Problem','ปัญหาระบบ','ระบบไม่อ่าน QR Code - อาคารสงเคราะห์'],
+  ['Problem','ปัญหาระบบ','ระบบไม่อ่าน QR Code - อิสลามแห่งประเทศไทย'],
+  ['Problem','ปัญหาระบบ','ระบบไม่อ่าน QR Code - ไอซีบีซี'],
+  ['Problem','ปัญหาระบบ','จำนวนลอตเตอรี่ในตู้เซฟไม่ถูกต้อง'],
+  ['Problem','ปัญหาระบบ','เลขลอตเตอรี่ ไม่ตรงกับที่ซื้อ'],
+  ['Problem','ปัญหาเว็บไซต์','แนบสลิปไม่ได้'],
+  ['Problem','ปัญหาเว็บไซต์','เปิดขายแล้ว แต่ตู้เซฟไม่รีเซ็ต'],
+  ['Problem','ปัญหาเว็บไซต์','ล็อกอินไม่ได้'],
+  ['Problem','ปัญหาเว็บไซต์','ปัญหาอื่นๆ'],
+  ['Problem','ปัญหาแอปพลิเคชัน','แนบสลิปไม่ได้'],
+  ['Problem','ปัญหาแอปพลิเคชัน','เปิดขายแล้ว แต่ตู้เซฟไม่รีเซ็ต'],
+  ['Problem','ปัญหาแอปพลิเคชัน','ล็อกอินไม่ได้'],
+  ['Problem','ปัญหาแอปพลิเคชัน','ปัญหาอื่นๆ'],
+  ['Problem','มิจฉาชีพ','โอนเงินให้มิจฉาชีพ'],
+  ['Problem','มิจฉาชีพ','รับแจ้งข้อมูลมิจฉาชีพ'],
+  ['Problem','มิจฉาชีพ','URL เพจมิจฉาชีพ'],
+  ['Problem','รับเงินรางวัล','ไม่ได้กรอกเลขบัญชีธนาคาร'],
+  ['Problem','รับเงินรางวัล','กรอกเลขบัญชีธนาคารผิด'],
+  ['Problem','รับเงินรางวัล','ไม่มีบัญชีธนาคารในประเทศไทย'],
+  ['Problem','ลูกค้าโอนผิดบัญชี','โอนผิดเข้าบัญชีลอตเตอรี่พลัส'],
+  ['Problem','ลูกค้าโอนผิดบัญชี','โอนผิดเข้าบัญชีลอตเตอรี่ออนไลน์'],
+  ['Problem','โอนเงินคืน','ขอยกเลิกคำสั่งซื้อ'],
+  ['Problem','ยกเลิกคำสั่งซื้อ','เกินระยะเวลาชำระเงิน'],
+  ['Problem','ยกเลิกคำสั่งซื้อ','แนบสลิปซ้ำ'],
+  ['Problem','Adaptis','อนุมัติคำสั่งซื้อ'],
+  ['Problem','Adaptis','ตรวจสอบ Statement'],
+  ['Problem','Adaptis','โอนเงินคืน'],
+  ['Problem','Line OPC','โดนบล็อคห้อง VIP/ห้องทำนายฝัน'],
+  ['Problem','Line OPC','แจ้งเตือนการทำผิดกฎของกลุ่ม'],
+  ['Problem','Line OPC','บล็อคลูกค้า'],
+  ['Problem','Call Back ล่าช้า','คำสั่งซื้อสำเร็จ'],
+  ['Problem','Call Back ล่าช้า','อนุมัติคำสั่งซื้อ PAYGENIX'],
+  ['Problem','Call Back ล่าช้า','อนุมัติคำสั่งซื้อ ADAPTIS'],
+  ['Problem','Call Back ล่าช้า','รอตรวจสอบสถานะคำสั่งซื้อ'],
+  ['Request','ขอสลิปโอนเงินคืน','ขอสลิปโอนเงินคืนจากลอตเตอรี่พลัส'],
+  ['Request','แก้ไขข้อมูลสมาชิก','ชื่อ - นามสกุล'],
+  ['Request','แก้ไขข้อมูลสมาชิก','เบอร์โทรศัพท์'],
+  ['Request','แก้ไขข้อมูลสมาชิก','วัน/เดือน/ปีเกิด'],
+  ['Request','แก้ไขข้อมูลสมาชิก','บัญชีธนาคาร'],
+  ['Request','แก้ไขข้อมูลสมาชิก','ที่อยู่'],
+  ['Request','แก้ไขข้อมูลสมาชิก','เพศ'],
+  ['Request','ขอสนับสนุน/Sponsor','CSR'],
+  ['Request','ขอสนับสนุน/Sponsor','Events'],
+  ['Request','ขอสนับสนุน/Sponsor','กิจกรรมทางการตลาด'],
+  ['Request','ขอสนับสนุน/Sponsor','ขอทุนการศึกษา'],
+  ['Request','ขอสนับสนุน/Sponsor','โฆษณา'],
+  ['Request','ขอสนับสนุน/Sponsor','วัด/ศาสนา'],
+  ['Request','ขอสนับสนุน/Sponsor','Wrap/สติกเกอร์'],
+  ['Request','ขอสนับสนุน/Sponsor','อื่นๆ'],
+  ['Request','ข้อเสนอแนะ','โอนพอยท์ให้เพื่อน'],
+  ['Request','ข้อเสนอแนะ','โอนพอยท์ไป LINE อื่น'],
+  ['Request','ข้อเสนอแนะ','ข้อเสนอแนะอื่นๆ'],
+  ['Request','แคมเปญทางการตลาด','ขอหนังสือรับรองหักภาษี'],
+  ['Request','แคมเปญทางการตลาด','ข้อเสนอแนะ'],
+  ['Request','แคมเปญ CRM','ข้อเสนอแนะ'],
+  ['Request','นกช็อป','แลกพอยท์แล้ว แต่อยากเปลี่ยนของพรีเมี่ยม'],
+  ['Request','นกช็อป','ขอแจ้งเปลี่ยนที่อยู่จัดส่ง'],
+  ['Request','นกช็อป','ข้อเสนอแนะ'],
+  ['Request','นกแคช','ข้อเสนอแนะ'],
+  ['Request','นกแคช','ขอคืนเงิน'],
+  ['Request','แนะนำเพื่อน','ยื่นเอกสารยืนยันตัวตน'],
+  ['Request','ยกเลิกคำสั่งซื้อ','ต้องการเปลี่ยนเลขลอตเตอรี่'],
+  ['Request','Line OPC','ขอเข้ากลุ่ม VIP'],
+  ['Request','Line OPC','ขอเข้ากลุ่มต่างประเทศ'],
+  ['Request','Line OPC','ขอเข้ากลุ่ม Platinum'],
+  ['Request','Line OPC','ขอเข้ากลุ่มทำนายฝัน'],
+  ['Request','ทำนายฝัน','ทำนายฝัน']
+];
+
+// Workflow data (mock - Column G from Category Sheet, keyed by cat1|cat2|cat3)
+// In production, this data will be fetched from Google Sheets Column G per row
+function getWorkflowKey(c1,c2,c3){ return c1+'|'+c2+'|'+c3; }
+const WORKFLOW_DATA = {
+  'Info|การส่งของขวัญ|วิธีการรับ/ส่งของขวัญ':'ตรวจสอบรหัสสมาชิกและเงื่อนไขการรับ/ส่งของขวัญ\nแจ้งรายละเอียดวิธีการส่งและรับของขวัญให้ลูกค้าทราบ รวมถึงระยะเวลาจัดส่ง\nยืนยันที่อยู่จัดส่งและข้อมูลผู้รับกับลูกค้า\nบันทึกผลการให้ข้อมูลในระบบ',
+  'Info|ข้อกฎหมาย อายุต่ำกว่า 20 ปี|สอบถามข้อมูลและเงื่อนไข':'ตรวจสอบอายุจากข้อมูลสมาชิกในระบบ\nแจ้งเงื่อนไขตามกฎหมาย พ.ร.บ. สลากกินแบ่งรัฐบาล ห้ามจำหน่ายให้ผู้ที่อายุต่ำกว่า 20 ปี\nหากมีคำสั่งซื้อ ดำเนินการยกเลิกและคืนเงินตามเงื่อนไข\nบันทึกผลและแจ้ง Supervisor',
+  'Info|คูปอง|วิธีการใช้คูปอง':'สอบถามรหัสคูปองหรือแคมเปญที่ลูกค้าต้องการใช้\nตรวจสอบเงื่อนไขการใช้งานและวันหมดอายุของคูปอง\nแนะนำขั้นตอนการใช้คูปอง: เข้าหน้าชำระเงิน > กรอกรหัสคูปอง > กดใช้งาน\nบันทึกผลการให้ข้อมูล',
+  'Info|แคมเปญทางการตลาด|สอบถามรายละเอียด':'ตรวจสอบรายละเอียดแคมเปญที่ลูกค้าสอบถาม จากระบบ Campaign Management\nแจ้งเงื่อนไข ระยะเวลา และวิธีการเข้าร่วมแคมเปญ\nหากลูกค้าสนใจเข้าร่วม แนะนำขั้นตอนถัดไป\nบันทึกผลและส่งต่อทีมการตลาด (ถ้าจำเป็น)',
+  'Info|แคมเปญทางการตลาด|ติดตามการประกาศผล/แจกของรางวัล':'ตรวจสอบสถานะการประกาศผลแคมเปญจากระบบ\nแจ้งกำหนดการประกาศผลรางวัลให้ลูกค้าทราบ\nหากประกาศผลแล้ว แจ้งผลและขั้นตอนการรับรางวัล\nบันทึกผล',
+  'Info|แคมเปญ CRM|สอบถามรายละเอียด':'ตรวจสอบแคมเปญ CRM ที่เกี่ยวข้องจากระบบ\nยืนยันเงื่อนไขการเข้าร่วมกับลูกค้า เช่น ยอดสั่งซื้อขั้นต่ำ ระยะเวลา\nดำเนินการตามขั้นตอนแคมเปญ\nบันทึกผลและแจ้ง CRM Team',
+  'Info|แคมเปญ CRM|ติดตามการประกาศผล/แจกของรางวัล':'ตรวจสอบสถานะประกาศผลแคมเปญ CRM\nแจ้งผลรางวัลและขั้นตอนการรับ\nบันทึกผลและแจ้ง CRM Team',
+  'Info|นกช็อป|สอบถามข้อมูล':'ตรวจสอบพอยท์คงเหลือของลูกค้าจากระบบนกช็อป\nแจ้งรายการของพรีเมี่ยมที่มีให้แลก พร้อมจำนวนพอยท์ที่ต้องใช้\nแนะนำขั้นตอนการแลกพอยท์: เข้านกช็อป > เลือกของรางวัล > กดแลก > กรอกที่อยู่จัดส่ง\nบันทึกผล',
+  'Info|นกช็อป|ติดตามการส่งของ':'ตรวจสอบสถานะการจัดส่งของพรีเมี่ยมจากระบบ\nแจ้งเลข tracking และระยะเวลาจัดส่งโดยประมาณให้ลูกค้า\nหากมีปัญหาการจัดส่ง ประสานงานกับทีมจัดส่ง\nบันทึกผล',
+  'Info|นกพอยท์|สอบถามข้อมูล':'ตรวจสอบยอดนกพอยท์คงเหลือจากระบบ\nแจ้งรายละเอียดการสะสมพอยท์: ทุกการซื้อลอตเตอรี่ 1 ใบ ได้รับ 1 พอยท์\nแจ้งวันหมดอายุของพอยท์และเงื่อนไขการใช้งาน\nบันทึกผล',
+  'Info|นกพอยท์|วิธีการแลกพอยท์':'แนะนำขั้นตอนการแลกพอยท์: เข้าเมนูนกพอยท์ > เลือกรายการ > กดแลก\nแจ้งอัตราแลกพอยท์และเงื่อนไข\nหากพอยท์ไม่ถูกต้อง แจ้งทีมตรวจสอบ\nบันทึกผล',
+  'Info|นกแคช|สอบถามข้อมูล':'ตรวจสอบยอดนกแคชคงเหลือของลูกค้า\nแจ้งเงื่อนไขการใช้นกแคช: ใช้เป็นส่วนลดในการซื้อลอตเตอรี่ครั้งถัดไป\nแจ้งวันหมดอายุและข้อจำกัดการใช้งาน\nบันทึกผล',
+  'Info|นกแคช|วิธีการใช้นกแคช':'แนะนำวิธีใช้นกแคช: เลือกลอตเตอรี่ > หน้าชำระเงิน > เลือก "ใช้นกแคช" > ยืนยัน\nแจ้งจำนวนนกแคชที่สามารถใช้ได้ต่อครั้ง\nหากใช้งานไม่ได้ ตรวจสอบเงื่อนไขและแจ้งลูกค้า\nบันทึกผล',
+  'Info|แนะนำเพื่อน|วิธีการกรอกรหัสแนะนำเพื่อน':'แนะนำขั้นตอน: เข้าเมนูแนะนำเพื่อน > คัดลอกรหัสแนะนำ > ส่งให้เพื่อน\nเพื่อนกรอกรหัสตอนสมัครสมาชิก\nเมื่อเพื่อนซื้อลอตเตอรี่สำเร็จ จะได้รับค่าแนะนำ\nบันทึกผล',
+  'Info|แนะนำเพื่อน|วิธีการยืนยันตัวตน':'แนะนำขั้นตอนยืนยันตัวตน: เข้าเมนูแนะนำเพื่อน > กดยืนยันตัวตน > ถ่ายรูปบัตรประชาชน > ถ่ายรูปเซลฟี่\nรอผลการตรวจสอบ 1-3 วันทำการ\nหากไม่ผ่าน แนะนำให้ถ่ายรูปใหม่ให้ชัดเจน\nบันทึกผล',
+  'Info|แนะนำเพื่อน|เงื่อนไขการใช้และถอนค่าแนะนำ':'แจ้งเงื่อนไขค่าแนะนำ: ต้องยืนยันตัวตนก่อนถอน\nค่าแนะนำจะได้รับเมื่อเพื่อนซื้อลอตเตอรี่สำเร็จ\nสามารถถอนค่าแนะนำเข้าบัญชีธนาคารที่ลงทะเบียนไว้\nขั้นต่ำการถอน 100 บาท\nบันทึกผล',
+  'Info|แนะนำเพื่อน|ขั้นตอนการแนะนำเพื่อน':'แนะนำขั้นตอนทั้งหมด:\n1. เข้าเมนูแนะนำเพื่อน คัดลอกรหัส/ลิงก์แนะนำ\n2. ส่งรหัสหรือลิงก์ให้เพื่อน\n3. เพื่อนสมัครสมาชิกและกรอกรหัสแนะนำ\n4. เพื่อนซื้อลอตเตอรี่สำเร็จ\n5. ผู้แนะนำได้รับค่าแนะนำอัตโนมัติ\nบันทึกผล',
+  'Info|บัญชีสมาชิก|ขั้นตอนการสมัครสมาชิก':'แจ้งขั้นตอนการสมัคร:\n1. เพิ่มเพื่อน Line OA ลอตเตอรี่พลัส\n2. กดเมนู "สมัครสมาชิก"\n3. กรอกข้อมูล: ชื่อ-นามสกุล, เบอร์โทร, วันเกิด\n4. ยืนยัน OTP ทาง SMS\n5. สมัครสำเร็จ พร้อมใช้งาน\nบันทึกผล',
+  'Info|บัญชีสมาชิก|สอบถามเลขสมาชิก':'ตรวจสอบเลขสมาชิกจากระบบโดยใช้เบอร์โทรหรือชื่อ-นามสกุล\nแจ้งเลขสมาชิกให้ลูกค้า\nแนะนำวิธีดูเลขสมาชิกด้วยตนเอง: เข้า Line OA > เมนู "ข้อมูลสมาชิก"\nบันทึกผล',
+  'Info|บัญชีสมาชิก|รายละเอียดเงื่อนไขการสมัครสมาชิก':'แจ้งเงื่อนไข: อายุ 20 ปีขึ้นไป, มีเบอร์โทรไทย, มีบัญชีธนาคารไทย\n1 เบอร์โทร สมัครได้ 1 บัญชีเท่านั้น\nต้องยอมรับข้อตกลงและเงื่อนไขการใช้งาน\nบันทึกผล',
+  'Info|บัญชีสมาชิก|ลูกค้าเปลี่ยนไลน์ใหม่':'แนะนำขั้นตอน: เพิ่มเพื่อน Line OA ใหม่ > กด "เข้าสู่ระบบ" > กรอกเบอร์โทรที่ลงทะเบียนไว้ > ยืนยัน OTP\nระบบจะเชื่อมบัญชีเดิมกับ Line ใหม่อัตโนมัติ\nบันทึกผล',
+  'Info|จิ๊ดริดหยิบโชค|รายละเอียดจิ๊ดริดหยิบโชค':'แจ้งรายละเอียด: จิ๊ดริดหยิบโชคคือการสุ่มเลขลอตเตอรี่จากระบบ\nมี 3 แพ็คเกจ: 3 ใบ, 5 ใบ, 10 ใบ\nระบบจะสุ่มเลขให้อัตโนมัติ ไม่สามารถเลือกเลขเองได้\nราคาตามจำนวนใบ x 80 บาท\nบันทึกผล',
+  'Info|มิจฉาชีพ|สอบถามข้อมูลมิจฉาชีพ':'รับแจ้งข้อมูลมิจฉาชีพจากลูกค้า\nบันทึก URL/ลิงก์/ข้อมูลที่เกี่ยวข้องอย่างละเอียด\nแจ้งเตือนลูกค้าอย่าโอนเงินหรือให้ข้อมูลส่วนตัว\nแจ้งทีม Security ทันทีเพื่อดำเนินการบล็อค\nบันทึกผล',
+  'Info|รับเงินรางวัล|วิธีการรับเงินรางวัล':'แจ้งขั้นตอน: ระบบตรวจผลอัตโนมัติหลังประกาศรางวัล\nเงินรางวัลจะโอนเข้าบัญชีธนาคารที่ลงทะเบียนไว้ภายใน 3 วันทำการ\nรางวัลที่ 1 และรางวัลใหญ่ ต้องยืนยันตัวตนเพิ่มเติม\nบันทึกผล',
+  'Info|รับเงินรางวัล|สอบถามผลรางวัล':'ตรวจสอบผลรางวัลจากระบบตามเลขสมาชิกหรือเบอร์โทร\nแจ้งผลรางวัลทุกงวดที่ลูกค้าซื้อ\nหากถูกรางวัล แจ้งขั้นตอนการรับเงิน\nบันทึกผล',
+  'Info|วิธีการแนบสลิป|แนบสลิปหน้าแดง':'แจ้งขั้นตอนแนบสลิปหน้าแดง (กรณีโอนแล้วยังไม่แนบ):\n1. เข้าหน้าคำสั่งซื้อ\n2. กดปุ่ม "แนบสลิป"\n3. ถ่ายรูปหรือเลือกรูปสลิปจากแกลเลอรี่\n4. ตรวจสอบว่าสลิปชัดเจนและถูกต้อง\n5. กดยืนยัน\nบันทึกผล',
+  'Info|วิธีการแนบสลิป|แนบสลิปหน้าเหลือง':'แจ้งขั้นตอนแนบสลิปหน้าเหลือง (กรณีสลิปไม่ผ่านการตรวจสอบ):\n1. ตรวจสอบเหตุผลที่สลิปไม่ผ่าน\n2. ถ่ายรูปสลิปใหม่ให้ชัดเจน ไม่ครอบ ไม่เบลอ\n3. กดแนบสลิปใหม่\n4. รอผลตรวจสอบ\nบันทึกผล',
+  'Info|วิธีการสั่งซื้อ/ ชำระเงิน|วิธีการสั่งซื้อลอตเตอรี่':'แจ้งขั้นตอน:\n1. เข้า Line OA หรือเว็บไซต์ลอตเตอรี่พลัส\n2. เลือกลอตเตอรี่ที่ต้องการ (ค้นหาเลข/สุ่ม)\n3. กดหยิบใส่ตะกร้า\n4. ตรวจสอบรายการและกดสั่งซื้อ\n5. ชำระเงินผ่าน QR Payment ภายใน 10 นาที\n6. แนบสลิปการโอนเงิน\n7. รอระบบตรวจสอบและยืนยัน\nบันทึกผล',
+  'Info|สอบถามข้อมูลทั่วไป|Greeting':'ทักทายลูกค้าตามช่วงเวลา (สวัสดีครับ/ค่ะ)\nสอบถามว่าต้องการสอบถามเรื่องอะไร\nให้ข้อมูลเบื้องต้นตามที่ลูกค้าสอบถาม\nบันทึกผล',
+  'Info|สอบถามข้อมูลทั่วไป|ราคาลอตเตอรี่':'แจ้งราคาลอตเตอรี่: ใบละ 80 บาท (ราคาเดียวทุกใบ)\nค่าบริการเพิ่มเติมตามช่องทางการชำระเงิน\nบันทึกผล',
+  'Info|สอบถามข้อมูลทั่วไป|วันเปิดจำหน่าย':'แจ้งวันเปิดจำหน่ายลอตเตอรี่ของแต่ละงวด\nปกติเปิดจำหน่ายหลังวันออกรางวัล 2-3 วัน\nสามารถติดตามข่าวสารได้ทาง Line OA และ Facebook Page\nบันทึกผล',
+  'Info|สอบถามข้อมูลทั่วไป|วันปิดจำหน่าย':'แจ้งวันปิดจำหน่าย: ปิดรับคำสั่งซื้อก่อนวันออกรางวัล 1 วัน เวลา 20:00 น.\nหลังปิดจำหน่าย ไม่สามารถสั่งซื้อเพิ่มได้\nบันทึกผล',
+  'Info|QR Payment|ADAPTIS':'แจ้งรายละเอียดการชำระเงินผ่าน QR Payment ระบบ ADAPTIS\nขั้นตอน: สแกน QR > โอนเงินตามจำนวน > แนบสลิป\nหากสแกนไม่ได้ แนะนำเปลี่ยนช่องทางชำระเงิน\nบันทึกผล',
+  'Info|QR Payment|PAYGENIX':'แจ้งรายละเอียดการชำระเงินผ่าน QR Payment ระบบ PAYGENIX\nขั้นตอน: สแกน QR > โอนเงินตามจำนวน > ระบบตรวจสอบอัตโนมัติ\nบันทึกผล',
+  'Info|QR Payment|EPOS':'แจ้งรายละเอียดการชำระเงินผ่าน QR Payment ระบบ EPOS\nขั้นตอน: สแกน QR > โอนเงินตามจำนวน > ระบบตรวจสอบอัตโนมัติ\nบันทึกผล',
+  'Problem|คำสั่งซื้อไม่สำเร็จ|ไม่แนบสลิปภายในเวลาที่กำหนด':'ตรวจสอบคำสั่งซื้อจากระบบ ยืนยันว่าเลยเวลาแนบสลิป\nสอบถามลูกค้าว่าโอนเงินแล้วหรือยัง\nหากโอนแล้ว: ให้ลูกค้าส่งสลิปทาง Chat แอดมินดำเนินการแนบให้\nหากยังไม่โอน: แนะนำสั่งซื้อใหม่\nบันทึกผลและติดตาม',
+  'Problem|คำสั่งซื้อไม่สำเร็จ|โอนเงินแล้วไม่มีสลิป':'ตรวจสอบรายการโอนจากระบบธนาคาร\nขอให้ลูกค้าขอสลิปย้อนหลังจากแอปธนาคาร\nหากไม่สามารถหาสลิปได้ แนะนำติดต่อธนาคารขอ Statement\nเมื่อได้สลิป แอดมินดำเนินการแนบให้\nส่งเรื่อง Finance ตรวจสอบยอดโอน\nบันทึกผล',
+  'Problem|คำสั่งซื้อไม่สำเร็จ|โอนเงินไม่ครบ/โอนขาด':'ตรวจสอบยอดที่ต้องชำระและยอดที่โอนจริง\nแจ้งลูกค้าเรื่องยอดที่ขาด\nแนะนำให้โอนเพิ่มเติมในส่วนที่ขาด\nหากไม่ต้องการโอนเพิ่ม ดำเนินการยกเลิกและคืนเงิน\nส่งเรื่อง Finance\nบันทึกผล',
+  'Problem|คำสั่งซื้อสำเร็จ|โอนซ้ำ':'ตรวจสอบรายการโอนทั้งหมดจากระบบ\nยืนยันจำนวนเงินที่โอนซ้ำกับลูกค้า\nดำเนินการส่งเรื่องคืนเงินส่วนที่โอนซ้ำให้ Finance\nแจ้งระยะเวลาคืนเงิน 3-5 วันทำการ\nบันทึกผล',
+  'Problem|คำสั่งซื้อสำเร็จ|โอนเงินเกิน':'ตรวจสอบยอดที่ต้องชำระและยอดที่โอนจริง คำนวณส่วนเกิน\nยืนยันยอดเงินเกินกับลูกค้า\nส่งเรื่องคืนเงินส่วนเกินให้ Finance พร้อมเลขบัญชีลูกค้า\nแจ้งระยะเวลาคืนเงิน 3-5 วันทำการ\nบันทึกผล',
+  'Problem|ปัญหาการสั่งซื้อ|แนบสลิปไม่ได้ (ลูกค้าดำเนินการด้วยตนเอง)':'สอบถามอาการ: ขึ้น error อะไร / หน้าจอค้าง / ปุ่มกดไม่ได้\nแนะนำ: ล้าง cache > ลองใหม่ / เปลี่ยน browser / ใช้แอปแทน\nหากยังไม่ได้ แนะนำส่งสลิปทาง Chat ให้แอดมินดำเนินการ\nบันทึกผล',
+  'Problem|ปัญหาการสั่งซื้อ|แนบสลิปไม่ได้ (แอดมินดำเนินการให้)':'รับสลิปจากลูกค้าทาง Chat\nตรวจสอบสลิปว่าถูกต้องและตรงกับคำสั่งซื้อ\nดำเนินการแนบสลิปให้ลูกค้าผ่านระบบ Admin\nแจ้งผลลูกค้าเมื่อดำเนินการเสร็จ\nบันทึกผล',
+  'Problem|ปัญหาการใช้งาน|หน้าจอค้าง/หน้าจอขาว':'สอบถามอุปกรณ์และเวอร์ชัน OS ของลูกค้า\nแนะนำ: ปิดแอป/เว็บแล้วเปิดใหม่ > ล้าง cache > รีสตาร์ทเครื่อง\nหากใช้เว็บ แนะนำเปลี่ยน browser (Chrome/Safari)\nหากยังมีปัญหา ส่งเรื่อง Tech Team พร้อม screenshot\nบันทึกผล',
+  'Problem|ปัญหาระบบ|ระบบไม่อ่าน QR Code - ทุกธนาคาร':'ตรวจสอบสถานะระบบ QR Payment ว่ามีปัญหาหรือไม่\nแจ้งลูกค้าให้ลองสแกนใหม่อีกครั้ง\nหากยังไม่ได้ แนะนำเปลี่ยนช่องทางชำระเงินเป็นโอนตามเลขบัญชี\nส่งเรื่อง Tech Team ตรวจสอบ\nบันทึกผล',
+  'Problem|ปัญหาเว็บไซต์|ล็อกอินไม่ได้':'สอบถามอาการ: ขึ้น error อะไร / กดปุ่มไม่ได้ / OTP ไม่เข้า\nแนะนำ: ล้าง cache + cookies > ลองใหม่ > เปลี่ยน browser\nหาก OTP ไม่เข้า ตรวจสอบเบอร์โทรที่ลงทะเบียน\nหากยังมีปัญหา ส่งเรื่อง Tech Team\nบันทึกผล',
+  'Problem|ปัญหาแอปพลิเคชัน|ล็อกอินไม่ได้':'สอบถามเวอร์ชันแอปและอุปกรณ์\nแนะนำ: อัปเดตแอปเป็นเวอร์ชันล่าสุด > ล้าง cache > ลองใหม่\nตรวจสอบว่าเบอร์โทรถูกต้อง\nหาก OTP ไม่เข้า ตรวจสอบสัญญาณโทรศัพท์\nหากยังมีปัญหา ส่งเรื่อง Tech Team\nบันทึกผล',
+  'Problem|มิจฉาชีพ|โอนเงินให้มิจฉาชีพ':'รับแจ้งรายละเอียด: จำนวนเงิน วันเวลา ช่องทาง\nแนะนำให้ลูกค้าแจ้งความที่สถานีตำรวจ และโทร 1441 (ศูนย์ AOC)\nบันทึก URL/ข้อมูลมิจฉาชีพ แจ้งทีม Security ทันที\nเตือนลูกค้าอย่าโอนเงินเพิ่ม\nบันทึกผล',
+  'Problem|ลูกค้าโอนผิดบัญชี|โอนผิดเข้าบัญชีลอตเตอรี่พลัส':'ตรวจสอบหลักฐานการโอนจากสลิป\nยืนยันว่าไม่มีคำสั่งซื้อที่ตรงกับยอดโอน\nรับเลขบัญชีธนาคารลูกค้าสำหรับคืนเงิน\nส่งเรื่อง Finance ดำเนินการคืนเงิน แจ้งระยะเวลา 5-7 วันทำการ\nบันทึกผล',
+  'Problem|โอนเงินคืน|ขอยกเลิกคำสั่งซื้อ':'ตรวจสอบสถานะคำสั่งซื้อ ว่ายังสามารถยกเลิกได้หรือไม่\nยืนยันเหตุผลการยกเลิกกับลูกค้า\nดำเนินการยกเลิกในระบบ\nส่งคำขอคืนเงินให้ Finance พร้อมเลขบัญชี\nแจ้งระยะเวลาคืนเงิน 3-5 วันทำการ\nบันทึกผล',
+  'Request|ขอสลิปโอนเงินคืน|ขอสลิปโอนเงินคืนจากลอตเตอรี่พลัส':'ตรวจสอบรายการโอนคืนจากระบบ Finance\nดึงสลิปการโอนคืนจากระบบ\nส่งสลิปให้ลูกค้าทาง Chat\nหากยังไม่มีการโอน แจ้งสถานะและระยะเวลา\nบันทึกผล',
+  'Request|แก้ไขข้อมูลสมาชิก|ชื่อ - นามสกุล':'ยืนยันตัวตนลูกค้า: สอบถามเลขสมาชิก + เบอร์โทร + วันเกิด\nรับชื่อ-นามสกุลใหม่ที่ต้องการแก้ไข\nขอรูปบัตรประชาชนเพื่อยืนยัน\nดำเนินการแก้ไขในระบบ\nยืนยันผลกับลูกค้าและบันทึก',
+  'Request|แก้ไขข้อมูลสมาชิก|บัญชีธนาคาร':'ยืนยันตัวตนลูกค้า: สอบถามเลขสมาชิก + เบอร์โทร + วันเกิด\nรับข้อมูลบัญชีธนาคารใหม่: ธนาคาร เลขบัญชี ชื่อบัญชี\nขอรูป Book Bank หน้าแรกเพื่อยืนยัน\nดำเนินการแก้ไขในระบบ\nยืนยันผลกับลูกค้าและบันทึก',
+  'Request|ขอสนับสนุน/Sponsor|CSR':'รับรายละเอียดคำขอสนับสนุน: กิจกรรม วันที่ สถานที่ งบประมาณ\nส่งต่อทีม CSR พิจารณา\nแจ้งลูกค้าว่าจะได้รับการติดต่อกลับภายใน 7 วันทำการ\nบันทึกผล',
+  'Request|ข้อเสนอแนะ|ข้อเสนอแนะอื่นๆ':'รับฟังข้อเสนอแนะจากลูกค้าอย่างละเอียด\nบันทึกรายละเอียดครบถ้วน\nส่งต่อทีมที่เกี่ยวข้องเพื่อพิจารณาปรับปรุง\nขอบคุณลูกค้าที่ให้ข้อเสนอแนะ\nบันทึกผล',
+  'Request|ยกเลิกคำสั่งซื้อ|ต้องการเปลี่ยนเลขลอตเตอรี่':'ตรวจสอบสถานะคำสั่งซื้อปัจจุบัน\nยืนยันว่าลูกค้าต้องการยกเลิกเพื่อเปลี่ยนเลข\nดำเนินการยกเลิกคำสั่งซื้อเดิม\nแนะนำให้สั่งซื้อใหม่พร้อมเลขที่ต้องการ\nหากมีเงินคืน ส่งเรื่อง Finance\nบันทึกผล',
+  'Request|ทำนายฝัน|ทำนายฝัน':'รับข้อมูลความฝันจากลูกค้า\nค้นหาผลทำนายจากระบบทำนายฝัน\nแจ้งผลทำนายและเลขเด็ดที่เกี่ยวข้องให้ลูกค้า\nบันทึกผล',
+  'Info|Null|Null':'ไม่มีข้อมูล Workflow สำหรับหมวดหมู่นี้'
+};
+
+const OPC_ROOMS = ['VIP 1','VIP 2','VIP 3','VIP 4','VIP 5','VIP 6','VIP 7','VIP 8','VIP 9','กลุ่มต่างประเทศ','Platinum','ทำนายฝัน'];
+const SM_TYPES = ['Facebook Pages','Facebook Groups','TikTok','YouTube','Social Listening','KOL/Influencer','Line OA','Outbound Call'];
+const SM_PAGES = ['ลอตเตอรี่พลัส (2.5 ล้าน)','ลอตเตอรี่พลัส(ใหม่)','ลอตเตอรี่พลัสOfficial','ชุมชนชาวลอตเตอรี่พลัส','ลอตเตอรี่พลัส Live','นกพลัส','FB : นอท พันธ์ธวัช นาควิสุทธิ์','เฮี้ยน','แม่ตุ๊กตาพารวย','นกพลัส Live','นอท พันธ์ธวัช','กลุ่มลอตเตอรี่พลัส 2.9 หมื่น','กลุ่มลอตเตอรี่พลัส 1.4 แสน','กลุ่มลอตเตอรี่พลัส 7.2 หมื่น','กลุ่มนกพลัส official 1.2 หมื่น','กลุ่มนกพลัส official 1.9 หมื่น','กลุ่มลอตเตอรี่พลัส 4.3 แสน','กลุ่มทำนายฝัน by ลอตเตอรี่พลัส','ลิงก์ข่าว/เพจพรีเซ็นเตอร์'];
+
+const SEGMENT_CONFIG = {
+  '3.Potential Loyalist':{color:'#4ade80',bg:'rgba(34,197,94,.15)',border:'rgba(34,197,94,.3)',label:'Potential Loyalist',avatar:'#22c55e'},
+  '6.Customers Low Frequency':{color:'#60a5fa',bg:'rgba(59,130,246,.15)',border:'rgba(59,130,246,.3)',label:'Low Frequency',avatar:'#3b82f6'},
+  '7.Promising':{color:'#22d3ee',bg:'rgba(6,182,212,.15)',border:'rgba(6,182,212,.3)',label:'Promising',avatar:'#06b6d4'},
+  '8.Need Attention':{color:'#fbbf24',bg:'rgba(245,158,11,.15)',border:'rgba(245,158,11,.3)',label:'Need Attention',avatar:'#f59e0b'},
+  '9.About To Sleep':{color:'#c084fc',bg:'rgba(168,85,247,.15)',border:'rgba(168,85,247,.3)',label:'About To Sleep',avatar:'#a855f7'},
+  '12.Hibernating Customers':{color:'#9ca3af',bg:'rgba(107,114,128,.15)',border:'rgba(107,114,128,.3)',label:'Hibernating',avatar:'#6b7280'},
+  '13.Lost Customers':{color:'#f87171',bg:'rgba(239,68,68,.15)',border:'rgba(239,68,68,.3)',label:'Lost Customer',avatar:'#ef4444'}
+};
+const SEGMENT_NEW = {color:'#2dd4bf',bg:'rgba(45,212,191,.15)',border:'rgba(45,212,191,.3)',label:'New Customer',avatar:'#14b8a6'};
+
+function getSegmentInfo(seg) { return SEGMENT_CONFIG[seg] || SEGMENT_NEW; }
+function fmtGender(g) { return g==='FEMALE'?'หญิง':g==='MALE'?'ชาย':'ไม่ระบุ'; }
+function fmtDate(d) { if(!d) return '-'; return new Date(d).toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'2-digit'}); }
+
+const MOCK_CUSTOMERS = [
+  {id:'P9139687',name:'อรวรรณ ประดุจชน',nickName:'หนูนา',initials:'อป',gender:'FEMALE',age:34,phone:'092-615-2361',birthday:'1992-07-19',countPrize:0,totalPrize:0,countRound:29,segment:'3.Potential Loyalist',totalItem:97,totalPrice:10185,lastRoundSpend:4,aovPerRound:3.34,createdAt:'2024-08-11',firstBuy:'2024-08-23',lastBuy:'2026-03-06',roundNotBuy:1,lotteryCount:2,lastTwoDigit:'85'},
+  {id:'P7204017',name:'เฉลิมศักดิ์ ลู่วิจิตรบรรจง',nickName:'จู',initials:'เล',gender:'MALE',age:41,phone:'083-788-1916',birthday:'1985-12-17',countPrize:0,totalPrize:0,countRound:43,segment:'3.Potential Loyalist',totalItem:55,totalPrice:5775,lastRoundSpend:2,aovPerRound:1.28,createdAt:'2023-09-23',firstBuy:'2024-01-08',lastBuy:'2026-03-05',roundNotBuy:1,lotteryCount:1,lastTwoDigit:'29'},
+  {id:'P12267613',name:'นริศรา สีสวาด',nickName:'มิ้ลค์',initials:'นส',gender:'FEMALE',age:32,phone:'098-868-9483',birthday:'1994-07-13',countPrize:0,totalPrize:0,countRound:11,segment:'9.About To Sleep',totalItem:51,totalPrice:5355,lastRoundSpend:0,aovPerRound:4.64,createdAt:'2025-07-01',firstBuy:'2025-07-01',lastBuy:'2026-03-07',roundNotBuy:7,lotteryCount:2,lastTwoDigit:'96'},
+  {id:'P13056837',name:'สิริรัตน์ หว่างจ้อย',nickName:'ป๊อป',initials:'สห',gender:'FEMALE',age:30,phone:'095-359-6352',birthday:'1996-04-17',countPrize:5,totalPrize:12000,countRound:8,segment:'3.Potential Loyalist',totalItem:239,totalPrice:25095,lastRoundSpend:51,aovPerRound:29.88,createdAt:'2025-11-16',firstBuy:'2025-11-27',lastBuy:'2026-03-07',roundNotBuy:1,lotteryCount:3,lastTwoDigit:'79'},
+  {id:'P10757449',name:'ชวนากร เล็กแจ่ม',nickName:'เอิร์ธ',initials:'ชล',gender:'MALE',age:30,phone:'094-829-8964',birthday:'1996-02-04',countPrize:10,totalPrize:38000,countRound:25,segment:'3.Potential Loyalist',totalItem:678,totalPrice:71190,lastRoundSpend:29,aovPerRound:27.12,createdAt:'2025-01-14',firstBuy:'2025-01-14',lastBuy:'2026-03-05',roundNotBuy:1,lotteryCount:6,lastTwoDigit:'89'},
+  {id:'P10584403',name:'ณัฐพงษ์ ศักดิ์จันทร์',nickName:'แนน',initials:'ณศ',gender:'MALE',age:31,phone:'082-097-1944',birthday:'1995-12-14',countPrize:4,totalPrize:10000,countRound:30,segment:'3.Potential Loyalist',totalItem:168,totalPrice:17640,lastRoundSpend:5,aovPerRound:5.6,createdAt:'2024-12-25',firstBuy:'2024-12-28',lastBuy:'2026-03-06',roundNotBuy:1,lotteryCount:1,lastTwoDigit:'39'},
+  {id:'P12481721',name:'ณรงค์ศักดิ์ สังสุด',nickName:'SPY',initials:'ณส',gender:'MALE',age:35,phone:'082-005-3873',birthday:'1991-09-25',countPrize:0,totalPrize:0,countRound:6,segment:'7.Promising',totalItem:62,totalPrice:6510,lastRoundSpend:4,aovPerRound:10.33,createdAt:'2025-07-29',firstBuy:'2025-07-30',lastBuy:'2026-03-06',roundNotBuy:1,lotteryCount:5,lastTwoDigit:'51'},
+  {id:'P7187314',name:'สมัชชา ประสงค์สุข',nickName:'ก๊อด',initials:'สป',gender:'UNSPECIFIED',age:31,phone:'091-886-3756',birthday:'1995-07-31',countPrize:0,totalPrize:0,countRound:16,segment:'9.About To Sleep',totalItem:155,totalPrice:16275,lastRoundSpend:0,aovPerRound:9.69,createdAt:'2023-09-18',firstBuy:'2023-09-22',lastBuy:'2026-03-05',roundNotBuy:43,lotteryCount:10,lastTwoDigit:'41'},
+  {id:'P12765967',name:'MinKo Naing',nickName:'โอ',initials:'MN',gender:'MALE',age:40,phone:'082-458-7101',birthday:'1986-03-12',countPrize:0,totalPrize:0,countRound:12,segment:'3.Potential Loyalist',totalItem:82,totalPrice:8610,lastRoundSpend:3,aovPerRound:6.83,createdAt:'2025-09-15',firstBuy:'2025-09-15',lastBuy:'2026-03-06',roundNotBuy:1,lotteryCount:8,lastTwoDigit:'35'},
+  {id:'P13519082',name:'Sabrine Bouras',nickName:'Sabrine',initials:'SB',gender:'FEMALE',age:48,phone:'094-705-745',birthday:'1978-03-14',countPrize:0,totalPrize:0,countRound:1,segment:null,totalItem:3,totalPrice:315,lastRoundSpend:0,aovPerRound:3,createdAt:'2026-03-08',firstBuy:'2026-03-08',lastBuy:'2026-03-08',roundNotBuy:0,lotteryCount:1,lastTwoDigit:'56'},
+  {id:'P12479796',name:'นิดานุช ลุงย่า',nickName:'ทิพย์',initials:'นล',gender:'FEMALE',age:32,phone:'097-969-6349',birthday:'1994-08-09',countPrize:0,totalPrize:0,countRound:2,segment:null,totalItem:8,totalPrice:840,lastRoundSpend:0,aovPerRound:4,createdAt:'2025-07-29',firstBuy:'2026-02-28',lastBuy:'2026-03-05',roundNotBuy:0,lotteryCount:1,lastTwoDigit:'34'},
+  {id:'P9014828',name:'สมหญิง แซ่โซ้ง',nickName:'น้องหญิง',initials:'สซ',gender:'FEMALE',age:37,phone:'092-665-5291',birthday:'1989-05-14',countPrize:0,totalPrize:0,countRound:20,segment:'3.Potential Loyalist',totalItem:308,totalPrice:32315,lastRoundSpend:16,aovPerRound:15.4,createdAt:'2024-07-31',firstBuy:'2024-07-31',lastBuy:'2026-03-07',roundNotBuy:1,lotteryCount:1,lastTwoDigit:'80'},
+  {id:'P12752403',name:'สมคิด สุวรรณรังศรี',nickName:'กุ่ย',initials:'สส',gender:'UNSPECIFIED',age:53,phone:'092-525-3363',birthday:'1973-08-11',countPrize:4,totalPrize:10000,countRound:12,segment:'3.Potential Loyalist',totalItem:129,totalPrice:13545,lastRoundSpend:12,aovPerRound:10.75,createdAt:'2025-09-12',firstBuy:'2025-09-14',lastBuy:'2026-03-07',roundNotBuy:1,lotteryCount:1,lastTwoDigit:'37'},
+  {id:'P8433137',name:'ปรีดาวรรณ สุขเกษม',nickName:'อ้อ',initials:'ปส',gender:'FEMALE',age:48,phone:'063-939-6355',birthday:'1978-01-03',countPrize:2,totalPrize:8000,countRound:25,segment:'8.Need Attention',totalItem:95,totalPrice:9975,lastRoundSpend:0,aovPerRound:3.8,createdAt:'2024-03-31',firstBuy:'2024-03-31',lastBuy:'2026-03-06',roundNotBuy:22,lotteryCount:3,lastTwoDigit:'07'},
+  {id:'P13209317',name:'สุดสงวน นโนธรรม',nickName:'แต๋ว',initials:'สน',gender:'UNSPECIFIED',age:75,phone:'082-565-4954',birthday:'1951-11-23',countPrize:12,totalPrize:48000,countRound:5,segment:'3.Potential Loyalist',totalItem:144,totalPrice:15120,lastRoundSpend:32,aovPerRound:28.8,createdAt:'2025-12-27',firstBuy:'2025-12-27',lastBuy:'2026-03-08',roundNotBuy:1,lotteryCount:8,lastTwoDigit:'29'},
+  {id:'P9115645',name:'พัชดา แฟรนซัน',nickName:'ดา',initials:'พฟ',gender:'FEMALE',age:44,phone:'096-250-9678',birthday:'1982-12-22',countPrize:3,totalPrize:6000,countRound:14,segment:'13.Lost Customers',totalItem:63,totalPrice:6615,lastRoundSpend:0,aovPerRound:4.5,createdAt:'2024-08-09',firstBuy:'2025-02-16',lastBuy:'2026-03-07',roundNotBuy:25,lotteryCount:3,lastTwoDigit:'97'},
+  {id:'P6557984',name:'ชัยยะ เคหะนันท์',nickName:'Ya',initials:'ชค',gender:'UNSPECIFIED',age:54,phone:'088-215-9824',birthday:'1972-04-24',countPrize:15,totalPrize:40000,countRound:57,segment:'3.Potential Loyalist',totalItem:1696,totalPrice:178080,lastRoundSpend:14,aovPerRound:29.75,createdAt:'2023-07-23',firstBuy:'2023-09-23',lastBuy:'2026-03-06',roundNotBuy:1,lotteryCount:5,lastTwoDigit:'30'},
+  {id:'P8400905',name:'สุวณีย์ วรโชติภัสร์สกุล',nickName:'ณี',initials:'สว',gender:'FEMALE',age:44,phone:'096-228-9338',birthday:'1982-02-09',countPrize:0,totalPrize:0,countRound:13,segment:'13.Lost Customers',totalItem:57,totalPrice:5985,lastRoundSpend:0,aovPerRound:4.38,createdAt:'2024-03-26',firstBuy:'2024-03-26',lastBuy:'2026-03-08',roundNotBuy:33,lotteryCount:4,lastTwoDigit:'56'},
+  {id:'P8851103',name:'มลฑาทิพย์ แสนเทพ',nickName:'แพรว',initials:'มแ',gender:'FEMALE',age:25,phone:'099-140-7495',birthday:'2001-03-29',countPrize:0,totalPrize:0,countRound:8,segment:'6.Customers Low Frequency',totalItem:14,totalPrice:1470,lastRoundSpend:1,aovPerRound:1.75,createdAt:'2024-07-14',firstBuy:'2025-09-01',lastBuy:'2026-03-07',roundNotBuy:1,lotteryCount:1,lastTwoDigit:'72'},
+  {id:'P11975611',name:'กาญจนา ศิริบูรณ์',nickName:'ญาดา',initials:'กศ',gender:'FEMALE',age:42,phone:'064-048-5401',birthday:'1984-04-14',countPrize:0,totalPrize:0,countRound:4,segment:'6.Customers Low Frequency',totalItem:37,totalPrice:3885,lastRoundSpend:3,aovPerRound:9.25,createdAt:'2025-05-30',firstBuy:'2025-06-20',lastBuy:'2026-03-06',roundNotBuy:1,lotteryCount:9,lastTwoDigit:'42'},
+  {id:'P7011085',name:'สุปราณี ซ่านะ',nickName:'มุก',initials:'สซ',gender:'FEMALE',age:45,phone:'061-307-4808',birthday:'1981-06-04',countPrize:0,totalPrize:0,countRound:8,segment:'12.Hibernating Customers',totalItem:14,totalPrice:1470,lastRoundSpend:0,aovPerRound:1.75,createdAt:'2023-09-03',firstBuy:'2024-01-07',lastBuy:'2026-03-05',roundNotBuy:51,lotteryCount:1,lastTwoDigit:'45'}
+];
+
+const MOCK_USERS = [
+  {id:'u1',username:'admin',password:'admin123',name:'Admin',team:'all',role:'admin'},
+  {id:'u2',username:'สมชาย',password:'1234',name:'สมชาย',team:'Phone Call',role:'agent'},
+  {id:'u3',username:'วิชัย',password:'1234',name:'วิชัย',team:'Line OPC',role:'agent'},
+  {id:'u4',username:'ธนา',password:'1234',name:'ธนา',team:'Social Media',role:'agent'},
+  {id:'u5',username:'กิตติ',password:'1234',name:'กิตติ',team:'Approve',role:'agent'},
+  {id:'u6',username:'นิภา',password:'1234',name:'นิภา',team:'Line OA',role:'agent'},
+  {id:'u7',username:'พรทิพย์',password:'1234',name:'พรทิพย์',team:'Phone Call',role:'agent'},
+  {id:'u8',username:'อรุณ',password:'1234',name:'อรุณ',team:'Line OPC',role:'agent'},
+  {id:'u9',username:'มานะ',password:'1234',name:'มานะ',team:'Social Media',role:'agent'},
+  {id:'u10',username:'สุดา',password:'1234',name:'สุดา',team:'Approve',role:'agent'},
+  {id:'u11',username:'ปราณี',password:'1234',name:'ปราณี',team:'Line OA',role:'agent'},
+  {id:'u12',username:'วรรณา',password:'1234',name:'วรรณา',team:'Phone Call',role:'agent'},
+];
+
+let currentUser = null;
+let currentPage = 'entry';
+let dashChart = null;
+
+// Period calculation
+function getPeriod(d) {
+  const date = d ? new Date(d) : new Date();
+  const y = date.getFullYear(), m = date.getMonth() + 1, day = date.getDate();
+  const periodNum = (m - 1) * 2 + (day >= 17 ? 2 : 1);
+  const periodStr = String(periodNum).padStart(2, '0');
+  return `${periodStr}/${y}`;
+}
+function getPeriodRange(periodStr) {
+  const [pNum, yr] = periodStr.split('/').map(Number);
+  const m = Math.ceil(pNum / 2), isOdd = pNum % 2 === 1;
+  if (isOdd) return { start: new Date(yr, m - 1, 2), end: new Date(yr, m - 1, 16) };
+  return { start: new Date(yr, m - 1, 17), end: new Date(yr, m, 1) };
+}
+function getAllPeriods(year) {
+  const periods = [];
+  for (let i = 1; i <= 24; i++) periods.push(String(i).padStart(2, '0') + '/' + year);
+  return periods;
+}
+
+// Storage helpers
+function getUsers() {
+  let u = JSON.parse(localStorage.getItem('crm_users') || 'null');
+  if (!u) { u = MOCK_USERS; localStorage.setItem('crm_users', JSON.stringify(u)); }
+  return u;
+}
+function saveUsers(u) { localStorage.setItem('crm_users', JSON.stringify(u)); }
+function getEntries() { return JSON.parse(localStorage.getItem('crm_entries') || '[]'); }
+function saveEntries(e) { localStorage.setItem('crm_entries', JSON.stringify(e)); }
+function getResets() { return JSON.parse(localStorage.getItem('crm_resets') || '[]'); }
+function saveResets(r) { localStorage.setItem('crm_resets', JSON.stringify(r)); }
+function getRegLogs() { return JSON.parse(localStorage.getItem('crm_reg_logs') || '[]'); }
+function saveRegLogs(l) { localStorage.setItem('crm_reg_logs', JSON.stringify(l)); }
+
+// Toast
+function toast(msg, type='success') {
+  const t = document.createElement('div');
+  t.className = `toast toast-${type}`;
+  t.innerHTML = `${type === 'success' ? '&#10003;' : '&#10007;'} ${msg}`;
+  document.getElementById('toasts').appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
+// Modal
+function showModal(id) { document.getElementById(id).classList.add('show'); }
+function hideModal(id) { document.getElementById(id).classList.remove('show'); }
+
+// Sidebar toggle
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('show');
+}
+
+// Login
+function doLogin() {
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
+  const users = getUsers();
+  const user = users.find(x => x.username === u && x.password === p);
+  if (!user) return toast('ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง', 'error');
+  currentUser = user;
+  localStorage.setItem('crm_session', JSON.stringify(user));
+  enterApp();
+}
+function doLogout() {
+  currentUser = null;
+  localStorage.removeItem('crm_session');
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('loginPage').style.display = 'flex';
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+}
+function submitForgot() {
+  const u = document.getElementById('forgotUser').value.trim();
+  if (!u) return;
+  const resets = getResets();
+  resets.push({ username: u, time: new Date().toISOString(), status: 'pending' });
+  saveResets(resets);
+  hideModal('forgotModal');
+  toast('ส่งคำขอรีเซ็ตรหัสผ่านแล้ว');
+}
+
+// Register
+function showRegister() {
+  const cards = document.querySelectorAll('#loginPage > .login-card');
+  cards[0].style.display = 'none';
+  document.getElementById('registerCard').style.display = 'block';
+}
+function showLoginCard() {
+  const cards = document.querySelectorAll('#loginPage > .login-card');
+  cards[0].style.display = 'block';
+  document.getElementById('registerCard').style.display = 'none';
+}
+function doRegister() {
+  const username = document.getElementById('regUser').value.trim();
+  const password = document.getElementById('regPass').value;
+  const confirmPass = document.getElementById('regPassConfirm').value;
+  const name = document.getElementById('regName').value.trim();
+  const team = document.getElementById('regTeam').value;
+  if (!username) return toast('กรุณากรอก Username', 'error');
+  if (!password) return toast('กรุณากรอกรหัสผ่าน', 'error');
+  if (password.length < 4) return toast('รหัสผ่านต้องมีอย่างน้อย 4 ตัวอักษร', 'error');
+  if (password !== confirmPass) return toast('รหัสผ่านไม่ตรงกัน', 'error');
+  if (!name) return toast('กรุณากรอกชื่อ-นามสกุล', 'error');
+  if (!team) return toast('กรุณาเลือกทีม', 'error');
+  const users = getUsers();
+  if (users.find(u => u.username === username)) return toast('Username นี้ถูกใช้แล้ว', 'error');
+  const newUser = {
+    id: 'u' + Date.now(),
+    username, password, name, team, role: 'agent',
+    registeredAt: new Date().toISOString(),
+    status: 'active'
+  };
+  users.push(newUser);
+  saveUsers(users);
+  // Save registration log
+  const logs = getRegLogs();
+  logs.push({
+    userId: newUser.id,
+    username: newUser.username,
+    name: newUser.name,
+    team: newUser.team,
+    registeredAt: newUser.registeredAt,
+    registeredBy: 'self'
+  });
+  saveRegLogs(logs);
+  toast('สมัครสมาชิกสำเร็จ! เข้าสู่ระบบได้เลย');
+  // Clear form & go back to login
+  ['regUser','regPass','regPassConfirm','regName'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('regTeam').selectedIndex = 0;
+  showLoginCard();
+}
+
+function enterApp() {
+  document.getElementById('loginPage').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('userAvatar').textContent = currentUser.name.charAt(0);
+  document.getElementById('userName').textContent = currentUser.name;
+  document.getElementById('userTeam').textContent = currentUser.team === 'all' ? 'Admin' : currentUser.team;
+  buildNav();
+  generateMockDataIfNeeded();
+  navigateTo('entry');
+}
+
+function buildNav() {
+  const items = [
+    { id: 'entry', icon: '\u{1F4DD}', label: 'บันทึกข้อมูล' },
+    { id: 'dashboard', icon: '\u{1F4CA}', label: 'Dashboard' }
+  ];
+  if (currentUser.role === 'admin') items.push({ id: 'admin', icon: '\u{1F465}', label: 'จัดการผู้ใช้' });
+  document.getElementById('navItems').innerHTML = items.map(i =>
+    `<div class="nav-item" data-page="${i.id}" onclick="navigateTo('${i.id}')"><span>${i.icon}</span><span>${i.label}</span></div>`
+  ).join('');
+}
+
+function navigateTo(page) {
+  currentPage = page;
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const target = document.getElementById('page' + page.charAt(0).toUpperCase() + page.slice(1));
+  if (target) { target.classList.add('active'); target.classList.add('fade-in'); }
+  const navEl = document.querySelector(`.nav-item[data-page="${page}"]`);
+  if (navEl) navEl.classList.add('active');
+  if (page === 'entry') renderEntryPage();
+  else if (page === 'dashboard') renderDashboard();
+  else if (page === 'admin') renderAdmin();
+  if (window.innerWidth < 768) { document.getElementById('sidebar').classList.remove('open'); document.getElementById('overlay').classList.remove('show'); }
+}
+
+// ===== DATA ENTRY PAGE =====
+const ENTRY_TEAMS = ['Phone Call','Line OA','Line OPC','Social Media','Approve'];
+const MGMT_ROLES = ['all','Team Leader','Specialist','Manager'];
+
+function renderEntryPage() {
+  const team = currentUser.team;
+  const period = getPeriod();
+  const teamColor = TEAM_COLORS[team] || '#dc2626';
+  // Top row: team/period left, stats+history right
+  let html = `<div class="entry-layout">`;
+  // Left column
+  html += `<div>`;
+  const isSpecialist = team === 'Specialist';
+  const displayTeam = isSpecialist ? ENTRY_TEAMS[0] : team;
+  const displayColor = isSpecialist ? TEAM_COLORS['Specialist'] : teamColor;
+  if (isSpecialist) {
+    html += `<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+      <select id="specialistTeamSelect" class="input" style="width:auto;min-width:160px;font-size:1rem;font-weight:700;color:${displayColor};border-color:${displayColor}44;background:var(--bg)" onchange="onSpecialistTeamChange()">
+        ${ENTRY_TEAMS.map(t => `<option value="${t}" style="color:var(--text)">${t}</option>`).join('')}
+      </select>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:.95rem;color:#dc2626;background:rgba(220,38,38,.06);padding:8px 18px;border-radius:20px;border:1px solid rgba(220,38,38,.15);font-weight:800;letter-spacing:.5px">งวด ${period}</span>
+    </div>`;
+  } else {
+    html += `<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+      <span style="font-size:1.15rem;font-weight:800;color:${teamColor};letter-spacing:.5px">${team}</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:.95rem;color:#dc2626;background:rgba(220,38,38,.06);padding:8px 18px;border-radius:20px;border:1px solid rgba(220,38,38,.15);font-weight:800;letter-spacing:.5px">งวด ${period}</span>
+    </div>`;
+  }
+  html += `<div class="global-search">
+    <span class="search-icon">&#128269;</span>
+    <input type="text" id="globalSearchInput" placeholder="ค้นหา รหัสสมาชิก / ชื่อ-นามสกุล / เบอร์โทรศัพท์ / หมายเลขออเดอร์..." autocomplete="off">
+    <div class="search-results" id="globalSearchResults"></div>
+  </div>`;
+  html += `<div class="entry-form"><div class="glass" id="entryFormInner">`;
+  html += buildTeamFields(isSpecialist ? displayTeam : team);
+  html += `<div class="submit-area"><button class="btn btn-red" onclick="submitEntry()">บันทึก</button><button class="btn btn-ghost" onclick="clearForm()">ล้าง</button></div>`;
+  html += `</div></div>`;
+  html += `</div>`;
+  // Right column: stats + history
+  html += `<div class="right-col">`;
+  html += `<div class="prod-mini" id="prodMiniStats"></div>`;
+  html += `<div><div class="section-title" style="margin-bottom:0"><span>&#9632;</span> History</div><div class="glass" style="overflow:hidden"><div class="table-wrap" style="max-height:370px" id="todayHistoryTable"></div></div></div>`;
+  html += `</div>`;
+  html += `</div>`;
+  document.getElementById('pageEntry').innerHTML = html;
+  initAutocomplete();
+  initGlobalSearch();
+  renderProdPanel();
+  renderTodayHistory();
+}
+
+function buildTeamFields(team) {
+  let html = '';
+  if (team === 'Phone Call') {
+    html += formGroup('เบอร์โทรศัพท์', 'phone', 'text', '0xx-xxx-xxxx');
+  } else if (team === 'Line OPC') {
+    html += `<div class="form-group"><label>ชื่อห้อง</label><select class="input" id="f_roomName">${OPC_ROOMS.map(r => `<option value="${r}">${r}</option>`).join('')}</select></div>`;
+    html += formGroup('คำตอบ', 'answer', 'text', 'คำตอบที่ให้');
+    html += `<div class="form-group" style="display:flex;gap:20px;flex-wrap:wrap">
+      <label class="checkbox-label"><input type="checkbox" id="f_1min"> 1 นาที</label>
+      <label class="checkbox-label"><input type="checkbox" id="f_2to5min"> 2-5 นาที</label>
+      <label class="checkbox-label"><input type="checkbox" id="f_content"> ส่งคอนเทนต์</label></div>`;
+  } else if (team === 'Social Media') {
+    html += `<div class="form-group"><label>ประเภท</label><select class="input" id="f_smType">${SM_TYPES.map(t => `<option>${t}</option>`).join('')}</select></div>`;
+    html += `<div class="form-group"><label>เพจ</label><select class="input" id="f_smPage">${SM_PAGES.map(p => `<option>${p}</option>`).join('')}</select></div>`;
+  } else if (team === 'Approve') {
+    html += formGroup('คำสั่งซื้อ', 'orderId', 'text', 'หมายเลขคำสั่งซื้อ');
+  }
+  html += categoryFields();
+  return html;
+}
+
+function formGroup(label, id, type, placeholder) {
+  return `<div class="form-group"><label>${label}</label><input type="${type}" class="input" id="f_${id}" placeholder="${placeholder || ''}"></div>`;
+}
+
+function categoryFields() {
+  return `<div class="form-group" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+    <label style="margin:0;font-weight:600;font-size:.85rem">Category</label>
+    <button class="btn btn-ghost btn-sm" onclick="openCatBrowser()" style="font-size:.75rem">&#128269; ค้นหา Category</button>
+  </div>` + ['cat1','cat2','cat3'].map((c, i) => `
+    <div class="form-group autocomplete-wrap">
+      <label>Category ${i + 1}</label>
+      <div class="cat-input-wrap">
+        <input type="text" class="input cat-input" id="f_${c}" data-cat="${c}" placeholder="พิมพ์เพื่อค้นหา..." autocomplete="off">
+        <button class="cat-browse-btn" onclick="openCatBrowser()" title="ค้นหา Category">&#128269;</button>
+      </div>
+      <div class="autocomplete-list" id="ac_${c}"></div>
+    </div>`).join('') + `<div class="wf-box" id="workflowBox"></div>`;
+}
+
+function initAutocomplete() {
+  document.querySelectorAll('.cat-input').forEach(inp => {
+    inp.addEventListener('input', function() {
+      const q = this.value.toLowerCase().trim();
+      const acId = 'ac_' + this.dataset.cat;
+      const list = document.getElementById(acId);
+      if (q.length < 1) { list.classList.remove('show'); return; }
+      const results = CATEGORIES.filter(c =>
+        c[1].toLowerCase().includes(q) || c[2].toLowerCase().includes(q) || c[0].toLowerCase().includes(q)
+      ).slice(0, 12);
+      if (!results.length) { list.classList.remove('show'); return; }
+      list.innerHTML = results.map((r, i) =>
+        `<div class="ac-item" onclick="selectCategory(${CATEGORIES.indexOf(r)})">
+          <span class="ac-cat1">${r[0]}</span><span class="ac-cat2">${r[1]}</span><span class="ac-cat3">${r[2]}</span>
+        </div>`
+      ).join('');
+      list.classList.add('show');
+    });
+    inp.addEventListener('blur', () => setTimeout(() => {
+      document.getElementById('ac_' + inp.dataset.cat).classList.remove('show');
+    }, 200));
+  });
+}
+
+// Global Search
+function initGlobalSearch() {
+  const input = document.getElementById('globalSearchInput');
+  const results = document.getElementById('globalSearchResults');
+  if (!input) return;
+  input.addEventListener('input', function() {
+    const q = this.value.toLowerCase().trim();
+    if (q.length < 2) { results.classList.remove('show'); hideCustomerProfile(); return; }
+    // Search customers first
+    const custMatched = MOCK_CUSTOMERS.filter(c =>
+      c.name.toLowerCase().includes(q) ||
+      c.id.toLowerCase().includes(q) ||
+      c.nickName.toLowerCase().includes(q) ||
+      c.phone.replace(/-/g,'').includes(q.replace(/-/g,'')) ||
+      c.phone.includes(q)
+    );
+    // Search entries
+    const entries = getEntries();
+    const entryMatched = entries.filter(e =>
+      (e.phone && e.phone.toLowerCase().includes(q)) ||
+      (e.agent && e.agent.toLowerCase().includes(q)) ||
+      (e.agentId && e.agentId.toLowerCase().includes(q)) ||
+      (e.orderId && e.orderId.toLowerCase().includes(q)) ||
+      (e.cat2 && e.cat2.toLowerCase().includes(q)) ||
+      (e.cat3 && e.cat3.toLowerCase().includes(q)) ||
+      (e.roomName && e.roomName.toLowerCase().includes(q)) ||
+      (e.smPage && e.smPage.toLowerCase().includes(q))
+    ).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 10);
+    let html = '';
+    // Customer results section
+    if (custMatched.length) {
+      html += '<div style="padding:8px 18px;font-size:.68rem;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;font-weight:600;border-bottom:1px solid var(--border);background:var(--bg)">ลูกค้า</div>';
+      html += custMatched.map(c => {
+        const seg = getSegmentInfo(c.segment);
+        return `<div class="search-result-item" onclick="showCustomerProfile('${c.id}')">
+          <div style="width:32px;height:32px;border-radius:50%;background:${seg.avatar};display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:#fff;flex-shrink:0">${c.initials}</div>
+          <div class="sr-info"><div class="sr-primary">${highlightText(c.name,q)} <span style="color:var(--text2);font-size:.7rem">(${c.nickName})</span></div>
+          <div class="sr-secondary">${highlightText(c.id,q)} &bull; ${highlightText(c.phone,q)}</div></div>
+          <span class="sr-badge" style="background:${seg.bg};color:${seg.color};border:1px solid ${seg.border}">${seg.label}</span>
+        </div>`;
+      }).join('');
+    }
+    // Entry results section
+    if (entryMatched.length) {
+      html += '<div style="padding:8px 18px;font-size:.68rem;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;font-weight:600;border-bottom:1px solid var(--border);background:var(--bg)">รายการบันทึก</div>';
+      html += entryMatched.map(e => {
+        const time = new Date(e.timestamp).toLocaleString('th-TH',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+        const teamColor = TEAM_COLORS[e.team] || '#94a3b8';
+        let detail = e.cat2 || '';
+        if (e.phone) detail = '\u{1F4DE} ' + e.phone + (detail ? ' \u2022 ' + detail : '');
+        if (e.orderId) detail = '\u{1F4E6} ' + e.orderId + (detail ? ' \u2022 ' + detail : '');
+        if (e.roomName) detail = '\u{1F4AC} ' + e.roomName + (detail ? ' \u2022 ' + detail : '');
+        return `<div class="search-result-item" onclick="showSearchDetail(this)" data-id="${e.id}">
+          <span class="sr-badge" style="background:${teamColor}22;color:${teamColor};border:1px solid ${teamColor}44">${e.team}</span>
+          <div class="sr-info"><div class="sr-primary">${e.agent} &bull; <span style="color:var(--text2);font-size:.75rem">${time}</span></div>
+          <div class="sr-secondary">${detail} \u2192 ${e.cat3 || ''}</div></div></div>`;
+      }).join('');
+    }
+    if (!html) {
+      html = '<div style="padding:16px;text-align:center;color:var(--text2);font-size:.85rem">ไม่พบผลลัพธ์</div>';
+    }
+    results.innerHTML = html;
+    results.classList.add('show');
+  });
+  input.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const q = this.value.toLowerCase().trim();
+      if (q.length < 2) return;
+      // Find first matching customer
+      const cust = MOCK_CUSTOMERS.find(c =>
+        c.name.toLowerCase().includes(q) ||
+        c.id.toLowerCase().includes(q) ||
+        c.nickName.toLowerCase().includes(q) ||
+        c.phone.replace(/-/g,'').includes(q.replace(/-/g,'')) ||
+        c.phone.includes(q)
+      );
+      if (cust) {
+        results.classList.remove('show');
+        renderCustomerProfile(cust, q);
+      } else {
+        // Click first entry result if available
+        const firstItem = results.querySelector('.search-result-item');
+        if (firstItem) firstItem.click();
+      }
+    }
+  });
+  input.addEventListener('blur', () => setTimeout(() => results.classList.remove('show'), 250));
+  input.addEventListener('focus', function() { if (this.value.trim().length >= 2) this.dispatchEvent(new Event('input')); });
+}
+
+function highlightText(text, query) {
+  if (!query || !text) return text;
+  const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return text.replace(new RegExp('(' + escaped + ')', 'gi'), '<mark>$1</mark>');
+}
+
+function showCustomerProfile(custId) {
+  const q = (document.getElementById('globalSearchInput')?.value || '').trim();
+  const cust = MOCK_CUSTOMERS.find(c => c.id === custId);
+  if (!cust) return;
+  document.getElementById('globalSearchResults').classList.remove('show');
+  renderCustomerProfile(cust, q);
+}
+
+function hideCustomerProfile() {
+  const panel = document.getElementById('cpPanel');
+  const sidebar = document.getElementById('sidebar');
+  if (!panel.classList.contains('show')) return;
+  panel.classList.add('closing');
+  panel.classList.remove('show');
+  sidebar.classList.remove('cp-active');
+  setTimeout(() => { panel.classList.remove('closing'); panel.innerHTML = ''; }, 250);
+}
+
+function renderCustomerProfile(cust, query) {
+  const panel = document.getElementById('cpPanel');
+  const sidebar = document.getElementById('sidebar');
+  if (!panel) return;
+  const q = query || '';
+  const h = (text) => highlightText(String(text||''), q);
+  const seg = getSegmentInfo(cust.segment);
+  const genderIcon = cust.gender==='FEMALE'?'\u{2640}\u{FE0F}':cust.gender==='MALE'?'\u{2642}\u{FE0F}':'\u{26AB}';
+  const daysSinceJoined = Math.floor((new Date() - new Date(cust.createdAt)) / 86400000);
+  const roundNotBuyClass = cust.roundNotBuy >= 20 ? 'danger' : cust.roundNotBuy >= 5 ? 'warn' : '';
+
+  let html = `<button class="cp-close" onclick="hideCustomerProfile()" title="ปิด">&times;</button>`;
+  html += `<div class="cp-header">
+    <div class="cp-avatar" style="background:linear-gradient(135deg,${seg.avatar},${seg.avatar}dd)">${cust.initials}</div>
+    <div class="cp-info">
+      <div class="cp-name" style="cursor:pointer;transition:color .2s" onclick="openCustomerDashboard('${cust.id}')" onmouseover="this.style.color='#dc2626'" onmouseout="this.style.color=''">${h(cust.name)} <span class="cp-nickname">(${h(cust.nickName)})</span></div>
+      <div class="cp-meta">
+        <span class="cp-meta-item"><span class="cp-icon">\u{1F194}</span> ${h(cust.id)}</span>
+        <span class="cp-meta-item"><span class="cp-icon">\u{1F4F1}</span> ${h(cust.phone)}</span>
+        <span class="cp-meta-item"><span class="cp-gender-icon">${genderIcon}</span> ${fmtGender(cust.gender)} &bull; ${cust.age} ปี</span>
+      </div>
+      <div style="margin-top:6px"><span class="cp-segment-badge" style="background:${seg.bg};color:${seg.color};border:1px solid ${seg.border}">${seg.label}</span></div>
+    </div>
+  </div>`;
+  html += `<div class="cp-body">`;
+  html += `<div class="cp-stats-grid">
+    <div class="cp-stat"><div class="cp-stat-val neon">${cust.totalItem.toLocaleString()}</div><div class="cp-stat-label">สลากรวม</div></div>
+    <div class="cp-stat"><div class="cp-stat-val cyan">\u{0E3F}${cust.totalPrice.toLocaleString()}</div><div class="cp-stat-label">ยอดรวม</div></div>
+    <div class="cp-stat"><div class="cp-stat-val gold">${cust.countRound}</div><div class="cp-stat-label">จำนวนงวด</div></div>
+    <div class="cp-stat"><div class="cp-stat-val neon">${cust.aovPerRound}</div><div class="cp-stat-label">ใบ/งวด</div></div>
+    <div class="cp-stat"><div class="cp-stat-val cyan">${cust.countPrize||0}</div><div class="cp-stat-label">ถูกรางวัล</div></div>
+    <div class="cp-stat"><div class="cp-stat-val gold">\u{0E3F}${(cust.totalPrize||0).toLocaleString()}</div><div class="cp-stat-label">เงินรางวัล</div></div>
+  </div>`;
+  html += `<div class="cp-orders-title">\u{1F4C5} ข้อมูลการมีส่วนร่วม</div>`;
+  html += `<div class="cp-engage-list">
+    <div class="cp-engage-item"><span class="cp-engage-label">สมัครสมาชิก</span><span class="cp-engage-val">${fmtDate(cust.createdAt)}</span></div>
+    <div class="cp-engage-item"><span class="cp-engage-label">ซื้อครั้งแรก</span><span class="cp-engage-val">${fmtDate(cust.firstBuy)}</span></div>
+    <div class="cp-engage-item"><span class="cp-engage-label">ซื้อล่าสุด</span><span class="cp-engage-val">${fmtDate(cust.lastBuy)}</span></div>
+    <div class="cp-engage-item"><span class="cp-engage-label">งวดที่ไม่ซื้อ</span><span class="cp-engage-val ${roundNotBuyClass}">${cust.roundNotBuy||0} งวด</span></div>
+  </div>`;
+  html += `<div class="cp-orders-title">\u{1F3B0} งวดปัจจุบัน</div>`;
+  html += `<div class="cp-engage-list">
+    <div class="cp-engage-item"><span class="cp-engage-label">ซื้องวดนี้</span><span class="cp-engage-val">${cust.lastRoundSpend||0} ใบ</span></div>
+    <div class="cp-engage-item"><span class="cp-engage-label">ซื้อเฉลี่ยต่องวด</span><span class="cp-engage-val">${cust.aovPerRound||0} ใบ</span></div>
+    <div class="cp-engage-item"><span class="cp-engage-label">เลขท้าย 2 ตัว</span><span class="cp-lastdigit">${cust.lastTwoDigit||'-'}</span></div>
+  </div>`;
+  html += `</div>`;
+  html += `<div class="cp-footer">
+    <span class="cp-footer-stat">สมาชิก <b>${daysSinceJoined}</b> วัน</span>
+    <span style="color:var(--border)">&bull;</span>
+    <span class="cp-footer-stat">ซื้อ <b>${cust.countRound}</b> งวด</span>
+    <span style="color:var(--border)">&bull;</span>
+    <span class="cp-footer-stat">รวม <b>\u{0E3F}${cust.totalPrice.toLocaleString()}</b></span>
+  </div>`;
+  panel.innerHTML = html;
+  panel.classList.remove('closing');
+  panel.classList.add('show');
+  sidebar.classList.add('cp-active');
+}
+
+function openCustomerDashboard(custId) {
+  const cust = MOCK_CUSTOMERS.find(c => c.id === custId);
+  if (!cust) return;
+  const seg = getSegmentInfo(cust.segment);
+  const daysSinceJoined = Math.floor((new Date() - new Date(cust.createdAt)) / 86400000);
+  const genderTh = fmtGender(cust.gender);
+  const genderIcon = cust.gender==='FEMALE'?'\u{2640}\u{FE0F}':cust.gender==='MALE'?'\u{2642}\u{FE0F}':'\u{26AB}';
+  const td = cust.lastTwoDigit || '00';
+  const tdInt = parseInt(td) || 0;
+  // Generate mock top 2-digit numbers
+  const mock2d = [
+    {num:td, count:Math.max(1,Math.round(cust.totalItem*0.12))},
+    {num:String((tdInt+17)%100).padStart(2,'0'), count:Math.max(1,Math.round(cust.totalItem*0.09))},
+    {num:String((tdInt+33)%100).padStart(2,'0'), count:Math.max(1,Math.round(cust.totalItem*0.07))},
+    {num:String((tdInt+51)%100).padStart(2,'0'), count:Math.max(1,Math.round(cust.totalItem*0.06))},
+    {num:String((tdInt+68)%100).padStart(2,'0'), count:Math.max(1,Math.round(cust.totalItem*0.05))}
+  ];
+  // Generate mock top 3-digit numbers
+  const mock3d = [
+    {num:td+'9', count:Math.max(1,Math.round(cust.totalItem*0.05))},
+    {num:'7'+td, count:Math.max(1,Math.round(cust.totalItem*0.038))},
+    {num:td+'3', count:Math.max(1,Math.round(cust.totalItem*0.03))},
+    {num:'5'+td, count:Math.max(1,Math.round(cust.totalItem*0.025))},
+    {num:td+'1', count:Math.max(1,Math.round(cust.totalItem*0.02))}
+  ];
+  const max2d = mock2d[0].count;
+  const max3d = mock3d[0].count;
+  const favNums = [td, String((tdInt+17)%100).padStart(2,'0'), String((tdInt+33)%100).padStart(2,'0'), String((tdInt+51)%100).padStart(2,'0'), String((tdInt+68)%100).padStart(2,'0')];
+  const roundNotBuyClass = cust.roundNotBuy>=20?'danger':cust.roundNotBuy>=5?'warn':'dim';
+
+  let html = '';
+  // 1. Customer Profile
+  html += `<div class="holo-section sec-profile">
+    <div class="holo-sec-title"><span class="sec-icon">\u{1F464}</span> Customer Profile</div>
+    <div class="holo-avatar-wrap">
+      <div class="holo-avatar-big" style="background:linear-gradient(135deg,${seg.avatar},${seg.avatar}cc)">${cust.initials}</div>
+      <div class="holo-cust-name">${cust.name}</div>
+      <div class="holo-cust-nick">${genderIcon} ${cust.nickName}</div>
+      <span class="holo-segment" style="background:${seg.bg};color:${seg.color};border:1px solid ${seg.border}">${seg.label}</span>
+    </div>
+    <div class="holo-profile-list">
+      <div class="holo-profile-row"><span class="holo-plabel">รหัสสมาชิก</span><span class="holo-pval" style="color:#dc2626">${cust.id}</span></div>
+      <div class="holo-profile-row"><span class="holo-plabel">ชื่อเล่น</span><span class="holo-pval">${cust.nickName}</span></div>
+      <div class="holo-profile-row"><span class="holo-plabel">วันเดือนปีเกิด</span><span class="holo-pval">${fmtDate(cust.birthday)}</span></div>
+      <div class="holo-profile-row"><span class="holo-plabel">อายุ</span><span class="holo-pval">${cust.age} ปี</span></div>
+      <div class="holo-profile-row"><span class="holo-plabel">เพศ</span><span class="holo-pval">${genderTh}</span></div>
+      <div class="holo-profile-row"><span class="holo-plabel">เบอร์โทร</span><span class="holo-pval">${cust.phone}</span></div>
+    </div>
+    <div style="margin-top:10px;text-align:center">
+      <div style="font-size:.68rem;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">5 อันดับเลขที่ชอบ</div>
+      <div style="display:flex;gap:8px;justify-content:center">${favNums.slice(0,3).map(n=>`<span class="holo-fav-num">${n}</span>`).join('')}</div>
+      <div style="display:flex;gap:8px;justify-content:center;margin-top:8px">${favNums.slice(3,5).map(n=>`<span class="holo-fav-num">${n}</span>`).join('')}</div>
+    </div>
+  </div>`;
+
+  // 2. Reward Summary + Top Number (merged)
+  html += `<div class="holo-section sec-reward">
+    <div class="holo-sec-title"><span class="sec-icon">\u{1F3C6}</span> Reward Summary</div>
+    <div class="holo-reward-hero">
+      <div class="holo-rh-card"><div class="holo-rh-val">${(cust.countPrize||0).toLocaleString()}</div><div class="holo-rh-label">ครั้งที่ถูกรางวัล</div></div>
+      <div class="holo-rh-card"><div class="holo-rh-val">\u{0E3F}${(cust.totalPrize||0).toLocaleString()}</div><div class="holo-rh-label">ยอดรวมรางวัล</div></div>
+    </div>
+    <div class="holo-reward-list">
+      <div class="holo-reward-row"><span class="holo-rlabel">งวดซื้อสะสม</span><span class="holo-rval glow-cyan">${cust.countRound} งวด</span></div>
+      <div class="holo-reward-row"><span class="holo-rlabel">RFM Segment</span><span class="holo-rval" style="color:${seg.color}">${seg.label}</span></div>
+      <div class="holo-reward-row"><span class="holo-rlabel">จำนวนใบสะสม</span><span class="holo-rval glow-green">${cust.totalItem.toLocaleString()} ใบ</span></div>
+      <div class="holo-reward-row"><span class="holo-rlabel">จำนวนเงินสะสม</span><span class="holo-rval glow-gold">\u{0E3F}${cust.totalPrice.toLocaleString()}</span></div>
+      <div class="holo-reward-row"><span class="holo-rlabel">จำนวนใบที่ซื้อล่าสุด</span><span class="holo-rval glow-cyan">${cust.lastRoundSpend||0} ใบ</span></div>
+      <div class="holo-reward-row"><span class="holo-rlabel">AOV (ใบ/งวด)</span><span class="holo-rval glow-green">${cust.aovPerRound}</span></div>
+    </div>
+    <div style="margin-top:18px;padding-top:16px;border-top:1px solid rgba(239,68,68,.12)">
+      <div class="holo-sec-title sec-top" style="margin-bottom:12px"><span class="sec-icon">\u{1F3B2}</span> Top Number</div>
+      <div class="holo-chart-block">
+        <div class="holo-chart-head"><span>อันดับเลขท้าย 3 ตัว</span><span><b class="top-num">${mock3d[0].num}</b> <span class="top-count">${mock3d[0].count.toLocaleString()} ใบ</span></span></div>
+        <div class="holo-bar-chart">
+          ${mock3d.map((d,i)=>`<div class="holo-bar-row">
+            <span class="holo-bar-label">${d.num}</span>
+            <div class="holo-bar-track"><div class="holo-bar-fill bar-red" style="width:${(d.count/max3d*100).toFixed(1)}%;animation-delay:${i*0.1}s"></div></div>
+            <span class="holo-bar-val">${d.count.toLocaleString()}</span>
+          </div>`).join('')}
+        </div>
+      </div>
+      <div class="holo-chart-block" style="margin-bottom:0">
+        <div class="holo-chart-head"><span>อันดับเลขท้าย 2 ตัว</span><span><b class="top-num">${mock2d[0].num}</b> <span class="top-count">${mock2d[0].count.toLocaleString()} ใบ</span></span></div>
+        <div class="holo-bar-chart">
+          ${mock2d.map((d,i)=>`<div class="holo-bar-row">
+            <span class="holo-bar-label">${d.num}</span>
+            <div class="holo-bar-track"><div class="holo-bar-fill bar-cyan" style="width:${(d.count/max2d*100).toFixed(1)}%;animation-delay:${i*0.1}s"></div></div>
+            <span class="holo-bar-val">${d.count.toLocaleString()}</span>
+          </div>`).join('')}
+        </div>
+      </div>
+    </div>
+  </div>`;
+
+  // 4. Generate mock orders data
+  const orderCount = 3 + Math.floor(Math.random() * 6);
+  const ticketPrice = 120;
+  const baseDate = new Date();
+  const mockOrders = [];
+  for (let i = 0; i < orderCount; i++) {
+    const oDate = new Date(baseDate);
+    oDate.setDate(oDate.getDate() - Math.floor(Math.random() * 14));
+    oDate.setHours(Math.floor(Math.random() * 12) + 8, Math.floor(Math.random() * 60));
+    const qty = 1 + Math.floor(Math.random() * Math.max(1, (cust.lastRoundSpend || 5) / 2));
+    const tickets = [];
+    for (let t = 0; t < qty; t++) {
+      const useNum = favNums[Math.floor(Math.random() * favNums.length)];
+      const prefix = String(Math.floor(Math.random() * 10000)).padStart(4, '0');
+      tickets.push({ num: prefix + useNum, price: ticketPrice });
+    }
+    mockOrders.push({
+      orderId: 'ORD-' + String(baseDate.getFullYear()).slice(2) + String(oDate.getMonth()+1).padStart(2,'0') + '-' + String(1000 + i + Math.floor(Math.random()*9000)),
+      date: oDate, qty, total: qty * ticketPrice, tickets
+    });
+  }
+  mockOrders.sort((a, b) => b.date - a.date);
+  window._holoOrders = mockOrders;
+  const latestOrder = mockOrders[0];
+
+  // 5. Purchase + Recent Orders (merged)
+  html += `<div class="holo-section sec-purchase">
+    <div class="holo-sec-title"><span class="sec-icon">\u{1F4B3}</span> Purchase</div>
+    <div class="holo-purchase-grid">
+      <div class="holo-purchase-item"><div class="holo-purchase-label">วันที่สมัคร</div><div class="holo-purchase-val dim">${fmtDate(cust.createdAt)}</div></div>
+      <div class="holo-purchase-item"><div class="holo-purchase-label">ซื้อครั้งแรก</div><div class="holo-purchase-val dim">${fmtDate(cust.firstBuy)}</div></div>
+    </div>
+    <div class="holo-purchase-grid">
+      <div class="holo-purchase-item"><div class="holo-purchase-label">ซื้อครั้งล่าสุด</div><div class="holo-purchase-val">${fmtDate(cust.lastBuy)}</div></div>
+      <div class="holo-purchase-item"><div class="holo-purchase-label">งวดที่หายไปสะสม</div><div class="holo-purchase-val ${roundNotBuyClass}">${cust.roundNotBuy||0} งวด</div></div>
+    </div>
+    <div class="holo-purchase-grid" style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(0,0,0,.06)">
+      <div class="holo-purchase-item"><div class="holo-purchase-label">สมาชิกมาแล้ว</div><div class="holo-purchase-val">${daysSinceJoined.toLocaleString()} วัน</div></div>
+      <div class="holo-purchase-item"><div class="holo-purchase-label">ซื้อเฉลี่ยต่องวด</div><div class="holo-purchase-val">${cust.aovPerRound} ใบ</div></div>
+    </div>
+    <div class="holo-purchase-grid">
+      <div class="holo-purchase-item"><div class="holo-purchase-label">เลขท้าย 2 ตัวล่าสุด</div><div class="holo-purchase-val" style="font-size:1.1rem;color:#dc2626">${cust.lastTwoDigit||'-'}</div></div>
+    </div>
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(0,0,0,.06)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="font-size:.75rem;font-weight:700;color:#dc2626;display:flex;align-items:center;gap:6px;letter-spacing:.5px">\u{1F6D2} รายการคำสั่งซื้อล่าสุด</div>
+        <button class="btn-view-orders" onclick="openOrdersModal()">\u{1F4CB} ดูทั้งหมด (${mockOrders.length})</button>
+      </div>
+      <div class="holo-order-row" id="orow-${latestOrder.orderId}" onclick="toggleOrderDetail('${latestOrder.orderId}')">
+        <div class="holo-order-head">
+          <span class="holo-order-id">${latestOrder.orderId}</span>
+          <span class="holo-order-expand-icon">\u25BC</span>
+        </div>
+        <div class="holo-order-summary">
+          <span class="holo-order-date">${latestOrder.date.toLocaleDateString('th-TH',{day:'2-digit',month:'short',year:'numeric'})} ${latestOrder.date.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'})}</span>
+          <span class="holo-order-qty">${latestOrder.qty} ใบ</span>
+          <span class="holo-order-total">\u{0E3F}${latestOrder.total.toLocaleString()}</span>
+        </div>
+      </div>
+      <div class="holo-order-detail" id="odet-${latestOrder.orderId}">
+        <div class="holo-order-detail-inner">
+          ${latestOrder.tickets.map(t => `<div class="holo-order-ticket"><span class="holo-order-ticket-num">${t.num}</span><span class="holo-order-ticket-price">\u{0E3F}${t.price}</span></div>`).join('')}
+          <div style="display:flex;justify-content:space-between;padding-top:6px;margin-top:4px;border-top:1px solid rgba(0,0,0,.06);font-size:.73rem;font-weight:700">
+            <span style="color:var(--text2)">รวม ${latestOrder.qty} ใบ</span>
+            <span style="color:#dc2626;font-family:'JetBrains Mono',monospace">\u{0E3F}${latestOrder.total.toLocaleString()}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+
+  document.getElementById('holoBody').innerHTML = html;
+  document.getElementById('holoDash').classList.add('show');
+}
+function closeHoloDash() { document.getElementById('holoDash').classList.remove('show'); closeOrdersModal(); }
+function toggleOrderDetail(orderId) {
+  const row = document.getElementById('orow-' + orderId);
+  const det = document.getElementById('odet-' + orderId);
+  if (!row || !det) return;
+  const isOpen = det.classList.contains('open');
+  document.querySelectorAll('.holo-order-detail.open').forEach(d => d.classList.remove('open'));
+  document.querySelectorAll('.holo-order-row.active').forEach(r => r.classList.remove('active'));
+  if (!isOpen) { det.classList.add('open'); row.classList.add('active'); }
+}
+function openOrdersModal() {
+  let overlay = document.getElementById('ordersModalOverlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'ordersModalOverlay';
+    overlay.className = 'orders-modal-overlay';
+    overlay.onclick = function(e) { if (e.target === overlay) closeOrdersModal(); };
+    document.body.appendChild(overlay);
+  }
+  const orders = window._holoOrders || [];
+  const totalQty = orders.reduce((s,o) => s + o.qty, 0);
+  const totalPrice = orders.reduce((s,o) => s + o.total, 0);
+  const ordersListHtml = orders.map(o => `
+    <div class="holo-order-row" id="modal-orow-${o.orderId}" onclick="toggleOrderDetail('modal-${o.orderId}')">
+      <div class="holo-order-head">
+        <span class="holo-order-id">${o.orderId}</span>
+        <span class="holo-order-expand-icon">\u25BC</span>
+      </div>
+      <div class="holo-order-summary">
+        <span class="holo-order-date">${o.date.toLocaleDateString('th-TH',{day:'2-digit',month:'short',year:'numeric'})} ${o.date.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'})}</span>
+        <span class="holo-order-qty">${o.qty} ใบ</span>
+        <span class="holo-order-total">\u{0E3F}${o.total.toLocaleString()}</span>
+      </div>
+    </div>
+    <div class="holo-order-detail" id="odet-modal-${o.orderId}">
+      <div class="holo-order-detail-inner">
+        ${o.tickets.map(t => `<div class="holo-order-ticket"><span class="holo-order-ticket-num">${t.num}</span><span class="holo-order-ticket-price">\u{0E3F}${t.price}</span></div>`).join('')}
+        <div style="display:flex;justify-content:space-between;padding-top:6px;margin-top:4px;border-top:1px solid rgba(0,0,0,.06);font-size:.73rem;font-weight:700">
+          <span style="color:var(--text2)">รวม ${o.qty} ใบ</span>
+          <span style="color:#dc2626;font-family:'JetBrains Mono',monospace">\u{0E3F}${o.total.toLocaleString()}</span>
+        </div>
+      </div>
+    </div>`).join('');
+  overlay.innerHTML = `<div class="orders-modal">
+    <div class="orders-modal-header">
+      <h3>\u{1F6D2} รายการคำสั่งซื้อทั้งหมดในงวด</h3>
+      <button class="orders-modal-close" onclick="closeOrdersModal()">\u2715 ปิด</button>
+    </div>
+    <div style="padding:8px 20px;display:flex;justify-content:space-between;font-size:.72rem;color:var(--text2);border-bottom:1px solid rgba(0,0,0,.06)">
+      <span>${orders.length} รายการ \u{2022} ${totalQty} ใบ</span>
+      <span style="color:#dc2626;font-family:'JetBrains Mono',monospace;font-weight:700">\u{0E3F}${totalPrice.toLocaleString()}</span>
+    </div>
+    <div class="orders-modal-body">${ordersListHtml}</div>
+  </div>`;
+  overlay.classList.add('show');
+}
+function closeOrdersModal() {
+  const overlay = document.getElementById('ordersModalOverlay');
+  if (overlay) overlay.classList.remove('show');
+}
+
+async function captureHoloDash() {
+  const el = document.querySelector('.holo-dash');
+  const canvas = await html2canvas(el, {
+    backgroundColor: '#ffffff',
+    scale: 2,
+    useCORS: true,
+    logging: false
+  });
+  return canvas;
+}
+
+async function copyHoloDashImage() {
+  try {
+    toast('กำลัง capture...', 'success');
+    const canvas = await captureHoloDash();
+    canvas.toBlob(async (blob) => {
+      try {
+        await navigator.clipboard.write([
+          new ClipboardItem({ 'image/png': blob })
+        ]);
+        toast('Copy ภาพสำเร็จ! วางได้เลย', 'success');
+      } catch (e) {
+        // Fallback: open in new tab
+        const url = canvas.toDataURL('image/png');
+        window.open(url, '_blank');
+        toast('เปิดภาพในแท็บใหม่ - กด Ctrl+C เพื่อ copy', 'success');
+      }
+    }, 'image/png');
+  } catch (e) {
+    toast('Copy ไม่สำเร็จ: ' + e.message, 'error');
+  }
+}
+
+async function saveHoloDashImage() {
+  try {
+    toast('กำลัง capture...', 'success');
+    const canvas = await captureHoloDash();
+    const link = document.createElement('a');
+    const custName = document.querySelector('.holo-cust-name')?.textContent || 'customer';
+    link.download = `LotteryPlus_${custName.replace(/\s+/g,'_')}_${new Date().toISOString().slice(0,10)}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    toast('Save ภาพสำเร็จ!', 'success');
+  } catch (e) {
+    toast('Save ไม่สำเร็จ: ' + e.message, 'error');
+  }
+}
+
+function showSearchDetail(el) {
+  const id = el.dataset.id;
+  const entry = getEntries().find(e => e.id === id);
+  if (!entry) return;
+  const time = new Date(entry.timestamp).toLocaleString('th-TH');
+  let details = `เวลา: ${time}\nAgent: ${entry.agent}\nทีม: ${entry.team}\nงวด: ${entry.period}`;
+  if (entry.phone) details += `\nเบอร์โทร: ${entry.phone}`;
+  if (entry.roomName) details += `\nห้อง: ${entry.roomName}`;
+  if (entry.orderId) details += `\nคำสั่งซื้อ: ${entry.orderId}`;
+  if (entry.smType) details += `\nประเภท: ${entry.smType}`;
+  if (entry.smPage) details += `\nเพจ: ${entry.smPage}`;
+  details += `\nCategory: ${entry.cat1} > ${entry.cat2} > ${entry.cat3}`;
+  alert(details);
+}
+
+function selectCategory(idx) {
+  const c = CATEGORIES[idx];
+  const f1 = document.getElementById('f_cat1');
+  const f2 = document.getElementById('f_cat2');
+  const f3 = document.getElementById('f_cat3');
+  if (f1) f1.value = c[0];
+  if (f2) f2.value = c[1];
+  if (f3) f3.value = c[2];
+  document.querySelectorAll('.autocomplete-list').forEach(l => l.classList.remove('show'));
+  hideModal('catBrowserModal');
+  renderWorkflow(c[0], c[1], c[2]);
+}
+
+function renderWorkflow(cat1, cat2, cat3) {
+  const wb = document.getElementById('workflowBox');
+  if (!wb) return;
+  const key = getWorkflowKey(cat1, cat2, cat3);
+  const text = WORKFLOW_DATA[key];
+  if (!text) { wb.innerHTML = ''; wb.classList.remove('show'); return; }
+  wb.innerHTML = `<div class="wf-card">
+    <div class="wf-title">&#9889; Work Flow</div>
+    <div class="wf-content">${text}</div>
+  </div>`;
+  wb.classList.add('show');
+}
+
+// Category Browser Modal
+let catTabFilter = 'All';
+function openCatBrowser() {
+  catTabFilter = 'All';
+  document.getElementById('catSearchInput').value = '';
+  document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+  document.querySelector('.cat-tab').classList.add('active');
+  filterCatList();
+  showModal('catBrowserModal');
+  setTimeout(() => document.getElementById('catSearchInput').focus(), 100);
+}
+function filterCatTab(tab) {
+  catTabFilter = tab;
+  document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  filterCatList();
+}
+function filterCatList() {
+  const q = (document.getElementById('catSearchInput').value || '').toLowerCase().trim();
+  let filtered = CATEGORIES;
+  if (catTabFilter !== 'All') filtered = filtered.filter(c => c[0] === catTabFilter);
+  if (q) filtered = filtered.filter(c => c[1].toLowerCase().includes(q) || c[2].toLowerCase().includes(q));
+  const body = document.getElementById('catListBody');
+  if (!filtered.length) { body.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text2)">ไม่พบผลลัพธ์</div>'; return; }
+  body.innerHTML = filtered.map(c => {
+    const idx = CATEGORIES.indexOf(c);
+    const badgeCls = c[0] === 'Info' ? 'cat-badge-info' : c[0] === 'Problem' ? 'cat-badge-problem' : 'cat-badge-request';
+    return `<div class="cat-row" onclick="selectCategory(${idx})"><span class="${badgeCls}">${c[0]}</span><span style="font-weight:500">${c[1]}</span><span style="color:var(--text2)">${c[2]}</span></div>`;
+  }).join('');
+}
+
+function getActiveTeam() {
+  if (currentUser.team === 'Specialist') {
+    const sel = document.getElementById('specialistTeamSelect');
+    return sel ? sel.value : ENTRY_TEAMS[0];
+  }
+  return currentUser.team;
+}
+
+function onSpecialistTeamChange() {
+  const sel = document.getElementById('specialistTeamSelect');
+  const team = sel.value;
+  const color = TEAM_COLORS[team] || '#14b8a6';
+  sel.style.color = color;
+  sel.style.borderColor = color + '44';
+  const inner = document.getElementById('entryFormInner');
+  if (!inner) return;
+  let html = buildTeamFields(team);
+  html += `<div class="submit-area"><button class="btn btn-red" onclick="submitEntry()">บันทึก</button><button class="btn btn-ghost" onclick="clearForm()">ล้าง</button></div>`;
+  inner.innerHTML = html;
+  initAutocomplete();
+}
+
+function submitEntry() {
+  const team = getActiveTeam();
+  const cat1 = document.getElementById('f_cat1')?.value || '';
+  const cat2 = document.getElementById('f_cat2')?.value || '';
+  const cat3 = document.getElementById('f_cat3')?.value || '';
+  if (!cat1 && !cat2 && !cat3) return toast('กรุณากรอก Category อย่างน้อย 1 ช่อง', 'error');
+  const entry = {
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+    timestamp: new Date().toISOString(),
+    agent: currentUser.name,
+    agentId: currentUser.id,
+    team, period: getPeriod(),
+    cat1, cat2, cat3
+  };
+  if (team === 'Phone Call') entry.phone = document.getElementById('f_phone')?.value || '';
+  if (team === 'Line OPC') {
+    entry.roomName = document.getElementById('f_roomName')?.value || '';
+    entry.answer = document.getElementById('f_answer')?.value || '';
+    entry.min1 = document.getElementById('f_1min')?.checked || false;
+    entry.min2to5 = document.getElementById('f_2to5min')?.checked || false;
+    entry.sentContent = document.getElementById('f_content')?.checked || false;
+  }
+  if (team === 'Social Media') {
+    entry.smType = document.getElementById('f_smType')?.value || '';
+    entry.smPage = document.getElementById('f_smPage')?.value || '';
+  }
+  if (team === 'Approve') entry.orderId = document.getElementById('f_orderId')?.value || '';
+  const entries = getEntries();
+  entries.push(entry);
+  saveEntries(entries);
+  toast('บันทึกข้อมูลสำเร็จ');
+  clearForm();
+  renderProdPanel();
+  renderTodayHistory();
+}
+
+function renderProdPanel() {
+  const el = document.getElementById('prodMiniStats');
+  if (!el) return;
+  const today = new Date().toISOString().slice(0, 10);
+  const entries = getEntries();
+  const myEntries = entries.filter(e => e.agentId === currentUser.id && e.timestamp.slice(0, 10) === today);
+  const allTodayEntries = entries.filter(e => e.timestamp.slice(0, 10) === today);
+  const teamEntries = allTodayEntries.filter(e => e.team === getActiveTeam());
+  const period = getPeriod();
+  const myPeriod = entries.filter(e => e.agentId === currentUser.id && e.period === period).length;
+  // Team agents today + ranking
+  const teamAgentCounts = {};
+  teamEntries.forEach(e => { teamAgentCounts[e.agentId] = (teamAgentCounts[e.agentId] || 0) + 1; });
+  const sorted = Object.entries(teamAgentCounts).sort((a, b) => b[1] - a[1]);
+  const myRank = sorted.findIndex(([id]) => id === currentUser.id) + 1;
+  const totalAgents = sorted.length || 1;
+  const teamAvg = totalAgents ? Math.round(teamEntries.length / totalAgents) : 0;
+  const dateStr = new Date().toLocaleDateString('th-TH',{day:'numeric',month:'short'});
+
+  el.innerHTML = `
+    <div class="prod-chip">
+      <span class="prod-chip-val" style="color:#dc2626">${myEntries.length}</span>
+      <span class="prod-chip-label">วันนี้ ${dateStr}</span>
+    </div>
+    <div class="prod-chip">
+      <span class="prod-chip-val" style="color:#dc2626">${myPeriod}</span>
+      <span class="prod-chip-label">ทั้งงวด</span>
+    </div>
+    <div class="prod-chip">
+      <span class="prod-chip-val" style="color:#16a34a">#${myRank || '-'}<span style="font-size:.65rem;font-weight:500;color:var(--text2)">/${totalAgents}</span></span>
+      <span class="prod-chip-label">Ranking</span>
+    </div>
+    <div class="prod-chip">
+      <span class="prod-chip-val" style="color:#7c3aed">${teamAvg}</span>
+      <span class="prod-chip-label">เฉลี่ย/คน</span>
+    </div>`;
+}
+
+function renderTodayHistory() {
+  const el = document.getElementById('todayHistoryTable');
+  if (!el) return;
+  const today = new Date().toISOString().slice(0, 10);
+  const allEntries = getEntries().filter(e => e.agentId === currentUser.id && e.timestamp.slice(0, 10) === today)
+    .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  const entries = allEntries;
+  if (!entries.length) {
+    el.innerHTML = '<p style="padding:20px;color:var(--text2);font-size:.85rem;text-align:center">ยังไม่มีรายการวันนี้</p>';
+    return;
+  }
+  // Dynamic columns based on team (no team column)
+  const hasPhone = entries.some(e => e.phone);
+  const hasRoom = entries.some(e => e.roomName);
+  const hasSM = entries.some(e => e.smType);
+  const hasOrder = entries.some(e => e.orderId);
+  let t = `<table class="data-table"><thead><tr><th style="width:28px">#</th><th style="width:52px">เวลา</th>`;
+  if (hasPhone) t += `<th>เบอร์โทร</th>`;
+  if (hasRoom) t += `<th>ห้อง</th>`;
+  if (hasSM) t += `<th>ประเภท</th>`;
+  if (hasOrder) t += `<th>ออเดอร์</th>`;
+  t += `<th style="width:58px">Cat 1</th><th>Cat 2</th><th>Cat 3</th></tr></thead><tbody>`;
+  entries.forEach((e, i) => {
+    const time = new Date(e.timestamp).toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'});
+    t += `<tr><td style="color:var(--text2)">${entries.length - i}</td>`;
+    t += `<td style="white-space:nowrap;font-size:.68rem">${time}</td>`;
+    if (hasPhone) t += `<td style="font-size:.68rem">${e.phone || '-'}</td>`;
+    if (hasRoom) t += `<td style="font-size:.68rem">${e.roomName || '-'}</td>`;
+    if (hasSM) t += `<td style="font-size:.68rem">${e.smType || '-'}</td>`;
+    if (hasOrder) t += `<td style="font-size:.68rem">${e.orderId || '-'}</td>`;
+    const cat1Color = e.cat1 === 'Info' ? '#dc2626' : e.cat1 === 'Problem' ? '#d97706' : '#dc2626';
+    t += `<td style="font-size:.63rem;color:${cat1Color};font-weight:600">${e.cat1 || '-'}</td>`;
+    t += `<td style="font-size:.63rem;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.cat2 || '-'}</td>`;
+    t += `<td style="font-size:.63rem;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.cat3 || '-'}</td>`;
+    t += `</tr>`;
+  });
+  t += `</tbody></table>`;
+  el.innerHTML = t;
+}
+
+function clearForm() {
+  document.querySelectorAll('.entry-form input[type="text"],.entry-form input[type="number"]').forEach(i => i.value = '');
+  document.querySelectorAll('.entry-form input[type="checkbox"]').forEach(i => i.checked = false);
+  document.querySelectorAll('.entry-form select').forEach(s => s.selectedIndex = 0);
+  const wb = document.getElementById('workflowBox');
+  if (wb) { wb.innerHTML = ''; wb.classList.remove('show'); }
+}
+
+// ===== DASHBOARD PAGE =====
+function renderDashboard() {
+  const now = new Date();
+  const todayStr = now.toISOString().slice(0, 10);
+  const weekAgo = new Date(now - 7 * 86400000).toISOString().slice(0, 10);
+  const periods = getAllPeriods(now.getFullYear());
+  const users = getUsers().filter(u => u.role !== 'admin');
+  const agentOpts = users.map(u => `<option value="${u.id}">${u.name} (${u.team})</option>`).join('');
+
+  let html = `<div class="page-title">Dashboard</div><div class="page-sub">ภาพรวมประสิทธิภาพการทำงาน</div>`;
+  html += `<div class="filters-bar">
+    <div class="filter-group"><label>งวด</label><select id="dPeriod" onchange="updateDashboard()">
+      ${periods.map(p => `<option value="${p}" ${p === getPeriod() ? 'selected' : ''}>${p}</option>`).join('')}
+    </select></div>
+    <div class="filter-group"><label>วันที่เริ่ม</label><input type="date" id="dStart" value="${weekAgo}" onchange="updateDashboard()"></div>
+    <div class="filter-group"><label>วันที่สิ้นสุด</label><input type="date" id="dEnd" value="${todayStr}" onchange="updateDashboard()"></div>
+    <div class="filter-group"><label>ทีม</label><select id="dTeam" onchange="updateDashboard()">
+      <option value="all">ทุกทีม</option>${TEAMS.map(t => `<option>${t}</option>`).join('')}
+    </select></div>
+    <div class="filter-group"><label>เจ้าหน้าที่</label><select id="dAgent" onchange="updateDashboard()">
+      <option value="all">ทุกคน</option>${agentOpts}
+    </select></div>
+  </div>`;
+  html += `<div class="summary-cards" id="summaryCards"></div>`;
+  html += `<div class="chart-section"><div class="section-title"><span>&#9632;</span> Productivity Chart</div><div class="chart-container glass"><canvas id="prodChart"></canvas></div></div>`;
+  html += `<div class="chart-section"><div class="section-title"><span>&#9632;</span> Interval Productivity</div><div class="table-wrap"><div class="glass"><div id="intervalTable"></div></div></div></div>`;
+  document.getElementById('pageDashboard').innerHTML = html;
+  updateDashboard();
+}
+
+function updateDashboard() {
+  const period = document.getElementById('dPeriod').value;
+  const startD = document.getElementById('dStart').value;
+  const endD = document.getElementById('dEnd').value;
+  const teamF = document.getElementById('dTeam').value;
+  const agentF = document.getElementById('dAgent').value;
+  let entries = getEntries();
+  entries = entries.filter(e => {
+    const d = e.timestamp.slice(0, 10);
+    if (d < startD || d > endD) return false;
+    if (teamF !== 'all' && e.team !== teamF) return false;
+    if (agentF !== 'all' && e.agentId !== agentF) return false;
+    return true;
+  });
+  const today = new Date().toISOString().slice(0, 10);
+  const todayEntries = entries.filter(e => e.timestamp.slice(0, 10) === today);
+  const agents = [...new Set(entries.map(e => e.agent))];
+  const avgPerPerson = agents.length ? Math.round(entries.length / agents.length) : 0;
+  const periodEntries = getEntries().filter(e => e.period === period && (teamF === 'all' || e.team === teamF));
+
+  document.getElementById('summaryCards').innerHTML = `
+    <div class="summary-card glass sc-red"><div class="sc-label">รายการวันนี้</div><div class="sc-value">${todayEntries.length}</div><div class="sc-sub">${today}</div></div>
+    <div class="summary-card glass sc-cyan"><div class="sc-label">เฉลี่ย/คน</div><div class="sc-value">${avgPerPerson}</div><div class="sc-sub">${agents.length} เจ้าหน้าที่</div></div>
+    <div class="summary-card glass sc-green"><div class="sc-label">รวมช่วงเวลา</div><div class="sc-value">${entries.length}</div><div class="sc-sub">${startD} - ${endD}</div></div>
+    <div class="summary-card glass sc-warn"><div class="sc-label">รวมทั้งงวด</div><div class="sc-value">${periodEntries.length}</div><div class="sc-sub">งวด ${period}</div></div>`;
+
+  renderProdChart(entries, agents);
+  renderIntervalTable(entries, startD, endD, agentF);
+}
+
+function renderProdChart(entries, agents) {
+  const ctx = document.getElementById('prodChart');
+  if (dashChart) dashChart.destroy();
+  const data = agents.map(a => entries.filter(e => e.agent === a).length);
+  const colors = agents.map(a => {
+    const entry = entries.find(e => e.agent === a);
+    return entry ? (TEAM_COLORS[entry.team] || '#dc2626') : '#dc2626';
+  });
+  dashChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: agents,
+      datasets: [{
+        label: 'จำนวนรายการ',
+        data,
+        backgroundColor: colors.map(c => c + '88'),
+        borderColor: colors,
+        borderWidth: 1,
+        borderRadius: 6
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { color: '#64748b', font: { size: 11 } }, grid: { color: 'rgba(0,0,0,.06)' } },
+        y: { ticks: { color: '#64748b', font: { family: 'JetBrains Mono', size: 11 } }, grid: { color: 'rgba(0,0,0,.06)' }, beginAtZero: true }
+      }
+    }
+  });
+}
+
+function renderIntervalTable(entries, startD, endD, agentF) {
+  const hours = [];
+  for (let h = 8; h <= 20; h++) hours.push(h);
+  const start = new Date(startD), end = new Date(endD);
+  const days = [];
+  for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) days.push(d.toISOString().slice(0, 10));
+  const isSingleDay = days.length === 1;
+
+  if (isSingleDay) {
+    const dayStr = days[0];
+    const dayEntries = entries.filter(e => e.timestamp.slice(0, 10) === dayStr);
+    const agents = [...new Set(dayEntries.map(e => e.agent))];
+    if (!agents.length) { document.getElementById('intervalTable').innerHTML = '<p style="padding:20px;color:var(--text2);font-size:.8rem">ไม่มีข้อมูลในวันที่เลือก</p>'; return; }
+    let t = `<table class="data-table"><thead><tr><th>ชั่วโมง</th>`;
+    agents.forEach(a => t += `<th>${a}</th>`);
+    t += `<th>รวม</th></tr></thead><tbody>`;
+    hours.forEach(h => {
+      const hStr = String(h).padStart(2, '0');
+      t += `<tr><td>${hStr}:00</td>`;
+      let rowTotal = 0;
+      agents.forEach(a => {
+        const count = dayEntries.filter(e => e.agent === a && new Date(e.timestamp).getHours() === h).length;
+        rowTotal += count;
+        t += `<td>${count || '-'}</td>`;
+      });
+      t += `<td style="font-weight:700;color:var(--cyan)">${rowTotal}</td></tr>`;
+    });
+    const totals = agents.map(a => dayEntries.filter(e => e.agent === a).length);
+    t += `<tr style="font-weight:700;background:var(--bg2)"><td>รวม</td>`;
+    totals.forEach(v => t += `<td style="color:var(--cyan)">${v}</td>`);
+    t += `<td style="color:#dc2626">${totals.reduce((a, b) => a + b, 0)}</td></tr>`;
+    t += `</tbody></table>`;
+    document.getElementById('intervalTable').innerHTML = t;
+  } else {
+    let t = `<table class="data-table"><thead><tr><th>ชั่วโมง</th>`;
+    days.forEach(d => t += `<th>${d.slice(5)}</th>`);
+    t += `</tr></thead><tbody>`;
+    const dayCounts = {};
+    days.forEach(d => { dayCounts[d] = {}; hours.forEach(h => { dayCounts[d][h] = 0; }); });
+    entries.forEach(e => {
+      const d = e.timestamp.slice(0, 10);
+      const h = new Date(e.timestamp).getHours();
+      if (dayCounts[d] && dayCounts[d][h] !== undefined) dayCounts[d][h]++;
+    });
+    hours.forEach(h => {
+      const hStr = String(h).padStart(2, '0');
+      t += `<tr><td>${hStr}:00</td>`;
+      days.forEach((d, i) => {
+        const val = dayCounts[d][h];
+        let pctHtml = '';
+        if (i > 0) {
+          const prev = dayCounts[days[i - 1]][h];
+          if (prev > 0) {
+            const pct = Math.round(((val - prev) / prev) * 100);
+            const cls = pct >= 0 ? 'pct-up' : 'pct-down';
+            pctHtml = ` <small class="${cls}">${pct >= 0 ? '+' : ''}${pct}%</small>`;
+          }
+        }
+        t += `<td>${val}${pctHtml}</td>`;
+      });
+      t += `</tr>`;
+    });
+    const dayTotals = days.map(d => hours.reduce((s, h) => s + dayCounts[d][h], 0));
+    t += `<tr style="font-weight:700;background:var(--bg2)"><td>รวม</td>`;
+    dayTotals.forEach((v, i) => {
+      let pctHtml = '';
+      if (i > 0 && dayTotals[i - 1] > 0) {
+        const pct = Math.round(((v - dayTotals[i - 1]) / dayTotals[i - 1]) * 100);
+        pctHtml = ` <small class="${pct >= 0 ? 'pct-up' : 'pct-down'}">${pct >= 0 ? '+' : ''}${pct}%</small>`;
+      }
+      t += `<td style="color:var(--cyan)">${v}${pctHtml}</td>`;
+    });
+    t += `</tr></tbody></table>`;
+    document.getElementById('intervalTable').innerHTML = t;
+  }
+}
+
+// ===== ADMIN PAGE =====
+function renderAdmin() {
+  if (currentUser.role !== 'admin') return;
+  const users = getUsers();
+  const resets = getResets().filter(r => r.status === 'pending');
+  const regLogs = getRegLogs();
+  let html = `<div class="page-title">จัดการผู้ใช้</div><div class="page-sub">เพิ่ม แก้ไข ลบ ผู้ใช้งานในระบบ</div>`;
+  html += `<div class="admin-section"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+    <div class="section-title" style="margin:0"><span>&#9632;</span> รายชื่อผู้ใช้ (${users.length})</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-ghost btn-sm" onclick="showRegLogs()">📋 ประวัติการสมัคร (${regLogs.length})</button>
+      <button class="btn btn-red btn-sm" onclick="openAddUser()">+ เพิ่มผู้ใช้</button>
+    </div>
+  </div>`;
+  html += `<div class="glass" style="overflow:auto"><table class="admin-table"><thead><tr>
+    <th>Username</th><th>ชื่อ</th><th>ทีม</th><th>Role</th><th>จัดการ</th></tr></thead><tbody>`;
+  users.forEach(u => {
+    const teamBadge = u.team === 'all' ? '<span class="badge badge-red">Admin</span>' :
+      `<span class="badge" style="background:${TEAM_COLORS[u.team]}22;color:${TEAM_COLORS[u.team]};border:1px solid ${TEAM_COLORS[u.team]}44">${u.team}</span>`;
+    html += `<tr>
+      <td class="mono">${u.username}</td><td>${u.name}</td><td>${teamBadge}</td>
+      <td><span class="badge ${u.role === 'admin' ? 'badge-red' : 'badge-cyan'}">${u.role}</span></td>
+      <td class="admin-actions">
+        <button class="btn btn-ghost btn-sm" onclick="editUser('${u.id}')">แก้ไข</button>
+        ${u.id !== 'u1' ? `<button class="btn btn-ghost btn-sm" style="color:#dc2626;border-color:rgba(220,38,38,.2)" onclick="deleteUser('${u.id}')">ลบ</button>` : ''}
+      </td></tr>`;
+  });
+  html += `</tbody></table></div></div>`;
+
+  if (resets.length) {
+    html += `<div class="admin-section"><div class="section-title"><span>&#9632;</span> คำขอรีเซ็ตรหัสผ่าน (${resets.length})</div>`;
+    html += `<div class="glass" style="overflow:auto"><table class="admin-table"><thead><tr><th>Username</th><th>เวลา</th><th>จัดการ</th></tr></thead><tbody>`;
+    resets.forEach((r, i) => {
+      html += `<tr><td class="mono">${r.username}</td><td class="mono" style="font-size:.7rem">${new Date(r.time).toLocaleString('th-TH')}</td>
+        <td><button class="btn btn-green btn-sm" onclick="approveReset(${i})">อนุมัติ</button></td></tr>`;
+    });
+    html += `</tbody></table></div></div>`;
+  }
+  document.getElementById('pageAdmin').innerHTML = html;
+}
+
+function openAddUser() {
+  document.getElementById('userModalTitle').textContent = 'เพิ่มผู้ใช้';
+  ['umUser','umPass','umName','umEditId'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('umTeam').selectedIndex = 0;
+  document.getElementById('umRole').selectedIndex = 0;
+  showModal('userModal');
+}
+function editUser(id) {
+  const u = getUsers().find(x => x.id === id);
+  if (!u) return;
+  document.getElementById('userModalTitle').textContent = 'แก้ไขผู้ใช้';
+  document.getElementById('umUser').value = u.username;
+  document.getElementById('umPass').value = '';
+  document.getElementById('umName').value = u.name;
+  document.getElementById('umEditId').value = u.id;
+  const teamSel = document.getElementById('umTeam');
+  for (let i = 0; i < teamSel.options.length; i++) { if (teamSel.options[i].value === u.team) teamSel.selectedIndex = i; }
+  document.getElementById('umRole').value = u.role;
+  showModal('userModal');
+}
+function saveUser() {
+  const editId = document.getElementById('umEditId').value;
+  const username = document.getElementById('umUser').value.trim();
+  const password = document.getElementById('umPass').value;
+  const name = document.getElementById('umName').value.trim();
+  const team = document.getElementById('umTeam').value;
+  const role = document.getElementById('umRole').value;
+  if (!username || !name) return toast('กรุณากรอกข้อมูลให้ครบ', 'error');
+  const users = getUsers();
+  if (editId) {
+    const idx = users.findIndex(u => u.id === editId);
+    if (idx >= 0) {
+      users[idx].username = username;
+      users[idx].name = name;
+      users[idx].team = role === 'admin' ? 'all' : team;
+      users[idx].role = role;
+      if (password) users[idx].password = password;
+    }
+  } else {
+    if (!password) return toast('กรุณากรอกรหัสผ่าน', 'error');
+    const newId = 'u' + Date.now();
+    const newTeam = role === 'admin' ? 'all' : team;
+    users.push({ id: newId, username, password, name, team: newTeam, role, registeredAt: new Date().toISOString(), status: 'active' });
+    // Log registration by admin
+    const logs = getRegLogs();
+    logs.push({ userId: newId, username, name, team: newTeam, registeredAt: new Date().toISOString(), registeredBy: 'admin (' + currentUser.name + ')' });
+    saveRegLogs(logs);
+  }
+  saveUsers(users);
+  hideModal('userModal');
+  toast(editId ? 'แก้ไขผู้ใช้สำเร็จ' : 'เพิ่มผู้ใช้สำเร็จ');
+  renderAdmin();
+}
+function deleteUser(id) {
+  if (!confirm('ต้องการลบผู้ใช้นี้?')) return;
+  const users = getUsers().filter(u => u.id !== id);
+  saveUsers(users);
+  toast('ลบผู้ใช้สำเร็จ');
+  renderAdmin();
+}
+function approveReset(idx) {
+  const resets = getResets();
+  const r = resets.filter(x => x.status === 'pending')[idx];
+  if (!r) return;
+  const users = getUsers();
+  const user = users.find(u => u.username === r.username);
+  if (user) {
+    user.password = '1234';
+    saveUsers(users);
+  }
+  r.status = 'approved';
+  saveResets(resets);
+  toast(`รีเซ็ตรหัสผ่านให้ ${r.username} เป็น 1234`);
+  renderAdmin();
+}
+
+function showRegLogs() {
+  const logs = getRegLogs().sort((a, b) => new Date(b.registeredAt) - new Date(a.registeredAt));
+  let t = '';
+  if (!logs.length) {
+    t = '<p style="padding:20px;color:var(--text2);font-size:.85rem;text-align:center">ยังไม่มีประวัติการสมัคร</p>';
+  } else {
+    t = `<table class="admin-table"><thead><tr><th>วันที่</th><th>Username</th><th>ชื่อ</th><th>ทีม</th><th>สมัครโดย</th></tr></thead><tbody>`;
+    logs.forEach(l => {
+      const teamColor = TEAM_COLORS[l.team] || '#94a3b8';
+      t += `<tr>
+        <td class="mono" style="font-size:.7rem;white-space:nowrap">${new Date(l.registeredAt).toLocaleString('th-TH')}</td>
+        <td class="mono">${l.username}</td>
+        <td>${l.name}</td>
+        <td><span class="badge" style="background:${teamColor}22;color:${teamColor};border:1px solid ${teamColor}44">${l.team}</span></td>
+        <td><span class="badge ${l.registeredBy === 'self' ? 'badge-cyan' : 'badge-warn'}">${l.registeredBy === 'self' ? 'สมัครเอง' : l.registeredBy}</span></td>
+      </tr>`;
+    });
+    t += `</tbody></table>`;
+  }
+  document.getElementById('regLogTable').innerHTML = t;
+  showModal('regLogModal');
+}
+
+// ===== MOCK DATA GENERATION =====
+function generateMockDataIfNeeded() {
+  if (!CONFIG.DEMO_MODE) return;
+  const entries = getEntries();
+  if (entries.length > 50) return;
+  const mockEntries = [];
+  const agentUsers = getUsers().filter(u => u.role !== 'admin');
+  const now = new Date();
+  for (let dayOff = 0; dayOff < 7; dayOff++) {
+    const day = new Date(now);
+    day.setDate(day.getDate() - dayOff);
+    if (day.getDay() === 0) continue;
+    agentUsers.forEach(agent => {
+      const count = 15 + Math.floor(Math.random() * 25);
+      for (let i = 0; i < count; i++) {
+        const h = 8 + Math.floor(Math.random() * 12);
+        const m = Math.floor(Math.random() * 60);
+        const ts = new Date(day);
+        ts.setHours(h, m, Math.floor(Math.random() * 60));
+        const cat = CATEGORIES[Math.floor(Math.random() * CATEGORIES.length)];
+        const entry = {
+          id: Math.random().toString(36).slice(2, 10),
+          timestamp: ts.toISOString(),
+          agent: agent.name,
+          agentId: agent.id,
+          team: agent.team,
+          period: getPeriod(ts),
+          cat1: cat[0], cat2: cat[1], cat3: cat[2]
+        };
+        if (agent.team === 'Phone Call') entry.phone = '0' + (80 + Math.floor(Math.random() * 20)) + '-' + Math.floor(1000000 + Math.random() * 9000000);
+        if (agent.team === 'Social Media') {
+          entry.smType = SM_TYPES[Math.floor(Math.random() * SM_TYPES.length)];
+          entry.smPage = SM_PAGES[Math.floor(Math.random() * SM_PAGES.length)];
+        }
+        if (agent.team === 'Approve') entry.orderId = 'ORD-' + Math.floor(100000 + Math.random() * 900000);
+        if (agent.team === 'Line OPC') {
+          entry.roomName = 'Room-' + Math.floor(Math.random() * 999);
+          entry.min1 = Math.random() > 0.5;
+          entry.min2to5 = Math.random() > 0.5;
+        }
+        mockEntries.push(entry);
+      }
+    });
+  }
+  saveEntries([...entries, ...mockEntries]);
+}
+
+// ===== KEYBOARD SHORTCUTS & INIT =====
+document.getElementById('loginPass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+document.getElementById('loginUser').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('loginPass').focus(); });
+document.getElementById('regPassConfirm').addEventListener('keydown', e => { if (e.key === 'Enter') doRegister(); });
+
+(function init() {
+  const session = JSON.parse(localStorage.getItem('crm_session') || 'null');
+  if (session) {
+    const users = getUsers();
+    const u = users.find(x => x.id === session.id);
+    if (u) { currentUser = u; enterApp(); return; }
+  }
+  document.getElementById('loginPage').style.display = 'flex';
+})();
+</script>
+</body>
+</html>
