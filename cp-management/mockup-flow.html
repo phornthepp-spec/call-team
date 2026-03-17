@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Item Flow Mockup</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#12111a;--card:#1e1b2c;--border:#3a3248;--gold:#c9a54a;--gold2:#e8d5a3;--green:#2ecc71;--yellow:#f1c40f;--red:#e74c3c;--purple:#9b6dff;--blue:#5dade2;--text:#f2ece0;--text2:#b5a898;--text3:#7f7568;--metal-mid:#7a7165;--metal-dark:#4a4540}
+body{font-family:'Inter','Noto Sans Thai',sans-serif;background:var(--bg);color:var(--text);padding:20px;max-width:900px;margin:0 auto}
+h1{font-size:1.4rem;color:var(--gold2);margin-bottom:8px;text-align:center}
+.subtitle{text-align:center;color:var(--text3);font-size:.8rem;margin-bottom:30px}
+.step{background:var(--card);border:1px solid var(--border);padding:24px;margin-bottom:24px;position:relative}
+.step-header{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.step-num{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.9rem;flex-shrink:0}
+.step-num.admin{background:rgba(155,109,255,.2);color:var(--purple);border:2px solid var(--purple)}
+.step-num.member{background:rgba(93,173,226,.2);color:var(--blue);border:2px solid var(--blue)}
+.step-num.system{background:rgba(201,165,74,.2);color:var(--gold);border:2px solid var(--gold)}
+.step-title{font-weight:700;font-size:1rem}
+.step-role{font-size:.7rem;text-transform:uppercase;letter-spacing:1px;font-weight:700}
+.step-role.admin{color:var(--purple)}
+.step-role.member{color:var(--blue)}
+.step-role.system{color:var(--gold)}
+.mock{background:rgba(0,0,0,.3);border:1px solid var(--metal-dark);padding:16px;margin:8px 0;border-radius:2px}
+.mock-title{font-size:.75rem;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px}
+.mock-page{font-size:.7rem;color:var(--gold);margin-bottom:12px;font-weight:600}
+.badge{font-size:.65rem;font-weight:700;padding:3px 8px;border-radius:2px;display:inline-block}
+.badge-green{background:rgba(46,204,113,.15);color:var(--green)}
+.badge-yellow{background:rgba(241,196,15,.15);color:var(--yellow)}
+.badge-red{background:rgba(231,76,60,.15);color:var(--red)}
+.badge-purple{background:rgba(155,109,255,.15);color:var(--purple)}
+.badge-cyan{background:rgba(201,165,74,.15);color:var(--gold)}
+.btn-mock{padding:6px 16px;border-radius:2px;font-size:.72rem;font-weight:600;display:inline-block;cursor:default;letter-spacing:.5px}
+.btn-p{background:rgba(201,165,74,.1);border:1px solid rgba(201,165,74,.35);color:var(--gold2)}
+.btn-g{background:transparent;border:1px solid var(--border);color:var(--text2)}
+.btn-s{background:rgba(46,204,113,.08);border:1px solid rgba(46,204,113,.3);color:var(--green)}
+.btn-d{background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.3);color:var(--red)}
+.btn-r{background:linear-gradient(135deg,rgba(241,196,15,.15),rgba(230,126,34,.1));border:1px solid rgba(241,196,15,.5);color:#f1c40f}
+.item-card{display:flex;justify-content:space-between;align-items:center;padding:12px;border:1px solid var(--border);margin-bottom:6px}
+.item-card:hover{border-color:rgba(201,165,74,.3)}
+.arrow{text-align:center;font-size:1.5rem;color:var(--gold);margin:8px 0;opacity:.5}
+.note{background:rgba(241,196,15,.08);border-left:3px solid var(--yellow);padding:10px 14px;font-size:.78rem;color:var(--yellow);margin-top:12px}
+.note.error{background:rgba(231,76,60,.08);border-left-color:var(--red);color:var(--red)}
+.note.success{background:rgba(46,204,113,.08);border-left-color:var(--green);color:var(--green)}
+.sub-row{display:flex;align-items:center;gap:12px;padding:8px 12px;border-bottom:1px solid var(--metal-dark)}
+.sub-thumb{width:40px;height:40px;background:var(--border);border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:.7rem;color:var(--text3)}
+.nav-mock{display:flex;flex-direction:column;gap:2px;margin-bottom:12px}
+.nav-mock-item{display:flex;align-items:center;gap:8px;padding:8px 12px;font-size:.78rem;color:var(--text2);border:1px solid transparent}
+.nav-mock-item.active{background:rgba(201,165,74,.08);color:var(--gold);border-color:rgba(201,165,74,.2)}
+.nav-badge{margin-left:auto;font-size:.65rem;font-weight:700;padding:2px 6px;border-radius:2px;background:rgba(231,76,60,.15);color:var(--red)}
+.flex{display:flex}.gap{gap:8px}.between{justify-content:space-between}.center{align-items:center}
+.tabs-mock{display:flex;gap:2px;background:rgba(0,0,0,.2);padding:3px;margin-bottom:12px;border:1px solid var(--metal-dark)}
+.tab-mock{flex:1;text-align:center;padding:6px;font-size:.72rem;font-weight:600;color:var(--text3);border:1px solid transparent}
+.tab-mock.active{background:rgba(201,165,74,.1);color:var(--gold);border-color:rgba(201,165,74,.25)}
+.modal-mock{background:var(--card);border:2px solid var(--metal-mid);padding:20px;margin:8px 0}
+.divider{height:1px;background:var(--metal-dark);margin:16px 0}
+.flow-label{text-align:center;padding:8px;font-size:.85rem;font-weight:700;color:var(--gold);background:rgba(201,165,74,.06);border:1px dashed rgba(201,165,74,.2);margin:20px 0 24px}
+</style>
+</head>
+<body>
+
+<h1>Item Flow Mockup</h1>
+<p class="subtitle">ขั้นตอนตั้งแต่สร้างรายการ → สมาชิกส่งรูป → Admin ตรวจสอบ → แจกรางวัล</p>
+
+<!-- ==================== STEP 1 ==================== -->
+<div class="step">
+  <div class="step-header">
+    <div class="step-num admin">1</div>
+    <div><div class="step-role admin">Admin</div><div class="step-title">สร้างรายการ (Create Item)</div></div>
+  </div>
+  <div class="mock">
+    <div class="mock-page">หน้า: แจกรางวัล → กดปุ่ม "+ สร้างรายการ"</div>
+    <div class="modal-mock">
+      <div style="font-weight:700;margin-bottom:12px;color:var(--gold2)">สร้างรายการ</div>
+      <div style="margin-bottom:8px"><span style="font-size:.72rem;color:var(--text3)">ชื่อรายการ</span><div style="background:rgba(0,0,0,.3);border:1px solid var(--metal-mid);padding:8px;margin-top:4px">เสื้อบอส สมรภูมิ</div></div>
+      <div style="margin-bottom:12px"><span style="font-size:.72rem;color:var(--text3)">มูลค่า (เพชร)</span><div style="background:rgba(0,0,0,.3);border:1px solid var(--metal-mid);padding:8px;margin-top:4px">40,000</div></div>
+      <div style="text-align:right"><span class="btn-mock btn-p">สร้างรายการ</span></div>
+    </div>
+  </div>
+  <div class="note">ระบบจะส่ง Notification "new_item" ให้สมาชิกทุกคนอัตโนมัติ + เริ่มนับเวลา 1 ชั่วโมง</div>
+</div>
+
+<div class="arrow">↓</div>
+
+<!-- ==================== STEP 2 ==================== -->
+<div class="step">
+  <div class="step-header">
+    <div class="step-num system">2</div>
+    <div><div class="step-role system">ระบบ</div><div class="step-title">Notification ถูกส่งให้ทุกคน</div></div>
+  </div>
+  <div class="mock">
+    <div class="mock-page">Sidebar: แถบ "แจ้งเตือน" แสดง badge</div>
+    <div class="nav-mock">
+      <div class="nav-mock-item">📊 Dashboard</div>
+      <div class="nav-mock-item active">🔔 แจ้งเตือน <span class="nav-badge">2</span></div>
+      <div class="nav-mock-item">👥 สมาชิก</div>
+    </div>
+  </div>
+  <div class="mock">
+    <div class="mock-page">Login Popup (สมาชิก login ครั้งแรก)</div>
+    <div class="modal-mock">
+      <div style="font-weight:700;margin-bottom:12px">📦 คุณมีรายการรอส่งรูป!</div>
+      <div class="item-card">
+        <div><strong>เสื้อบอส สมรภูมิ</strong><br><span style="color:var(--gold);font-size:.8rem">40,000 เพชร</span></div>
+        <span style="color:var(--green);font-size:.7rem">เหลือ 58 นาที</span>
+      </div>
+      <div style="text-align:center;margin-top:12px">
+        <span class="btn-mock btn-p">ไปส่งรูปเลย</span>
+        <span class="btn-mock btn-g" style="margin-left:8px">ไว้ทีหลัง</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="arrow">↓</div>
+
+<!-- ==================== STEP 3 ==================== -->
+<div class="step">
+  <div class="step-header">
+    <div class="step-num member">3</div>
+    <div><div class="step-role member">สมาชิก / Admin (ทุก role)</div><div class="step-title">ดูรายการในแท็บ "รายการ"</div></div>
+  </div>
+  <div class="mock">
+    <div class="mock-page">หน้า: แจ้งเตือน → แท็บ "รายการ"</div>
+    <div class="tabs-mock">
+      <div class="tab-mock active">📦 รายการ <span class="badge badge-green" style="font-size:.6rem">2</span></div>
+      <div class="tab-mock">ℹ️ ระบบ</div>
+      <div class="tab-mock">🔔 ทั้งหมด</div>
+    </div>
+
+    <div style="font-weight:700;font-size:.85rem;margin-bottom:8px">📦 รายการรอส่งรูป</div>
+
+    <!-- Item 1: ยังไม่ส่ง -->
+    <div class="item-card" style="cursor:pointer">
+      <div>
+        <strong>เสื้อบอส สมรภูมิ</strong><br>
+        <span style="color:var(--gold);font-size:.8rem">40,000 เพชร</span>
+        <span style="font-size:.7rem;color:var(--text3);margin-left:8px">14 มี.ค. 2569 · iitoonx</span><br>
+        <span style="font-size:.7rem;color:var(--text3)">ส่งแล้ว 0 · อนุมัติ 0</span>
+      </div>
+      <div style="text-align:right">
+        <span class="badge badge-yellow">PENDING</span><br>
+        <span class="btn-mock btn-p" style="margin-top:6px;font-size:.65rem">ส่งรูป</span>
+      </div>
+    </div>
+    <div class="note" style="font-size:.72rem">คลิกที่รายการ → เปิด Modal ดูรายละเอียด + รายชื่อคนส่ง</div>
+  </div>
+</div>
+
+<div class="arrow">↓</div>
+
+<!-- ==================== STEP 4 ==================== -->
+<div class="step">
+  <div class="step-header">
+    <div class="step-num member">4</div>
+    <div><div class="step-role member">สมาชิก / Admin</div><div class="step-title">อัพโหลดรูป</div></div>
+  </div>
+  <div class="mock">
+    <div class="mock-page">กดปุ่ม "ส่งรูป" → Modal อัพโหลด</div>
+    <div class="modal-mock">
+      <div style="font-weight:700;margin-bottom:12px;color:var(--gold2)">อัพโหลดรูป: เสื้อบอส สมรภูมิ</div>
+      <div style="border:1px dashed var(--metal-mid);padding:30px;text-align:center;margin-bottom:12px">
+        <div style="color:var(--text3);font-size:.8rem">📷 เลือกรูปภาพ</div>
+        <div style="font-size:.65rem;color:var(--text3);margin-top:4px">รูปจะถูก resize อัตโนมัติ</div>
+      </div>
+      <div style="text-align:right">
+        <span class="btn-mock btn-g">ยกเลิก</span>
+        <span class="btn-mock btn-p" style="margin-left:8px">ส่งรูป</span>
+      </div>
+    </div>
+  </div>
+  <div class="note success">ส่งรูปสำเร็จ → สถานะเปลี่ยนเป็น "รอตรวจ" + ส่ง notification ให้ admin</div>
+</div>
+
+<div class="arrow">↓</div>
+
+<!-- ==================== STEP 5 ==================== -->
+<div class="step">
+  <div class="step-header">
+    <div class="step-num member">5</div>
+    <div><div class="step-role member">สมาชิก / Admin</div><div class="step-title">สถานะหลังส่งรูป (แก้ไข / รอตรวจ)</div></div>
+  </div>
+  <div class="mock">
+    <div class="mock-page">หน้า: แจ้งเตือน → แท็บ "รายการ" (หลังส่งรูปแล้ว)</div>
+
+    <div class="item-card">
+      <div>
+        <strong>เสื้อบอส สมรภูมิ</strong><br>
+        <span style="color:var(--gold);font-size:.8rem">40,000 เพชร</span><br>
+        <span style="font-size:.7rem;color:var(--text3)">ส่งแล้ว 5 · อนุมัติ 2</span>
+      </div>
+      <div style="text-align:right">
+        <span class="badge badge-yellow">PENDING</span><br>
+        <span style="color:var(--yellow);font-size:.7rem">รอตรวจ</span>
+        <span class="btn-mock btn-g" style="font-size:.65rem;margin-left:4px">แก้ไข</span>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <div style="font-size:.78rem;color:var(--text2);margin-bottom:8px">กรณีต่างๆ:</div>
+    <table style="width:100%;font-size:.75rem;border-collapse:collapse">
+      <tr style="border-bottom:1px solid var(--metal-dark)">
+        <td style="padding:8px;color:var(--text3)">ยังไม่ส่ง + ยังไม่หมดเวลา</td>
+        <td style="padding:8px;text-align:right"><span class="btn-mock btn-p" style="font-size:.62rem">ส่งรูป</span></td>
+      </tr>
+      <tr style="border-bottom:1px solid var(--metal-dark)">
+        <td style="padding:8px;color:var(--yellow)">ส่งแล้ว รอตรวจ (ยังไม่หมดเวลา)</td>
+        <td style="padding:8px;text-align:right"><span class="btn-mock btn-g" style="font-size:.62rem">แก้ไข</span></td>
+      </tr>
+      <tr style="border-bottom:1px solid var(--metal-dark)">
+        <td style="padding:8px;color:var(--green)">อนุมัติแล้ว</td>
+        <td style="padding:8px;text-align:right"><span class="badge badge-green">อนุมัติแล้ว</span></td>
+      </tr>
+      <tr style="border-bottom:1px solid var(--metal-dark)">
+        <td style="padding:8px;color:var(--red)">ถูกปฏิเสธ</td>
+        <td style="padding:8px;text-align:right"><span class="btn-mock btn-p" style="font-size:.62rem">ส่งใหม่</span></td>
+      </tr>
+      <tr>
+        <td style="padding:8px;color:var(--text3)">ยังไม่ส่ง + หมดเวลาแล้ว</td>
+        <td style="padding:8px;text-align:right;color:var(--text3);font-size:.7rem">ปิดรับแล้ว</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<div class="arrow">↓</div>
+
+<!-- ==================== STEP 6 ==================== -->
+<div class="step">
+  <div class="step-header">
+    <div class="step-num member">6</div>
+    <div><div class="step-role member">ทุก role</div><div class="step-title">คลิกดูรายละเอียดรายการ</div></div>
+  </div>
+  <div class="mock">
+    <div class="mock-page">คลิกที่รายการ → Modal รายละเอียด</div>
+    <div class="modal-mock">
+      <div style="font-weight:700;margin-bottom:16px;color:var(--gold2);border-bottom:1px solid var(--metal-dark);padding-bottom:12px">เสื้อบอส สมรภูมิ</div>
+      <div class="flex between center" style="margin-bottom:16px">
+        <div>
+          <span style="color:var(--gold);font-size:1.1rem;font-weight:900">40,000 เพชร</span><br>
+          <span style="font-size:.72rem;color:var(--text3)">14 มี.ค. 2569 · สร้างโดย iitoonx</span>
+        </div>
+        <div style="text-align:right">
+          <span class="badge badge-yellow">PENDING</span><br>
+          <span style="font-size:.72rem;color:var(--text3)">ส่งแล้ว 7 · อนุมัติ 3</span>
+        </div>
+      </div>
+      <div style="font-weight:700;font-size:.82rem;margin-bottom:8px;color:var(--gold2)">รายชื่อผู้ส่งรูป</div>
+      <div style="border:1px solid var(--metal-dark)">
+        <div class="sub-row">
+          <div class="sub-thumb">📷</div>
+          <div style="flex:1"><strong style="font-size:.82rem">DarkKnight</strong><br><span style="font-size:.68rem;color:var(--text3)">14 มี.ค. 06:00</span></div>
+          <span class="badge badge-green">อนุมัติ</span>
+        </div>
+        <div class="sub-row">
+          <div class="sub-thumb">📷</div>
+          <div style="flex:1"><strong style="font-size:.82rem">ShadowFox</strong><br><span style="font-size:.68rem;color:var(--text3)">14 มี.ค. 06:30</span></div>
+          <span class="badge badge-green">อนุมัติ</span>
+        </div>
+        <div class="sub-row">
+          <div class="sub-thumb">📷</div>
+          <div style="flex:1"><strong style="font-size:.82rem">IceQueen</strong><br><span style="font-size:.68rem;color:var(--text3)">14 มี.ค. 01:30</span></div>
+          <span class="badge badge-yellow">รอตรวจ</span>
+        </div>
+        <div class="sub-row">
+          <div class="sub-thumb">📷</div>
+          <div style="flex:1"><strong style="font-size:.82rem">FireStorm</strong><br><span style="font-size:.68rem;color:var(--text3)">14 มี.ค. 02:15</span></div>
+          <span class="badge badge-yellow">รอตรวจ</span>
+        </div>
+        <div class="sub-row">
+          <div class="sub-thumb">📷</div>
+          <div style="flex:1"><strong style="font-size:.82rem">EarthShaker</strong><br><span style="font-size:.68rem;color:var(--text3)">14 มี.ค. 07:45</span></div>
+          <span class="badge badge-red">ปฏิเสธ</span>
+        </div>
+      </div>
+      <div style="text-align:right;margin-top:12px"><span class="btn-mock btn-g">ปิด</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="arrow">↓</div>
+
+<!-- ==================== STEP 7 ==================== -->
+<div class="step">
+  <div class="step-header">
+    <div class="step-num admin">7</div>
+    <div><div class="step-role admin">Admin</div><div class="step-title">ตรวจสอบ Submissions (Approve / Reject)</div></div>
+  </div>
+  <div class="mock">
+    <div class="mock-page">หน้า: แจกรางวัล → ตาราง Items → กดปุ่ม "ตรวจสอบ"</div>
+    <div class="modal-mock">
+      <div style="font-weight:700;margin-bottom:12px;color:var(--gold2);border-bottom:1px solid var(--metal-dark);padding-bottom:12px">ตรวจสอบรายการ: เสื้อบอส สมรภูมิ</div>
+      <div class="flex gap" style="margin-bottom:12px">
+        <span class="btn-mock btn-s" style="font-size:.62rem">อนุมัติทั้งหมด</span>
+        <span class="btn-mock btn-d" style="font-size:.62rem">ปฏิเสธทั้งหมด</span>
+      </div>
+      <div style="border:1px solid var(--metal-dark)">
+        <div class="sub-row">
+          <div class="sub-thumb">📷</div>
+          <div style="flex:1"><strong>IceQueen</strong></div>
+          <span class="btn-mock btn-s" style="font-size:.6rem">อนุมัติ</span>
+          <span class="btn-mock btn-d" style="font-size:.6rem;margin-left:4px">ปฏิเสธ</span>
+        </div>
+        <div class="sub-row">
+          <div class="sub-thumb">📷</div>
+          <div style="flex:1"><strong>FireStorm</strong></div>
+          <span class="btn-mock btn-s" style="font-size:.6rem">อนุมัติ</span>
+          <span class="btn-mock btn-d" style="font-size:.6rem;margin-left:4px">ปฏิเสธ</span>
+        </div>
+      </div>
+      <div style="text-align:right;margin-top:12px">
+        <span class="btn-mock btn-g">ปิด</span>
+        <span class="btn-mock btn-r" style="margin-left:8px">แจกรางวัล</span>
+      </div>
+    </div>
+  </div>
+  <div class="note">Admin กด "อนุมัติ" ทีละคน หรือ "อนุมัติทั้งหมด" → สถานะ submission เปลี่ยนเป็น approved</div>
+</div>
+
+<div class="arrow">↓</div>
+
+<!-- ==================== STEP 8 ==================== -->
+<div class="step">
+  <div class="step-header">
+    <div class="step-num admin">8</div>
+    <div><div class="step-role admin">Admin</div><div class="step-title">แจกรางวัล (Distribute) → สถานะเป็น CONFIRMED</div></div>
+  </div>
+  <div class="mock">
+    <div class="mock-page">กดปุ่ม "แจกรางวัล" ใน Modal ตรวจสอบ</div>
+    <div class="note success" style="margin:0">ระบบคำนวณรางวัลตาม CP Tier ให้เฉพาะคนที่ approved → สร้าง Distribution → สถานะ Item เปลี่ยนเป็น "distributed"</div>
+  </div>
+  <div class="mock" style="margin-top:12px">
+    <div class="mock-page">หน้า: แจ้งเตือน → แท็บ "รายการ" (หลังแจกรางวัลแล้ว)</div>
+    <div class="item-card">
+      <div>
+        <strong>เสื้อบอส สมรภูมิ</strong><br>
+        <span style="color:var(--gold);font-size:.8rem">40,000 เพชร</span><br>
+        <span style="font-size:.7rem;color:var(--text3)">ส่งแล้ว 8 · อนุมัติ 8</span>
+      </div>
+      <div style="text-align:right">
+        <span class="badge badge-green">CONFIRMED</span><br>
+        <span class="badge badge-green" style="margin-top:4px">อนุมัติแล้ว</span>
+      </div>
+    </div>
+    <div class="item-card">
+      <div>
+        <strong>ดาบเทพ +15</strong><br>
+        <span style="color:var(--gold);font-size:.8rem">25,000 เพชร</span><br>
+        <span style="font-size:.7rem;color:var(--text3)">ส่งแล้ว 3 · อนุมัติ 1</span>
+      </div>
+      <div style="text-align:right">
+        <span class="badge badge-yellow">PENDING</span><br>
+        <span style="color:var(--yellow);font-size:.7rem">รอตรวจ</span>
+        <span class="btn-mock btn-g" style="font-size:.62rem;margin-left:4px">แก้ไข</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="arrow">↓</div>
+
+<!-- ==================== STEP 9 ==================== -->
+<div class="step">
+  <div class="step-header">
+    <div class="step-num system">9</div>
+    <div><div class="step-role system">สรุป</div><div class="step-title">คลิกดูรายการ CONFIRMED</div></div>
+  </div>
+  <div class="mock">
+    <div class="mock-page">คลิกรายการที่ CONFIRMED → Modal รายละเอียด</div>
+    <div class="modal-mock">
+      <div style="font-weight:700;margin-bottom:16px;color:var(--gold2);border-bottom:1px solid var(--metal-dark);padding-bottom:12px">เสื้อบอส สมรภูมิ</div>
+      <div class="flex between center" style="margin-bottom:16px">
+        <div>
+          <span style="color:var(--gold);font-size:1.1rem;font-weight:900">40,000 เพชร</span><br>
+          <span style="font-size:.72rem;color:var(--text3)">14 มี.ค. 2569 · สร้างโดย iitoonx</span>
+        </div>
+        <div style="text-align:right">
+          <span class="badge badge-green">CONFIRMED</span><br>
+          <span style="font-size:.72rem;color:var(--text3)">ส่งแล้ว 8 · อนุมัติ 8</span>
+        </div>
+      </div>
+      <div style="font-weight:700;font-size:.82rem;margin-bottom:8px;color:var(--gold2)">รายชื่อผู้ส่งรูป</div>
+      <div style="border:1px solid var(--metal-dark)">
+        <div class="sub-row"><div class="sub-thumb">📷</div><div style="flex:1"><strong style="font-size:.82rem">DarkKnight</strong></div><span class="badge badge-green">อนุมัติ</span></div>
+        <div class="sub-row"><div class="sub-thumb">📷</div><div style="flex:1"><strong style="font-size:.82rem">ShadowFox</strong></div><span class="badge badge-green">อนุมัติ</span></div>
+        <div class="sub-row"><div class="sub-thumb">📷</div><div style="flex:1"><strong style="font-size:.82rem">IceQueen</strong></div><span class="badge badge-green">อนุมัติ</span></div>
+        <div class="sub-row"><div class="sub-thumb">📷</div><div style="flex:1"><strong style="font-size:.82rem">FireStorm</strong></div><span class="badge badge-green">อนุมัติ</span></div>
+        <div class="sub-row"><div class="sub-thumb">📷</div><div style="flex:1"><strong style="font-size:.82rem">ThunderBolt</strong></div><span class="badge badge-green">อนุมัติ</span></div>
+        <div class="sub-row"><div class="sub-thumb">📷</div><div style="flex:1"><strong style="font-size:.82rem">MoonWalker</strong></div><span class="badge badge-green">อนุมัติ</span></div>
+        <div class="sub-row"><div class="sub-thumb">📷</div><div style="flex:1"><strong style="font-size:.82rem">StarLight</strong></div><span class="badge badge-green">อนุมัติ</span></div>
+        <div class="sub-row"><div class="sub-thumb">📷</div><div style="flex:1"><strong style="font-size:.82rem">WindRunner</strong></div><span class="badge badge-green">อนุมัติ</span></div>
+      </div>
+      <div style="text-align:right;margin-top:12px"><span class="btn-mock btn-g">ปิด</span></div>
+    </div>
+  </div>
+</div>
+
+<div style="margin:30px 0;padding:20px;border:2px solid var(--gold);background:rgba(201,165,74,.06);text-align:center">
+  <div style="font-weight:700;color:var(--gold2);font-size:1rem;margin-bottom:8px">Flow Summary</div>
+  <div style="font-size:.82rem;color:var(--text2);line-height:1.8">
+    <strong style="color:var(--purple)">Admin</strong> สร้างรายการ →
+    <strong style="color:var(--gold)">ระบบ</strong> ส่ง Notification →
+    <strong style="color:var(--blue)">สมาชิก</strong> อัพโหลดรูป →<br>
+    <strong style="color:var(--purple)">Admin</strong> ตรวจสอบ (Approve/Reject) →
+    <strong style="color:var(--purple)">Admin</strong> กดแจกรางวัล →
+    <strong style="color:var(--green)">CONFIRMED</strong>
+  </div>
+  <div style="margin-top:12px;font-size:.75rem;color:var(--text3)">
+    สถานะรายการ: <span class="badge badge-yellow">PENDING</span> → <span class="badge badge-green">CONFIRMED</span>
+  </div>
+</div>
+
+</body>
+</html>
