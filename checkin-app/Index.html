@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Sarabun:wght@300;400;600;700&display=swap');
+
+    :root {
+      --red-50: #fef2f2;
+      --red-100: #fee2e2;
+      --red-200: #fecaca;
+      --red-300: #fca5a5;
+      --red-400: #f87171;
+      --red-500: #ef4444;
+      --red-600: #dc2626;
+      --red-700: #b91c1c;
+      --red-800: #991b1b;
+      --red-900: #7f1d1d;
+      --white: #ffffff;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-400: #9ca3af;
+      --gray-500: #6b7280;
+      --gray-600: #4b5563;
+      --gray-700: #374151;
+      --gray-800: #1f2937;
+      --gray-900: #111827;
+      --gold: #f59e0b;
+      --gold-light: #fef3c7;
+      --green-500: #22c55e;
+      --green-600: #16a34a;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Sarabun', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-800);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ===== HEADER ===== */
+    .header {
+      background: linear-gradient(135deg, var(--red-700) 0%, var(--red-600) 50%, var(--red-500) 100%);
+      color: var(--white);
+      padding: 16px 16px 14px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 20px rgba(185, 28, 28, 0.3);
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .brand-logo {
+      width: 32px;
+      height: 32px;
+      background: var(--white);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--red-600);
+      font-family: 'Inter', sans-serif;
+      letter-spacing: -1px;
+      flex-shrink: 0;
+    }
+
+    .brand-text {
+      font-family: 'Inter', sans-serif;
+      font-weight: 800;
+      font-size: 15px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      opacity: 0.95;
+    }
+
+    .header-event {
+      text-align: center;
+      font-size: 13px;
+      opacity: 0.85;
+      font-weight: 400;
+      margin-bottom: 12px;
+    }
+
+    .stats-row {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .stat-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 24px;
+      padding: 6px 14px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .stat-pill .stat-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .stat-pill .stat-dot.green { background: var(--green-500); box-shadow: 0 0 6px rgba(34,197,94,0.5); }
+    .stat-pill .stat-dot.waiting { background: rgba(255,255,255,0.5); }
+
+    .stat-pill .stat-num {
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    /* ===== SEARCH ===== */
+    .search-section {
+      padding: 12px 16px;
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-200);
+      position: sticky;
+      top: 94px;
+      z-index: 99;
+    }
+
+    .search-wrap {
+      position: relative;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gray-400);
+      font-size: 16px;
+      pointer-events: none;
+    }
+
+    .search-wrap input {
+      width: 100%;
+      padding: 12px 16px 12px 42px;
+      border: 2px solid var(--gray-200);
+      border-radius: 14px;
+      font-size: 15px;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.2s;
+      background: var(--gray-50);
+      color: var(--gray-800);
+    }
+
+    .search-wrap input:focus {
+      border-color: var(--red-400);
+      background: var(--white);
+      box-shadow: 0 0 0 3px var(--red-100);
+    }
+
+    .search-wrap input::placeholder { color: var(--gray-400); }
+
+    /* ===== FILTER TABS ===== */
+    .filter-bar {
+      display: flex;
+      padding: 10px 16px;
+      gap: 8px;
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-200);
+      position: sticky;
+      top: 152px;
+      z-index: 98;
+    }
+
+    .ftab {
+      flex: 1;
+      padding: 10px 4px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 600;
+      border: 2px solid var(--gray-200);
+      background: var(--white);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: var(--gray-500);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .ftab:active { transform: scale(0.97); }
+
+    .ftab.active {
+      border-color: var(--red-600);
+      background: var(--red-600);
+      color: var(--white);
+    }
+
+    .ftab .ftab-count {
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .ftab.active .ftab-count { color: var(--white); }
+
+    /* ===== CARDS ===== */
+    .cards {
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding-bottom: 60px;
+    }
+
+    .card {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      border: 1px solid var(--gray-200);
+      overflow: hidden;
+      transition: all 0.3s;
+      position: relative;
+    }
+
+    .card.is-checked {
+      border-color: var(--green-500);
+      box-shadow: 0 1px 3px rgba(34,197,94,0.15), 0 0 0 1px rgba(34,197,94,0.1);
+    }
+
+    /* -- Visited indicator strip -- */
+    .card-strip {
+      height: 4px;
+      width: 100%;
+    }
+
+    .card-strip.newcomer {
+      background: linear-gradient(90deg, var(--red-500), var(--red-400), var(--red-500));
+      animation: shimmer 2s infinite;
+    }
+
+    .card-strip.veteran {
+      background: linear-gradient(90deg, var(--gold), #fbbf24, var(--gold));
+    }
+
+    @keyframes shimmer {
+      0%,100% { opacity: 0.7; }
+      50% { opacity: 1; }
+    }
+
+    .card-body {
+      padding: 14px 16px;
+    }
+
+    .card-row-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .card-identity {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .card-name {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--gray-900);
+      line-height: 1.3;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .visited-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 6px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .visited-badge.veteran {
+      background: var(--gold-light);
+      color: #92400e;
+      border: 1px solid #fde68a;
+    }
+
+    .visited-badge.newcomer {
+      background: var(--red-100);
+      color: var(--red-700);
+      border: 1px solid var(--red-200);
+    }
+
+    .card-member-id {
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      color: var(--gray-400);
+      margin-top: 2px;
+      font-weight: 500;
+    }
+
+    .card-order-num {
+      background: var(--gray-100);
+      color: var(--gray-600);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 10px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .card.is-checked .card-order-num {
+      background: #dcfce7;
+      color: var(--green-600);
+    }
+
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-bottom: 14px;
+    }
+
+    .tag {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 8px;
+      white-space: nowrap;
+    }
+
+    .tag.t-applicant { background: #dbeafe; color: #1e40af; }
+    .tag.t-follower { background: #ffedd5; color: #9a3412; }
+    .tag.t-channel { background: #f3e8ff; color: #6b21a8; }
+    .tag.t-shirt { background: var(--red-100); color: var(--red-700); }
+    .tag.t-phone { background: var(--gray-100); color: var(--gray-600); }
+    .tag.t-confirmed { background: #dcfce7; color: #166534; }
+    .tag.t-unconfirmed { background: var(--red-100); color: var(--red-700); }
+
+    /* -- Check-in action row -- */
+    .card-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-top: 12px;
+      border-top: 1px solid var(--gray-100);
+    }
+
+    /* Custom checkbox */
+    .checkin-toggle {
+      position: relative;
+      width: 52px;
+      height: 52px;
+      flex-shrink: 0;
+    }
+
+    .checkin-toggle input {
+      position: absolute;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+      z-index: 2;
+      margin: 0;
+    }
+
+    .checkin-box {
+      width: 52px;
+      height: 52px;
+      border: 3px solid var(--gray-300);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      background: var(--white);
+      position: relative;
+    }
+
+    .checkin-box::after {
+      content: '';
+      width: 20px;
+      height: 10px;
+      border-left: 3.5px solid transparent;
+      border-bottom: 3.5px solid transparent;
+      transform: rotate(-45deg) scale(0);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      margin-top: -4px;
+    }
+
+    .checkin-toggle input:checked + .checkin-box {
+      background: var(--green-500);
+      border-color: var(--green-500);
+      box-shadow: 0 2px 8px rgba(34,197,94,0.3);
+    }
+
+    .checkin-toggle input:checked + .checkin-box::after {
+      border-left-color: var(--white);
+      border-bottom-color: var(--white);
+      transform: rotate(-45deg) scale(1);
+    }
+
+    .checkin-toggle input:not(:checked):hover + .checkin-box {
+      border-color: var(--red-400);
+    }
+
+    .checkin-toggle.processing .checkin-box {
+      border-color: var(--gray-300);
+      background: var(--gray-100);
+      animation: pulse-box 1s infinite;
+    }
+
+    @keyframes pulse-box {
+      0%,100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .checkin-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .checkin-label {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--gray-500);
+    }
+
+    .checkin-label.done {
+      color: var(--green-600);
+    }
+
+    .checkin-time {
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      color: var(--gray-400);
+      margin-top: 1px;
+    }
+
+    /* Table number input */
+    .table-input-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      flex-shrink: 0;
+    }
+
+    .table-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--gray-400);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .table-input {
+      width: 52px;
+      height: 44px;
+      text-align: center;
+      font-family: 'Inter', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      border: 2px solid var(--gray-200);
+      border-radius: 12px;
+      outline: none;
+      color: var(--gray-800);
+      background: var(--gray-50);
+      transition: all 0.2s;
+      padding: 0;
+    }
+
+    .table-input:focus {
+      border-color: var(--red-500);
+      background: var(--white);
+      box-shadow: 0 0 0 3px var(--red-100);
+    }
+
+    .table-input.has-value {
+      border-color: var(--red-500);
+      background: var(--red-50);
+      color: var(--red-700);
+    }
+
+    /* ===== STATES ===== */
+    .loading-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--gray-400);
+    }
+
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid var(--red-100);
+      border-top-color: var(--red-500);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .no-results {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--gray-400);
+      font-size: 15px;
+    }
+
+    /* ===== REFRESH INDICATOR ===== */
+    .refresh-dot {
+      position: fixed;
+      bottom: 16px;
+      right: 16px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--green-500);
+      box-shadow: 0 0 8px rgba(34,197,94,0.5);
+      opacity: 0;
+      transition: opacity 0.3s;
+      z-index: 200;
+    }
+
+    .refresh-dot.show { opacity: 1; }
+
+    /* ===== UNDO BUTTON ===== */
+    .btn-undo-small {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--gray-400);
+      background: none;
+      border: 1px solid var(--gray-200);
+      border-radius: 8px;
+      padding: 4px 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn-undo-small:active {
+      background: var(--red-500);
+      color: var(--white);
+      border-color: var(--red-500);
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (min-width: 600px) {
+      .cards {
+        max-width: 540px;
+        margin: 0 auto;
+      }
+    }
+
+    @media (min-width: 900px) {
+      .cards {
+        max-width: 800px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-brand">
+      <div class="brand-logo">L+</div>
+      <div class="brand-text">Lottery Plus</div>
+    </div>
+    <div class="header-event">ท้าพิสูจน์รางวัลที่ 1 — Event Check-in</div>
+    <div class="stats-row">
+      <div class="stat-pill">
+        <span class="stat-dot green"></span>
+        มาแล้ว <span class="stat-num" id="stat-in">0</span>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-dot waiting"></span>
+        รอ <span class="stat-num" id="stat-wait">0</span>
+      </div>
+      <div class="stat-pill">
+        ทั้งหมด <span class="stat-num" id="stat-total">0</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEARCH -->
+  <div class="search-section">
+    <div class="search-wrap">
+      <span class="search-icon">&#128269;</span>
+      <input type="text" id="searchInput" placeholder="ค้นหาชื่อ, เบอร์โทร, รหัสสมาชิก..." autocomplete="off">
+    </div>
+  </div>
+
+  <!-- FILTER -->
+  <div class="filter-bar">
+    <button class="ftab active" data-filter="all">ทั้งหมด <span class="ftab-count" id="c-all">0</span></button>
+    <button class="ftab" data-filter="pending">ยังไม่มา <span class="ftab-count" id="c-pending">0</span></button>
+    <button class="ftab" data-filter="checked">มาแล้ว <span class="ftab-count" id="c-checked">0</span></button>
+  </div>
+
+  <!-- CARDS -->
+  <div class="cards" id="cardsContainer">
+    <div class="loading-state">
+      <div class="loading-spinner"></div>
+      <div>กำลังโหลดข้อมูล...</div>
+    </div>
+  </div>
+
+  <div class="refresh-dot" id="refreshDot"></div>
+
+  <script>
+    var attendees = [];
+    var currentFilter = 'all';
+    var searchQuery = '';
+    var isProcessing = {};
+    var tableDebounce = {};
+
+    // ===== INIT =====
+    document.addEventListener('DOMContentLoaded', function() {
+      loadData();
+      setInterval(function() { loadData(true); }, 5000);
+
+      document.getElementById('searchInput').addEventListener('input', function() {
+        searchQuery = this.value.trim().toLowerCase();
+        renderCards();
+      });
+
+      document.querySelectorAll('.ftab').forEach(function(tab) {
+        tab.addEventListener('click', function() {
+          document.querySelectorAll('.ftab').forEach(function(t) { t.classList.remove('active'); });
+          this.classList.add('active');
+          currentFilter = this.getAttribute('data-filter');
+          renderCards();
+        });
+      });
+    });
+
+    // ===== DATA =====
+    function loadData(silent) {
+      google.script.run
+        .withSuccessHandler(function(data) {
+          attendees = data || [];
+          updateStats();
+          renderCards();
+          if (silent) {
+            var dot = document.getElementById('refreshDot');
+            dot.classList.add('show');
+            setTimeout(function() { dot.classList.remove('show'); }, 600);
+          }
+        })
+        .withFailureHandler(function(err) {
+          console.error('Load error:', err);
+        })
+        .getAttendees();
+    }
+
+    // ===== STATS =====
+    function updateStats() {
+      var total = attendees.length;
+      var checked = 0;
+      for (var i = 0; i < attendees.length; i++) {
+        if (attendees[i].checkinStatus === 'เช็คอินแล้ว') checked++;
+      }
+      document.getElementById('stat-in').textContent = checked;
+      document.getElementById('stat-wait').textContent = total - checked;
+      document.getElementById('stat-total').textContent = total;
+      document.getElementById('c-all').textContent = total;
+      document.getElementById('c-pending').textContent = total - checked;
+      document.getElementById('c-checked').textContent = checked;
+    }
+
+    // ===== RENDER =====
+    function renderCards() {
+      var container = document.getElementById('cardsContainer');
+      var filtered = attendees.filter(function(a) {
+        if (currentFilter === 'pending' && a.checkinStatus === 'เช็คอินแล้ว') return false;
+        if (currentFilter === 'checked' && a.checkinStatus !== 'เช็คอินแล้ว') return false;
+        if (searchQuery) {
+          var hay = (a.name + ' ' + a.phone + ' ' + a.memberId).toLowerCase();
+          return hay.indexOf(searchQuery) !== -1;
+        }
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<div class="no-results">ไม่พบข้อมูล</div>';
+        return;
+      }
+
+      var html = '';
+      for (var i = 0; i < filtered.length; i++) {
+        var a = filtered[i];
+        var isChecked = a.checkinStatus === 'เช็คอินแล้ว';
+        var busy = isProcessing[a.rowNum];
+
+        // Visited indicator
+        var isVeteran = a.visited && (a.visited.indexOf('เคย') !== -1 || a.visited === 'ใช่' || a.visited === 'Y' || a.visited === 'Yes');
+        var stripClass = isVeteran ? 'veteran' : 'newcomer';
+        var badgeClass = isVeteran ? 'veteran' : 'newcomer';
+        var badgeIcon = isVeteran ? '&#9733;' : '&#10022;';
+        var badgeText = isVeteran ? 'มาแล้ว' : 'มาครั้งแรก';
+
+        // Type
+        var typeClass = '';
+        if (a.type.indexOf('ผู้สมัคร') !== -1) typeClass = 't-applicant';
+        else if (a.type.indexOf('ติดตาม') !== -1) typeClass = 't-follower';
+
+        // Confirmed
+        var confClass = '';
+        if (a.confirmed && a.confirmed !== '') {
+          confClass = (a.confirmed.indexOf('ยืนยัน') !== -1 || a.confirmed === 'ใช่') ? 't-confirmed' : 't-unconfirmed';
+        }
+
+        // Table value
+        var tableVal = (a.tableNo && a.tableNo !== 'undefined' && a.tableNo.trim() !== '') ? a.tableNo.trim() : '';
+
+        html += '<div class="card ' + (isChecked ? 'is-checked' : '') + '">';
+        html += '  <div class="card-strip ' + stripClass + '"></div>';
+        html += '  <div class="card-body">';
+
+        // Top row
+        html += '    <div class="card-row-top">';
+        html += '      <div class="card-identity">';
+        html += '        <div class="card-name">';
+        html +=            esc(a.name);
+        html += '          <span class="visited-badge ' + badgeClass + '">' + badgeIcon + ' ' + badgeText + '</span>';
+        html += '        </div>';
+        html += '        <div class="card-member-id">ID: ' + esc(a.memberId) + '</div>';
+        html += '      </div>';
+        html += '      <div class="card-order-num">#' + esc(String(a.order)) + '</div>';
+        html += '    </div>';
+
+        // Tags
+        html += '    <div class="card-tags">';
+        if (a.type) html += '<span class="tag ' + typeClass + '">' + esc(a.type) + '</span>';
+        if (a.channel) html += '<span class="tag t-channel">' + esc(a.channel) + '</span>';
+        if (a.shirtSize) html += '<span class="tag t-shirt">' + esc(a.shirtSize) + '</span>';
+        if (a.phone) html += '<span class="tag t-phone">' + esc(a.phone) + '</span>';
+        if (confClass) html += '<span class="tag ' + confClass + '">' + esc(a.confirmed) + '</span>';
+        html += '    </div>';
+
+        // Actions row
+        html += '    <div class="card-actions">';
+
+        // Checkbox
+        html += '      <label class="checkin-toggle ' + (busy ? 'processing' : '') + '">';
+        html += '        <input type="checkbox" ' + (isChecked ? 'checked' : '') + ' onchange="toggleCheckIn(this, ' + a.rowNum + ')" ' + (busy ? 'disabled' : '') + '>';
+        html += '        <div class="checkin-box"></div>';
+        html += '      </label>';
+
+        // Info
+        html += '      <div class="checkin-info">';
+        if (isChecked) {
+          html += '        <div class="checkin-label done">เช็คอินแล้ว</div>';
+          if (a.checkinTime) html += '<div class="checkin-time">' + esc(a.checkinTime) + '</div>';
+          html += '        <button class="btn-undo-small" onclick="undoCheckIn(' + a.rowNum + ')" ' + (busy ? 'disabled' : '') + '>ยกเลิก</button>';
+        } else {
+          html += '        <div class="checkin-label">' + (busy ? 'กำลังบันทึก...' : 'ยังไม่เช็คอิน') + '</div>';
+        }
+        html += '      </div>';
+
+        // Table number
+        html += '      <div class="table-input-wrap">';
+        html += '        <span class="table-label">โต๊ะ</span>';
+        html += '        <input type="text" class="table-input ' + (tableVal ? 'has-value' : '') + '" maxlength="2" inputmode="numeric" pattern="[0-9]*" value="' + esc(tableVal) + '" onchange="saveTable(this, ' + a.rowNum + ')" oninput="formatTable(this)" placeholder="--">';
+        html += '      </div>';
+
+        html += '    </div>'; // card-actions
+        html += '  </div>'; // card-body
+        html += '</div>'; // card
+      }
+
+      container.innerHTML = html;
+    }
+
+    // ===== ACTIONS =====
+    function toggleCheckIn(el, rowNum) {
+      if (isProcessing[rowNum]) { el.checked = !el.checked; return; }
+
+      if (el.checked) {
+        doCheckIn(rowNum);
+      } else {
+        if (!confirm('ต้องการยกเลิกเช็คอินใช่หรือไม่?')) {
+          el.checked = true;
+          return;
+        }
+        doUndoCheckIn(rowNum);
+      }
+    }
+
+    function doCheckIn(rowNum) {
+      isProcessing[rowNum] = true;
+      renderCards();
+
+      // Get table value if filled
+      var tableVal = '';
+      for (var i = 0; i < attendees.length; i++) {
+        if (attendees[i].rowNum === rowNum) {
+          tableVal = attendees[i].tableNo || '';
+          break;
+        }
+      }
+
+      google.script.run
+        .withSuccessHandler(function(result) {
+          delete isProcessing[rowNum];
+          if (result && result.success) {
+            for (var i = 0; i < attendees.length; i++) {
+              if (attendees[i].rowNum === rowNum) {
+                attendees[i].checkinStatus = 'เช็คอินแล้ว';
+                attendees[i].checkinTime = result.time;
+                break;
+              }
+            }
+            updateStats();
+            renderCards();
+          }
+        })
+        .withFailureHandler(function(err) {
+          delete isProcessing[rowNum];
+          alert('เกิดข้อผิดพลาด: ' + err.message);
+          renderCards();
+        })
+        .checkIn(rowNum, tableVal);
+    }
+
+    function undoCheckIn(rowNum) {
+      if (isProcessing[rowNum]) return;
+      if (!confirm('ต้องการยกเลิกเช็คอินใช่หรือไม่?')) return;
+      doUndoCheckIn(rowNum);
+    }
+
+    function doUndoCheckIn(rowNum) {
+      isProcessing[rowNum] = true;
+      renderCards();
+
+      google.script.run
+        .withSuccessHandler(function(result) {
+          delete isProcessing[rowNum];
+          if (result && result.success) {
+            for (var i = 0; i < attendees.length; i++) {
+              if (attendees[i].rowNum === rowNum) {
+                attendees[i].checkinStatus = '';
+                attendees[i].checkinTime = '';
+                attendees[i].tableNo = '';
+                break;
+              }
+            }
+            updateStats();
+            renderCards();
+          }
+        })
+        .withFailureHandler(function(err) {
+          delete isProcessing[rowNum];
+          alert('เกิดข้อผิดพลาด: ' + err.message);
+          renderCards();
+        })
+        .undoCheckIn(rowNum);
+    }
+
+    function formatTable(el) {
+      el.value = el.value.replace(/[^0-9]/g, '').substring(0, 2);
+      if (el.value) {
+        el.classList.add('has-value');
+      } else {
+        el.classList.remove('has-value');
+      }
+    }
+
+    function saveTable(el, rowNum) {
+      var val = el.value.replace(/[^0-9]/g, '').substring(0, 2);
+      el.value = val;
+
+      // Update local
+      for (var i = 0; i < attendees.length; i++) {
+        if (attendees[i].rowNum === rowNum) {
+          attendees[i].tableNo = val;
+          break;
+        }
+      }
+
+      // Debounce save
+      if (tableDebounce[rowNum]) clearTimeout(tableDebounce[rowNum]);
+      tableDebounce[rowNum] = setTimeout(function() {
+        google.script.run
+          .withFailureHandler(function(err) {
+            console.error('Save table error:', err);
+          })
+          .setTableNo(rowNum, val);
+      }, 500);
+    }
+
+    function esc(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+  </script>
+
+</body>
+</html>
