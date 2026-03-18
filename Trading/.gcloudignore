@@ -1,0 +1,40 @@
+# Git
+.git
+.gitignore
+
+# Frontend node_modules (built in Docker)
+frontend/node_modules/
+node_modules/
+
+# Backend alternative (not used)
+backend/
+
+# Dev / test / docs
+tests/
+docs/
+scripts/
+*.md
+.env
+.env.*
+settings.json
+settings.example.json
+
+# Docker Compose (local dev only)
+docker-compose.yml
+docker-compose.*.yml
+
+# Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo

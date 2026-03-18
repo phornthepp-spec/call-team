@@ -1,0 +1,90 @@
+{
+  "trading": {
+    "symbol": "BTC/USDT",
+    "timeframe": "15m",
+    "evaluation_interval_seconds": 60,
+    "max_open_positions": 3,
+    "max_trades_per_day": 10
+  },
+
+  "strategy": {
+    "ema_fast": 9,
+    "ema_slow": 21,
+    "ema_trend": 50,
+    "ema_macro": 200,
+    "rsi_period": 14,
+    "macd_fast": 12,
+    "macd_slow": 26,
+    "macd_signal": 9,
+    "atr_period": 14,
+    "bb_period": 20,
+    "bb_std": 2.0,
+    "volume_ma_period": 20,
+    "volume_surge_multiplier": 1.5,
+    "min_confirmations": 3,
+    "min_confidence": 0.65,
+    "min_rr_ratio": 1.5,
+    "sl_atr_multiplier": 1.5,
+    "tp1_rr": 1.0,
+    "tp2_rr": 2.0,
+    "tp1_close_pct": 0.5,
+    "bars_lookback": 300
+  },
+
+  "risk": {
+    "risk_per_trade_pct": 1.5,
+    "daily_loss_limit_pct": 3.0,
+    "max_consecutive_losses": 3,
+    "min_balance_usd": 50.0,
+    "max_open_risk_pct": 5.0,
+    "warn_reduction_factor": 0.85,
+    "min_lot_reduction": 0.40
+  },
+
+  "market_guards": {
+    "max_spread_pct": 0.10,
+    "warn_spread_pct": 0.05,
+    "max_atr_spike_multiplier": 2.5,
+    "min_volume_ratio": 0.3,
+    "price_stale_seconds": 30
+  },
+
+  "cooldowns": {
+    "after_trade_seconds": 300,
+    "after_loss_seconds": 900,
+    "same_direction_seconds": 1800,
+    "after_consecutive_loss_seconds": 3600
+  },
+
+  "trailing_stop": {
+    "enabled": true,
+    "activation_rr": 0.8,
+    "trail_atr_multiplier": 0.5,
+    "check_interval_seconds": 15
+  },
+
+  "policy": {
+    "active_mode": "balanced",
+    "aggressive": {
+      "min_confidence": 0.55,
+      "min_rr_ratio": 1.2,
+      "risk_per_trade_pct": 2.0,
+      "daily_loss_limit_pct": 5.0,
+      "max_consecutive_losses": 5
+    },
+    "balanced": {
+      "min_confidence": 0.65,
+      "min_rr_ratio": 1.5,
+      "risk_per_trade_pct": 1.5,
+      "daily_loss_limit_pct": 3.0,
+      "max_consecutive_losses": 3
+    },
+    "conservative": {
+      "min_confidence": 0.78,
+      "min_rr_ratio": 2.0,
+      "risk_per_trade_pct": 0.5,
+      "daily_loss_limit_pct": 1.5,
+      "max_consecutive_losses": 2
+    }
+  }
+}

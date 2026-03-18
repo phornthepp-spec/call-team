@@ -1,0 +1,64 @@
+steps:
+  # Step 1: Build Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${_IMAGE}:${SHORT_SHA}'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${_IMAGE}:latest'
+      - '.'
+
+  # Step 2: Push to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - '--all-tags'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${_IMAGE}'
+
+  # Step 3: Deploy to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - '${_SERVICE}'
+      - '--image'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${_IMAGE}:${SHORT_SHA}'
+      - '--region'
+      - '${_REGION}'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--add-cloudsql-instances'
+      - '${PROJECT_ID}:${_REGION}:${_SQL_INSTANCE}'
+      - '--set-env-vars'
+      - 'INSTANCE_CONNECTION_NAME=${PROJECT_ID}:${_REGION}:${_SQL_INSTANCE},DB_USER=${_DB_USER},DB_NAME=${_DB_NAME},MT5_SIMULATION_MODE=true,LOG_FORMAT=json'
+      - '--set-secrets'
+      - 'DB_PASSWORD=db-password:latest'
+      - '--min-instances'
+      - '0'
+      - '--max-instances'
+      - '1'
+      - '--memory'
+      - '512Mi'
+      - '--cpu'
+      - '1'
+      - '--port'
+      - '8000'
+
+images:
+  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${_IMAGE}:${SHORT_SHA}'
+  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${_IMAGE}:latest'
+
+substitutions:
+  _REGION: asia-southeast1
+  _REPO: trading-repo
+  _IMAGE: trading-api
+  _SERVICE: trading-api
+  _SQL_INSTANCE: trading-db
+  _DB_USER: trading_user
+  _DB_NAME: trading
+
+options:
+  logging: CLOUD_LOGGING_ONLY

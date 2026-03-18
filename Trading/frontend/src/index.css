@@ -1,0 +1,92 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply bg-slate-900 text-white antialiased;
+  }
+
+  body {
+    @apply min-h-screen bg-slate-900 font-sans;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-slate-900;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-slate-700 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-slate-600;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-slate-800 border border-slate-700 rounded-xl p-5;
+  }
+
+  .card-compact {
+    @apply bg-slate-800 border border-slate-700 rounded-xl p-4;
+  }
+
+  .btn-primary {
+    @apply bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-danger {
+    @apply bg-red-600 hover:bg-red-700 text-white font-medium px-4 py-2 rounded-lg transition-colors duration-150;
+  }
+
+  .btn-outline {
+    @apply border border-slate-600 hover:border-slate-500 text-slate-300 hover:text-white font-medium px-4 py-2 rounded-lg transition-colors duration-150;
+  }
+
+  .input-dark {
+    @apply w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-150;
+  }
+
+  .badge-green {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-500/20 text-green-400;
+  }
+
+  .badge-red {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-500/20 text-red-400;
+  }
+
+  .badge-yellow {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-500/20 text-yellow-400;
+  }
+
+  .badge-blue {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-500/20 text-blue-400;
+  }
+
+  .table-dark {
+    @apply w-full text-sm text-left;
+  }
+
+  .table-dark thead {
+    @apply text-xs text-slate-400 uppercase border-b border-slate-700;
+  }
+
+  .table-dark th {
+    @apply px-4 py-3 font-medium;
+  }
+
+  .table-dark td {
+    @apply px-4 py-3;
+  }
+
+  .table-dark tbody tr {
+    @apply border-b border-slate-700/50 hover:bg-slate-700/30 transition-colors;
+  }
+}
